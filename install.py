@@ -67,7 +67,6 @@ class SpecteroInstaller:
         self.dotnet_script_name = "dotnet-install.sh"
         self.suppress_bash_tag = " >/dev/null 2>&1"
 
-        # Determine which release channel to download from.
         self.determine_channel()
 
         # Check to see if the installer needs updated or if there's a release for the channel.
@@ -143,13 +142,17 @@ class SpecteroInstaller:
             self.channel = "stable"
 
     def find_dotnet_framework(self):
-        dotnet_framework_path = subprocess.check_output(["which", "dotnet"])
-        if b'dotnet' in dotnet_framework_path:
-            self.dotnet_framework_path = dotnet_framework_path
-            return True
-        else:
+        try:
+            dotnet_framework_path = subprocess.check_output(["which", "dotnet"])
+            if b'dotnet' in dotnet_framework_path:
+                self.dotnet_framework_path = dotnet_framework_path
+                return True
+            else:
+                return False
+        except:
+            # Sometimes which will return `exit 1`
             return False
-
+            
     def download_dotnet_framework(self):
         if not self.execution_contains_cli_flag("--install-dotnet"):
             lines = [
