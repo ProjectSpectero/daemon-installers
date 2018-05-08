@@ -163,7 +163,7 @@ class SpecteroInstaller:
             return False
 
     def download_dotnet_framework(self):
-        if not self.execution_contains_cli_flag("--install-dotnet") and\
+        if not self.execution_contains_cli_flag("--install-dotnet") and \
                 not self.execution_contains_cli_flag("--no-prompt"):
             lines = [
                 ""
@@ -232,7 +232,7 @@ class SpecteroInstaller:
                 print("The installation path cannot be the root of the filesystem.")
 
             # if it is empty, they want the default installation path.
-            elif prompted_install_path== "":
+            elif prompted_install_path == "":
                 return
 
             # the user specified a path.
@@ -245,9 +245,8 @@ class SpecteroInstaller:
                             print("Created directory: %s" % self.spectero_install_path)
                             return
                     except:
-                        print("Failed to make the directory, please validate the path.")
+                        print("Failed to make the directory, please validate the path and ensure the parent directory exists.")
                         continue
-
 
     def prompt_install_ready(self):
         lines = [
