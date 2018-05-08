@@ -163,7 +163,7 @@ class SpecteroInstaller:
             return False
 
     def download_dotnet_framework(self):
-        if not self.execution_contains_cli_flag("--install-dotnet") or \
+        if not self.execution_contains_cli_flag("--install-dotnet") and\
                 not self.execution_contains_cli_flag("--no-prompt"):
             lines = [
                 ""
