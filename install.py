@@ -60,6 +60,7 @@ class SpecteroInstaller:
     def __init__(self):
         # Initialize Variables
         self.channel = None
+        self.channel_version = None
         self.release_data = None
         self.dotnet_framework_path = None
         self.spectero_releases_url = "https://spectero.com/releases.json"
@@ -281,17 +282,17 @@ class SpecteroInstaller:
         print("Getting releases from CI...")
         try:
             releases = self.get_spectero_releases()
-            channel_version = releases["channels"][self.channel]
+            self.channel_version = releases["channels"][self.channel]
 
-            print("Found %s release: %s" % (self.channel, channel_version))
-            channel_download_url = releases["versions"][channel_version]["download"]
-            channel_download_url_alt = releases["versions"][channel_version]["altDownload"]
+            print("Found %s release: %s" % (self.channel, self.channel_version))
+            channel_download_url = releases["versions"][self.channel_version]["download"]
+            channel_download_url_alt = releases["versions"][self.channel_version]["altDownload"]
 
-            projected_zip_path = ("/tmp/%s.zip" % channel_version)
+            projected_zip_path = ("/tmp/%s.zip" % self.channel_version)
 
             # Try to download from the primary mirror
             try:
-                print("Downloading %s from %s..." % (channel_version, channel_download_url))
+                print("Downloading %s from %s..." % (self.channel_version, channel_download_url))
                 with open(projected_zip_path, "wb") as zip:
                     for chunk in requests.get(channel_download_url).iter_content(chunk_size=1024):
                         zip.write(chunk)
@@ -301,7 +302,7 @@ class SpecteroInstaller:
 
                 # Try to download from the secondary
                 try:
-                    print("Downloading %s from %s..." % (channel_version, channel_download_url_alt))
+                    print("Downloading %s from %s..." % (self.channel_version, channel_download_url_alt))
                     with open(projected_zip_path, "wb") as zip:
                         for chunk in requests.get(channel_download_url_alt).iter_content(chunk_size=1024):
                             zip.write(chunk)
@@ -327,13 +328,8 @@ class SpecteroInstaller:
                 print("Removing old symlink...")
                 os.system("unlink " + self.spectero_install_path + "/latest")
 
-            print("Symlinking `latest` to version %s" % channel_version)
-            os.system("ln -s %s/%s %s/latest" %
-                      (
-                          self.spectero_install_path,
-                          channel_version,
-                          self.spectero_install_path
-                      ))
+            print("Symlinking `latest` to version %s" % self.channel_version)
+            os.system("ln -s %s/%s %s/latest" % (self.spectero_install_path, self.channel_version, self.spectero_install_path))
 
             try:
                 self.create_user_and_groups()
@@ -345,7 +341,14 @@ class SpecteroInstaller:
                 print(e2)
                 sys.exit(9)
 
-            self.systemd_service(self.spectero_install_path + "/" + channel_version + "/daemon")
+            # Create the service.
+            self.systemd_service(self.spectero_install_path + "/" + self.channel_version + "/daemon")
+
+            # Create the command
+            self.build_usr_sbin_script()
+
+            print("=" * 50)
+            print("Spectero should be installed and running!")
 
 
         except Exception as e:
@@ -392,8 +395,28 @@ class SpecteroInstaller:
             print("The installer encountered a problem while configuring the systemd service.")
             print("Please report this problem.")
 
-        print("=" * 40)
-        print("Spectero should be installed and running!")
+    def build_usr_sbin_script(self):
+        try:
+            cli_script = self.spectero_install_path + "/latest/cli/Tooling/spectero"
+
+            # String replacement.
+            with open(cli_script, 'r') as file:
+                filedata = file.read()
+            print("Replacing variables in console management interface template...")
+            filedata = filedata.replace("{dotnet path}", self.dotnet_framework_path)
+            filedata = filedata.replace("{spectero working directory}", self.spectero_install_path)
+            filedata = filedata.replace("{version}", self.channel_version)
+
+            with open(cli_script, 'w') as file:
+                file.write(filedata)
+
+            print("Copying console management interface shell script to /usr/sbin/spectero")
+            shutil.copyfile(cli_script, "/usr/sbin/spectero")
+            os.system("chmod +x /usr/sbin/spectero")
+        except Exception as e:
+            traceback.print_exc()
+            print("The installer encountered a problem while copying the CLI script.")
+            print("Please report this problem.")
 
 
 if __name__ == "__main__":
