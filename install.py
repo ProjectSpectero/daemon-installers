@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 import os
+import shutil
 import subprocess
 import sys
 import zipfile
+import traceback
 import requests
-import shutil
 
 """
 Spectero Installer
@@ -15,10 +16,10 @@ https://spectero.com/
 Description:
     This utility serves the purpose to install the daemon and command line tools into your operating system
     It supports Mac OS X and Linux variants.
-    
+
 Warranty:
     This software is provided without warranty.
-    
+
 Liability:
     The user runs this application at their own risk, and takes responsibility for any system changes.
     You will be promoted to read the terms service upon execution and installation.    
@@ -27,29 +28,29 @@ Command Line Arguments:
 
     Release Channels:
         Release channels are categorized based on how stable the builds are.
-        
+
         --alpha
             Use the alpha channel and get bleeding edge builds of the daemon.
             It is ill-advised to use this channel as bugs may be present.
-        
+
         --beta
             Use the beta channel and get semi-stable builds that contain new features.
             This channel also may contain bugs.
-            
+
         --stable
             Use the stable channel and get release candidates that are deemed suitable for production
             (this flag is used by default)
-        
+
     Other:
         --agree
             Agree to the Spectero Terms of Service located at https://spectero.com/tos.
-            
+
         --install-dotnet
             Automatically install the .NET Core Framework if it does not exist.
-            
+
         --no-prompt
             Disable all Spectero related prompts and automatically install into /opt/spectero
-        
+
 """
 
 INSTALLER_VERSION = 1
@@ -66,7 +67,9 @@ class SpecteroInstaller:
         self.dotnet_install_script_link = "https://dot.net/v1/dotnet-install.sh"
         self.dotnet_script_name = "dotnet-install.sh"
         self.suppress_bash_tag = " >/dev/null 2>&1"
+        self.use_local_dotnet = False
 
+        # Determine which release channel to download from.
         self.determine_channel()
 
         # Check to see if the installer needs updated or if there's a release for the channel.
@@ -86,17 +89,17 @@ class SpecteroInstaller:
         else:
             print("You have agreed to the Terms of Service.")
 
-        # Find dotnet framework, and download if it doesn't exist.
-        if not self.find_dotnet_framework():
-            self.download_dotnet_framework()
-        else:
-            print("The .NET Core Framework is already installed.")
-
         # Prompt the user with the path that spectero should install.
         if not self.execution_contains_cli_flag("--no-prompt"):
             self.prompt_install_location()
 
         print("Spectero will be installed in: %s" % self.spectero_install_path)
+
+        # Find dotnet framework, and download if it doesn't exist.
+        if not self.find_dotnet_framework():
+            self.download_dotnet_framework()
+        else:
+            print("The .NET Core Framework is already installed.")
 
         # Ask the user if they are ready to install.
         if not self.execution_contains_cli_flag("--no-prompt"):
@@ -143,18 +146,26 @@ class SpecteroInstaller:
 
     def find_dotnet_framework(self):
         try:
-            dotnet_framework_path = subprocess.check_output(["which", "dotnet"])
-            if b'dotnet' in dotnet_framework_path:
+            # Run `where`, convert to string.
+            with open(os.devnull, 'w') as devnull:
+                dotnet_framework_path = (subprocess.check_output(["which", "dotnet"], stderr=devnull)[:-1]).decode(
+                    "utf-8")
+
+            if 'dotnet' in dotnet_framework_path:
                 self.dotnet_framework_path = dotnet_framework_path
                 return True
-            else:
-                return False
-        except:
-            # Sometimes which will return `exit 1`
+
+            if os.path.isfile(self.spectero_install_path + "/dotnet/dotnet"):
+                self.dotnet_framework_path = self.spectero_install_path + "/dotnet/dotnet"
+                return True
+
             return False
-            
+        except:
+            return False
+
     def download_dotnet_framework(self):
-        if not self.execution_contains_cli_flag("--install-dotnet"):
+        if not self.execution_contains_cli_flag("--install-dotnet") or \
+                not self.execution_contains_cli_flag("--no-prompt"):
             lines = [
                 ""
                 "Spectero is built with the .NET Core 2.0 Framework and needs to be installed.",
@@ -175,11 +186,16 @@ class SpecteroInstaller:
                 for chunk in requests.get(self.dotnet_install_script_link).iter_content(chunk_size=1024):
                     dnsn.write(chunk)
             os.system("chmod +x /tmp/%s" % self.dotnet_script_name)
-            os.system("bash /tmp/%s --channel 2.0 --shared-runtime" % self.dotnet_script_name)
+            os.system("bash /tmp/%s --channel 2.0 --shared-runtime --install-dir %s/dotnet" %
+                      (
+                          self.dotnet_script_name,
+                          self.spectero_install_path
+                      ))
         else:
             print("Unsupported Operating System: %s" % sys.platform)
             sys.exit(3)
 
+        self.dotnet_framework_path = self.spectero_install_path + "/dotnet/dotnet"
         print(".NET Core has successfully been installed.")
 
     def create_user_and_groups(self):
@@ -260,7 +276,7 @@ class SpecteroInstaller:
             releases = self.get_spectero_releases()
             channel_version = releases["channels"][self.channel]
 
-            print("Found %s release candidate: %s" % (self.channel, channel_version))
+            print("Found %s release: %s" % (self.channel, channel_version))
             channel_download_url = releases["versions"][channel_version]["download"]
             channel_download_url_alt = releases["versions"][channel_version]["altDownload"]
 
@@ -316,24 +332,18 @@ class SpecteroInstaller:
                           self.spectero_install_path
                       ))
 
-            try :
+            try:
                 self.create_user_and_groups()
                 print("Changing ownership for installation directory: %s" % self.spectero_install_path)
                 os.system("chown -R spectero:spectero %s" % self.spectero_install_path)
             except Exception as e2:
-                print("An error occured while attempting to change directory ownership")
+                print("An error occurred while attempting to change directory ownership")
                 print("Does the spectero user exist?")
                 print(e2)
                 sys.exit(9)
 
+            self.systemd_service(self.spectero_install_path + "/" + channel_version + "/daemon")
 
-            try :
-                self.systemd_service(self.spectero_install_path + "/" + channel_version + "/daemon")
-            except Exception as e3:
-                print("The installer encountered a problem while configuring the systemd service.")
-                print("Please report this problem.")
-                print(e3)
-                sys.exit(10)
 
         except Exception as e:
             print("The installer encountered a problem while retrieving release data from the download server.")
@@ -353,20 +363,36 @@ class SpecteroInstaller:
         return self.release_data
 
     def systemd_service(self, daemon_path):
-        systemd_script = daemon_path + "/Tooling/Linux/spectero.service"
-        systemd_dest = "/etc/systemd/system/spectero.service"
+        try:
+            systemd_script = daemon_path + "/Tooling/Linux/spectero.service"
+            systemd_dest = "/etc/systemd/system/spectero.service"
 
-        print("Installing systemd service")
-        shutil.copyfile(systemd_script, systemd_dest)
-        os.system("systemctl daemon-reload")
-        os.system("systemctl enable spectero" + self.suppress_bash_tag)
-        print("Using systemctl to start `spectero` service.")
-        os.system("systemctl start spectero")
-        os.system("systemctl status spectero")
-        print("Systemd service installed successfully.")
+            # String replacement.
+            with open(systemd_script, 'r') as file:
+                filedata = file.read()
 
-        print("="*40)
+            filedata = filedata.replace("ExecStart=/usr/bin/dotnet",
+                                        "ExecStart=" + self.dotnet_framework_path)
+
+            with open(systemd_script, 'w') as file:
+                file.write(filedata)
+
+            print("Installing systemd service")
+            shutil.copyfile(systemd_script, systemd_dest)
+            os.system("systemctl daemon-reload")
+            os.system("systemctl enable spectero" + self.suppress_bash_tag)
+            print("Using systemctl to start `spectero` service.")
+            os.system("systemctl start spectero")
+            os.system("systemctl status spectero")
+            print("Systemd service installed successfully.")
+        except Exception as e:
+            traceback.print_exc()
+            print("The installer encountered a problem while configuring the systemd service.")
+            print("Please report this problem.")
+
+        print("=" * 40)
         print("Spectero should be installed and running!")
+
 
 if __name__ == "__main__":
     SpecteroInstaller()
