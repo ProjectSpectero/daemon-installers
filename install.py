@@ -186,17 +186,21 @@ class SpecteroInstaller:
                 for chunk in requests.get(self.dotnet_install_script_link).iter_content(chunk_size=1024):
                     dnsn.write(chunk)
             os.system("chmod +x /tmp/%s" % self.dotnet_script_name)
-            os.system("bash /tmp/%s --channel 2.0 --shared-runtime --install-dir %s/dotnet" %
-                      (
-                          self.dotnet_script_name,
-                          self.spectero_install_path
-                      ))
+            dotnet_subproccess = subprocess.Popen(
+                ['/tmp/' + self.dotnet_script_name, '--channel', '2.0', '--shared-runtime', '--install-dir', self.spectero_install_path + '/dotnet']
+            )
+            dotnet_subproccess.communicate()
+            if dotnet_subproccess.returncode == 0:
+                self.dotnet_framework_path = self.spectero_install_path + "/dotnet/dotnet"
+                print(".NET Core has successfully been installed.")
+            else:
+                print("The installer failed to install the .NET Core Framework 2.0 Runtime")
+                print("Please install it manually and re-run the script.")
+                sys.exit(10)
+
         else:
             print("Unsupported Operating System: %s" % sys.platform)
             sys.exit(3)
-
-        self.dotnet_framework_path = self.spectero_install_path + "/dotnet/dotnet"
-        print(".NET Core has successfully been installed.")
 
     def create_user_and_groups(self):
         # Create User, Group and assign.
