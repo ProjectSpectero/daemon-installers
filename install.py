@@ -237,8 +237,17 @@ class SpecteroInstaller:
 
             # the user specified a path.
             else:
-                self.spectero_install_path = prompted_install_path
-                return
+                if prompted_install_path[0] == "/":
+                    self.spectero_install_path = prompted_install_path
+                    try:
+                        if not os.path.exists(self.spectero_install_path):
+                            os.mkdir(self.spectero_install_path)
+                            print("Created directory: %s" % self.spectero_install_path)
+                            return
+                    except:
+                        print("Failed to make the directory, please validate the path.")
+                        continue
+
 
     def prompt_install_ready(self):
         lines = [
@@ -306,10 +315,6 @@ class SpecteroInstaller:
 
             # Try to extract
             try:
-                if not os.path.exists(self.spectero_install_path):
-                    os.mkdir(self.spectero_install_path)
-                    print("Created directory: %s" % self.spectero_install_path)
-
                 referenced_zip = zipfile.ZipFile(projected_zip_path, 'r')
                 referenced_zip.extractall(self.spectero_install_path)
                 referenced_zip.close()
