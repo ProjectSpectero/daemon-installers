@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="84c384c8-3d0f-44b9-82cd-8bb7c4bc72b7" name="Default" comment="" />
+    <list default="true" id="84c384c8-3d0f-44b9-82cd-8bb7c4bc72b7" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/install.py" beforeDir="false" afterPath="$PROJECT_DIR$/install.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,8 +16,8 @@
       <file leaf-file-name="install.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/install.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
-              <caret line="372" selection-start-line="372" selection-end-line="372" />
+            <state relative-caret-position="178">
+              <caret line="373" column="68" selection-start-line="373" selection-start-column="68" selection-end-line="373" selection-end-column="68" />
             </state>
           </provider>
         </entry>
@@ -125,14 +127,14 @@
     <frame x="67" y="25" width="1853" height="950" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18888289" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18888289" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" visible="true" weight="0.4047619" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.4047619" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -200,8 +202,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/install.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="372" selection-start-line="372" selection-end-line="372" />
+        <state relative-caret-position="178">
+          <caret line="373" column="68" selection-start-line="373" selection-start-column="68" selection-end-line="373" selection-end-column="68" />
         </state>
       </provider>
     </entry>

@@ -371,8 +371,7 @@ class SpecteroInstaller:
             with open(systemd_script, 'r') as file:
                 filedata = file.read()
 
-            filedata = filedata.replace("ExecStart=/usr/bin/dotnet",
-                                        "ExecStart=" + self.dotnet_framework_path)
+            filedata = filedata.replace("ExecStart=/usr/bin/dotnet", "ExecStart=" + self.dotnet_framework_path)
 
             with open(systemd_script, 'w') as file:
                 file.write(filedata)
