@@ -16,8 +16,8 @@
       <file leaf-file-name="install.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/install.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="373" column="68" selection-start-line="373" selection-start-column="68" selection-end-line="373" selection-end-column="68" />
+            <state relative-caret-position="373">
+              <caret line="155" lean-forward="true" selection-start-line="155" selection-end-line="155" />
             </state>
           </provider>
         </entry>
@@ -202,8 +202,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/install.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="373" column="68" selection-start-line="373" selection-start-column="68" selection-end-line="373" selection-end-column="68" />
+        <state relative-caret-position="373">
+          <caret line="155" lean-forward="true" selection-start-line="155" selection-end-line="155" />
         </state>
       </provider>
     </entry>

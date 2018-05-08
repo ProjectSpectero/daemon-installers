@@ -148,11 +148,10 @@ class SpecteroInstaller:
         try:
             # Run `where`, convert to string.
             with open(os.devnull, 'w') as devnull:
-                dotnet_framework_path = (subprocess.check_output(["which", "dotnet"], stderr=devnull)[:-1]).decode(
-                    "utf-8")
+                which_path = (subprocess.check_output(["which", "dotnet"], stderr=devnull)[:-1]).decode("utf-8")
 
-            if 'dotnet' in dotnet_framework_path:
-                self.dotnet_framework_path = dotnet_framework_path
+            if 'dotnet' in which_path:
+                self.dotnet_framework_path = which_path
                 return True
 
             if os.path.isfile(self.spectero_install_path + "/dotnet/dotnet"):
