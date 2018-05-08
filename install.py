@@ -120,7 +120,7 @@ class SpecteroInstaller:
             "Spectero releases all software with a Terms of Service Agreement located at:",
             "https://spectero.com/tos",
             "",
-            "Do you agree to the Terms of Service? (yes/no)"
+            "Do you agree to the Terms of Service? (yes/No)"
         ]
         for line in lines:
             print(line)
@@ -168,12 +168,12 @@ class SpecteroInstaller:
             lines = [
                 ""
                 "Spectero is built with the .NET Core 2.0 Framework and needs to be installed.",
-                "Can we go ahead and install the latest .NET Core Framework? (yes/no)"
+                "Can we go ahead and install the latest .NET Core Framework? (Yes/no)"
             ]
             for line in lines:
                 print(line)
 
-            if str(input("> ")).lower().strip() not in ["yes", "y"]:
+            if str(input("> ")).lower().strip() not in ["yes", "y", ""]:
                 print(".NET Framework will not be installed and the installer will exit.")
                 sys.exit(2)
 
@@ -232,7 +232,7 @@ class SpecteroInstaller:
                 print("The installation path cannot be the root of the filesystem.")
 
             # if it is empty, they want the default installation path.
-            elif str(prompted_install_path) == "":
+            elif str(prompted_install_path).trim() == "":
                 return
 
             # the user specified a path.
@@ -244,13 +244,13 @@ class SpecteroInstaller:
         lines = [
             "",
             "Spectero is ready to install",
-            "Continue? (yes/no)"
+            "Continue? (Yes/no)"
         ]
 
         for line in lines:
             print(line)
 
-        if str(input("> ")).lower().strip() not in ["yes", "y"]:
+        if str(input("> ")).lower().strip() not in ["yes", "y", ""]:
             print("Spectero will not be installed.")
             sys.exit(4)
 
