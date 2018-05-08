@@ -225,14 +225,14 @@ class SpecteroInstaller:
 
         while True:
             # ask them for where they want to install the path.
-            prompted_install_path = input('> ')
+            prompted_install_path = str(input('> '))
 
             # root of the filesystem was specified
-            if str(prompted_install_path) == "/":
+            if prompted_install_path == "/":
                 print("The installation path cannot be the root of the filesystem.")
 
             # if it is empty, they want the default installation path.
-            elif str(prompted_install_path).trim() == "":
+            elif prompted_install_path== "":
                 return
 
             # the user specified a path.
