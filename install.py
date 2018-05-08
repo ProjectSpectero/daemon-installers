@@ -175,7 +175,7 @@ class SpecteroInstaller:
                 for chunk in requests.get(self.dotnet_install_script_link).iter_content(chunk_size=1024):
                     dnsn.write(chunk)
             os.system("chmod +x /tmp/%s" % self.dotnet_script_name)
-            os.system("bash /tmp/%s --channel 2.0" % self.dotnet_script_name)
+            os.system("bash /tmp/%s --channel 2.0 --shared-runtime" % self.dotnet_script_name)
         else:
             print("Unsupported Operating System: %s" % sys.platform)
             sys.exit(3)
