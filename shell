@@ -1,15 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 DOTNET_BINARY="{dotnet path}"
 SPECTERO_WORKING_DIRECTORY="{spectero working directory}"
 DAEMON_WORKING_DIRECTORY="$SPECTERO_WORKING_DIRECTORY/$VERSION/cli"
 DAEMON_VERSION="latest"
 CLI_WORKING_DIRECTORY="$SPECTERO_WORKING_DIRECTORY/$VERSION/cli"
-CLI_DAEMON_BINARY="Spectero.daemon.CLI.dll"
+CLI_BINARY="Spectero.daemon.CLI.dll"
 
 
 if [ "$1" == "cli" ]; then
-		$DOTNET_BINARY $CLI_WORKING_DIRECTORY/$CLI_DAEMON_BINARY
+		$DOTNET_BINARY $CLI_WORKING_DIRECTORY/$CLI_BINARY
 else
 	echo "No arguments specified"
 	echo "Available commands: 'cli'"
