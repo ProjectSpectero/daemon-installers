@@ -84,7 +84,7 @@ elif [ "$(uname)" == "Linux" ]; then
             # Debian / Ubuntu
             elif [[ ! -z $APT_GET_CMD ]]; then
             
-                if [ $ID == "ubuntu"]; then
+                if [ $ID == "ubuntu" ]; then
                 
                     # Some versions of ubuntu name the packages differently.
                     # Please add specifics for each version.
