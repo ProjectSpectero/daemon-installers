@@ -38,5 +38,8 @@ https://spectero.com/
             Automatically install the .NET Core Framework if it does not exist.  
             
         --no-prompt  
-            Disable all Spectero related prompts and automatically install into /opt/spectero  
+            Disable all Spectero related prompts and automatically install into /opt/spectero
+
+        --overwrite
+            By default spectero's installer
         
