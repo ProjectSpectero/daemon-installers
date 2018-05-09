@@ -50,10 +50,141 @@ Command Line Arguments:
 
         --no-prompt
             Disable all Spectero related prompts and automatically install into /opt/spectero
+            
+        --overwrite
+            Force an overwrite of the current version installed.
+            If this is not provided, the installer will assume it should check for an update.
 
 """
 
 INSTALLER_VERSION = 1
+
+
+def execution_contains_cli_flag(flag):
+    for current_flag in sys.argv:
+        if flag == current_flag:
+            return True
+    return False
+
+
+class DepencencyDownloader:
+    def __init__(self):
+        self.package_managers = ["apt-get", "yum"]
+        self.dependencies = {
+            "apt-get": ["libunwind-dev", "libcurl4"],
+            "yum": ["libunwind-devel", "libcurl-devel"]
+        }
+        self.__package_manager = None
+        self.__package_manager_path = None
+        self.dotnet_install_script_link = "https://dot.net/v1/dotnet-install.sh"
+        self.dotnet_script_name = "dotnet-install.sh"
+        self.dotnet_framework_path = None
+
+        self.get_package_manager()
+
+    def get_package_manager(self):
+        if self.__package_manager:
+            # There's already a package manager in the memory.
+            return self.__package_manager
+        else:
+            # Iterate through each package manager and try to find the path.
+            for current_package_manager in self.package_managers:
+                # Which will sometimes throw an exception
+                try:
+                    print("Searching for package manager: %s" % current_package_manager)
+                    current_package_manager_path = (subprocess.check_output(['which', current_package_manager])[:-1]).decode("utf-8")
+
+                    # Check if a path
+                    if current_package_manager_path[0] == "/":
+                        print("Found package manager %s at %s" % (current_package_manager, current_package_manager_path))
+
+                        # Assignment and return
+                        self.__package_manager = current_package_manager
+                        self.__package_manager_path = current_package_manager_path
+                        return current_package_manager_path
+                except:
+                    # which threw an exception.
+                    continue
+
+            # Package manager was not found
+            return None
+
+    def install_dependencies(self):
+        for dependency in self.dependencies[self.__package_manager]:
+            print("Installing dependency %s" % dependency)
+            try:
+                dependency_log = subprocess.Popen([self.__package_manager_path, "install", dependency, "-y"])
+                dependency_log.communicate()
+
+                # Check exit code
+                if dependency_log.returncode != 0:
+                    self.dependency_install_exception(dependency)
+            except:
+                traceback.print_exc()
+                self.dependency_install_exception(dependency)
+
+    def dependency_install_exception(self, dependency):
+        print("An error was returned from your package manager.")
+        print("Please install the '%s' dependency and re-run the installer." % dependency)
+        print("Failed command: %s install %s -y" % (self.__package_manager, dependency))
+        sys.exit(11)
+
+    def find_dotnet_core(self, spectero_install_path):
+        # Check system installation
+        try:
+            with open(os.devnull, 'w') as devnull:
+                which_path = (subprocess.check_output(["which", "dotnet"], stderr=devnull)[:-1]).decode("utf-8")
+
+            if 'dotnet' in which_path:
+                self.dotnet_framework_path = which_path
+                return True
+        except:
+            pass
+
+        # Check local installation
+        if os.path.isfile(os.path.join(spectero_install_path, "/dotnet/dotnet")):
+            self.dotnet_framework_path = spectero_install_path + "/dotnet/dotnet"
+            return True
+
+        # No installation
+        return False
+
+    def download_dotnet_core(self, spectero_install_path):
+        if not execution_contains_cli_flag("--install-dotnet") and \
+                not execution_contains_cli_flag("--no-prompt"):
+            lines = [
+                ""
+                "Spectero is built with the .NET Core 2.0 Framework and needs to be installed.",
+                "Can we go ahead and install the latest .NET Core Framework? (Yes/no)"
+            ]
+            for line in lines:
+                print(line)
+
+            if str(input("> ")).lower().strip() not in ["yes", "y", ""]:
+                print(".NET Framework will not be installed and the installer will exit.")
+                sys.exit(2)
+
+        print("Downloading .NET Core Runtime...")
+        if sys.platform in ["linux", "linux2", "darwin"]:
+            with open("/tmp/" + self.dotnet_script_name, "wb") as dnsn:
+                for chunk in requests.get(self.dotnet_install_script_link).iter_content(chunk_size=1024):
+                    dnsn.write(chunk)
+            os.system("chmod +x /tmp/%s" % self.dotnet_script_name)
+            dotnet_subproccess = subprocess.Popen(
+                ['/tmp/' + self.dotnet_script_name, '--channel', '2.0', '--shared-runtime', '--install-dir', spectero_install_path + '/dotnet']
+            )
+            dotnet_subproccess.communicate()
+            if dotnet_subproccess.returncode == 0:
+                self.dotnet_framework_path = spectero_install_path + "/dotnet/dotnet"
+                print(".NET Core has successfully been installed.")
+            else:
+                print("The installer failed to install the .NET Core Framework 2.0 Runtime")
+                print("Please install it manually and re-run the script.")
+                sys.exit(10)
+
+        else:
+            print("Unsupported Operating System: %s" % sys.platform)
+            sys.exit(3)
 
 
 class SpecteroInstaller:
@@ -62,13 +193,12 @@ class SpecteroInstaller:
         self.channel = None
         self.channel_version = None
         self.release_data = None
-        self.dotnet_framework_path = None
         self.spectero_releases_url = "https://spectero.com/releases.json"
         self.spectero_install_path = "/opt/spectero"
-        self.dotnet_install_script_link = "https://dot.net/v1/dotnet-install.sh"
-        self.dotnet_script_name = "dotnet-install.sh"
         self.suppress_bash_tag = " >/dev/null 2>&1"
+        self.systemd_service_destination = "/etc/systemd/system/spectero.service"
         self.use_local_dotnet = False
+        self.dependency_class = DepencencyDownloader()
 
         # Determine which release channel to download from.
         self.determine_channel()
@@ -85,26 +215,31 @@ class SpecteroInstaller:
         self.welcome()
 
         # Check if we should display the terms of service, if the user passes the --agree flag we can skip.
-        if not self.execution_contains_cli_flag("--agree"):
+        if not execution_contains_cli_flag("--agree"):
             self.agree_to_terms_of_service()
         else:
             print("You have agreed to the Terms of Service.")
 
         # Prompt the user with the path that spectero should install.
-        if not self.execution_contains_cli_flag("--no-prompt"):
+        if not execution_contains_cli_flag("--no-prompt"):
             self.prompt_install_location()
 
         print("Spectero will be installed in: %s" % self.spectero_install_path)
 
         # Find dotnet framework, and download if it doesn't exist.
-        if not self.find_dotnet_framework():
-            self.download_dotnet_framework()
+        if not self.dependency_class.find_dotnet_core(self.spectero_install_path):
+            self.dependency_class.install_dependencies()
+            self.dependency_class.download_dotnet_core(self.spectero_install_path)
         else:
             print("The .NET Core Framework is already installed.")
 
         # Ask the user if they are ready to install.
-        if not self.execution_contains_cli_flag("--no-prompt"):
+        if not execution_contains_cli_flag("--no-prompt"):
             self.prompt_install_ready()
+
+        if os.path.isfile(self.systemd_service_destination):
+            print("Stopping the currently running spectero daemon to upgrade...")
+            os.system('systemctl stop spectero')
 
         # Install.
         self.install()
@@ -133,74 +268,17 @@ class SpecteroInstaller:
             sys.exit(2)
 
     def determine_channel(self):
-        if self.execution_contains_cli_flag("--stable"):
+        if execution_contains_cli_flag("--stable"):
             self.channel = "stable"
 
-        elif self.execution_contains_cli_flag("--beta"):
+        elif execution_contains_cli_flag("--beta"):
             self.channel = "beta"
 
-        elif self.execution_contains_cli_flag("--alpha"):
+        elif execution_contains_cli_flag("--alpha"):
             self.channel = "alpha"
 
         else:
             self.channel = "stable"
-
-    def find_dotnet_framework(self):
-        try:
-            # Run `where`, convert to string.
-            with open(os.devnull, 'w') as devnull:
-                which_path = (subprocess.check_output(["which", "dotnet"], stderr=devnull)[:-1]).decode("utf-8")
-
-            if 'dotnet' in which_path:
-                self.dotnet_framework_path = which_path
-                return True
-
-            if os.path.isfile(self.spectero_install_path + "/dotnet/dotnet"):
-                self.dotnet_framework_path = self.spectero_install_path + "/dotnet/dotnet"
-                return True
-
-            return False
-        except:
-            return False
-
-    def download_dotnet_framework(self):
-        if not self.execution_contains_cli_flag("--install-dotnet") and \
-                not self.execution_contains_cli_flag("--no-prompt"):
-            lines = [
-                ""
-                "Spectero is built with the .NET Core 2.0 Framework and needs to be installed.",
-                "Can we go ahead and install the latest .NET Core Framework? (Yes/no)"
-            ]
-            for line in lines:
-                print(line)
-
-            if str(input("> ")).lower().strip() not in ["yes", "y", ""]:
-                print(".NET Framework will not be installed and the installer will exit.")
-                sys.exit(2)
-
-        print("Downloading .NET Core...")
-
-        # Download and install .NET Core 2.0
-        if sys.platform in ["linux", "linux2", "darwin"]:
-            with open("/tmp/" + self.dotnet_script_name, "wb") as dnsn:
-                for chunk in requests.get(self.dotnet_install_script_link).iter_content(chunk_size=1024):
-                    dnsn.write(chunk)
-            os.system("chmod +x /tmp/%s" % self.dotnet_script_name)
-            dotnet_subproccess = subprocess.Popen(
-                ['/tmp/' + self.dotnet_script_name, '--channel', '2.0', '--shared-runtime', '--install-dir', self.spectero_install_path + '/dotnet']
-            )
-            dotnet_subproccess.communicate()
-            if dotnet_subproccess.returncode == 0:
-                self.dotnet_framework_path = self.spectero_install_path + "/dotnet/dotnet"
-                print(".NET Core has successfully been installed.")
-            else:
-                print("The installer failed to install the .NET Core Framework 2.0 Runtime")
-                print("Please install it manually and re-run the script.")
-                sys.exit(10)
-
-        else:
-            print("Unsupported Operating System: %s" % sys.platform)
-            sys.exit(3)
 
     def create_user_and_groups(self):
         # Create User, Group and assign.
@@ -289,6 +367,10 @@ class SpecteroInstaller:
             self.channel_version = releases["channels"][self.channel]
 
             print("Found %s release: %s" % (self.channel, self.channel_version))
+            if not execution_contains_cli_flag("--overwrite") and os.path.exists(os.path.join(self.spectero_install_path, self.channel_version)):
+                print("You are running the latest version of spectero.")
+                sys.exit(0)
+
             channel_download_url = releases["versions"][self.channel_version]["download"]
             channel_download_url_alt = releases["versions"][self.channel_version]["altDownload"]
 
@@ -361,12 +443,6 @@ class SpecteroInstaller:
             print(e)
             sys.exit(5)
 
-    def execution_contains_cli_flag(self, flag):
-        for current_flag in sys.argv:
-            if flag == current_flag:
-                return True
-        return False
-
     def get_spectero_releases(self):
         if self.release_data is None:
             self.release_data = requests.get(self.spectero_releases_url).json()
@@ -375,19 +451,20 @@ class SpecteroInstaller:
     def systemd_service(self, daemon_path):
         try:
             systemd_script = daemon_path + "/Tooling/Linux/spectero.service"
-            systemd_dest = "/etc/systemd/system/spectero.service"
 
             # String replacement.
             with open(systemd_script, 'r') as file:
                 filedata = file.read()
 
-            filedata = filedata.replace("ExecStart=/usr/bin/dotnet", "ExecStart=" + self.dotnet_framework_path)
+            filedata = filedata.replace("ExecStart=/usr/bin/dotnet", "ExecStart=" + self.dependency_class.dotnet_framework_path)
 
             with open(systemd_script, 'w') as file:
                 file.write(filedata)
 
-            print("Installing systemd service")
-            shutil.copyfile(systemd_script, systemd_dest)
+            if not os.path.isfile(self.systemd_service_destination):
+                print("Installing systemd service")
+
+            shutil.copyfile(systemd_script, self.systemd_service_destination)
             os.system("systemctl daemon-reload")
             os.system("systemctl enable spectero" + self.suppress_bash_tag)
             print("Using systemctl to start `spectero` service.")
@@ -407,7 +484,7 @@ class SpecteroInstaller:
             with open(cli_script, 'r') as file:
                 filedata = file.read()
             print("Replacing variables in console management interface template...")
-            filedata = filedata.replace("{dotnet path}", self.dotnet_framework_path)
+            filedata = filedata.replace("{dotnet path}", self.dependency_class.dotnet_framework_path)
             filedata = filedata.replace("{spectero working directory}", self.spectero_install_path)
             filedata = filedata.replace("{version}", self.channel_version)
 
@@ -421,6 +498,7 @@ class SpecteroInstaller:
             traceback.print_exc()
             print("The installer encountered a problem while copying the CLI script.")
             print("Please report this problem.")
+            sys.exit(12)
 
 
 if __name__ == "__main__":
