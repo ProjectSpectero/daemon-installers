@@ -1,3 +1,103 @@
+#!/usr/bin/env bash
+
+###############################################################################
+##
+##  Spectero, Inc
+##  Copyright (c) 2018 - All rights reserved 
+## 
+##  By using this script you are agreeing to the terms of services
+##  provided to the end user at https://spectero.com/tos
+##
+###############################################################################
+
+# Check if we are root
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be ran as root.";
+    exit 1;
+fi
+
+# Check if we have dependencies
+if [ "$(uname)" == "Darwin" ]; then
+    # Check to see if python is installed.
+    which -s python3
+    if [[ $? != 0 ]]; then
+
+        # Check to see if brew is installed.
+        which -s brew
+        if [[ $? != 0 ]]; then
+            # Download and install
+            ruby -e "$(curl -FsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+            
+            # chown
+            chown root /usr/local/bin/brew
+        fi
+        
+        # Install Python3
+        brew install python3
+    fi
+    
+    # Check to see if dotnet core is installed
+    which -s dotnet
+    if [[ $? != 0 ]]; then
+        # Install dotnet core
+        brew install dotnet
+    fi
+    
+elif [ "$(uname)" == "Linux" ]; then
+    
+    # Find the package manager
+    YUM_CMD=$(which yum)
+    APT_GET_CMD=$(which apt-get)
+
+    # Check to see if we have Python3 installed.
+    if ! type "python3" > /dev/null; then
+    
+        # Debian/Ubuntu
+        if [[ ! -z $YUM_CMD ]]; then
+            yum install python34 -y
+    
+        # Cent/RHEL
+        elif [[ ! -z $APT_GET_CMD ]]; then
+            apt-get install python3 -y
+    
+        # ???
+        else
+            echo "The package manager for your system was not found"
+            echo "Please report your package manager to the developers so we can add support!"
+            exit 1;
+        fi
+    fi
+    
+    # Check to see if we have dotnet core installed.
+    if ! type "dotnet" > /dev/null; then
+    
+        # Debian/Ubuntu
+        if [[ ! -z $YUM_CMD ]]; then
+            yum install libunwind-devel libcurl-devel -y
+    
+        # Cent/RHEL
+        elif [[ ! -z $APT_GET_CMD ]]; then
+            apt-get install libunwind-dev libcurl4 -y
+    
+        # ???
+        else
+            echo "The package manager for your system was not found"
+            echo "Please report your package manager to the developers so we can add support!"
+            exit 1;
+        fi
+        
+        # Download dotnet installation script and execute it
+        wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh
+        bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/
+    fi
+    
+    
+else
+    echo "Unsupported Operating System"
+fi
+
+# Launch python script
+cat << EOF > "/tmp/spectero-installer.sh"
 #!/usr/bin/env python3
 
 import os
@@ -22,7 +122,7 @@ Warranty:
 
 Liability:
     The user runs this application at their own risk, and takes responsibility for any system changes.
-    You will be promoted to read the terms service upon execution and installation.    
+    You will be promoted to read the terms service upon execution and installation.
 
 Command Line Arguments:
 
@@ -50,7 +150,7 @@ Command Line Arguments:
 
         --no-prompt
             Disable all Spectero related prompts and automatically install into /opt/spectero
-            
+
         --overwrite
             Force an overwrite of the current version installed.
             If this is not provided, the installer will assume it should check for an update.
@@ -403,3 +503,11 @@ class SpecteroInstaller:
 
 if __name__ == "__main__":
     SpecteroInstaller()
+
+EOF
+
+# Run the installer.
+python3 /tmp/spectero-installer.sh $@
+
+# Exit gracefully.
+exit 0;
