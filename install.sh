@@ -52,11 +52,11 @@ elif [ "$(uname)" == "Linux" ]; then
     # Check to see if we have Python3 installed.
     if ! type "python3" > /dev/null; then
     
-        # Debian/Ubuntu
+        # Cent / RHEL
         if [[ ! -z $YUM_CMD ]]; then
             yum install python34 -y
     
-        # Cent/RHEL
+        # Debian / Ubuntu
         elif [[ ! -z $APT_GET_CMD ]]; then
             apt-get install python3 -y
     
@@ -71,11 +71,11 @@ elif [ "$(uname)" == "Linux" ]; then
     # Check to see if we have dotnet core installed.
     if ! type "dotnet" > /dev/null; then
     
-        # Debian/Ubuntu
+        # Cent / RHEL
         if [[ ! -z $YUM_CMD ]]; then
             yum install libunwind-devel libcurl-devel libicu -y
     
-        # Cent/RHEL
+        # Debian / Ubuntu
         elif [[ ! -z $APT_GET_CMD ]]; then
             apt-get install libunwind-dev libcurl4 -y
     
