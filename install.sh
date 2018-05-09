@@ -19,81 +19,112 @@ fi
 # Check if we have dependencies
 if [ "$(uname)" == "Darwin" ]; then
     # Check to see if python is installed.
-    which -s python3
+    which -s python3;
     if [[ $? != 0 ]]; then
 
         # Check to see if brew is installed.
-        which -s brew
+        which -s brew;
         if [[ $? != 0 ]]; then
             # Download and install
             ruby -e "$(curl -FsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
             
             # chown
-            chown root /usr/local/bin/brew
+            chown root /usr/local/bin/brew;
         fi
         
         # Install Python3
-        brew install python3
+        brew install python3;
     fi
     
     # Check to see if dotnet core is installed
-    which -s dotnet
+    which -s dotnet;
     if [[ $? != 0 ]]; then
         # Install dotnet core
-        brew install dotnet
+        brew install dotnet;
     fi
     
 elif [ "$(uname)" == "Linux" ]; then
     
-    # Find the package manager
-    YUM_CMD=$(which yum 2> /dev/null)
-    APT_GET_CMD=$(which apt-get 2> /dev/null)
+    # Check for Systemd
+    if [ -e /etc/os-release ]; then
+    
+        # Load OS Variables
+        source /etc/os-release;
+    
+        # Find the package manager
+        YUM_CMD=$(which yum 2> /dev/null);
+        APT_GET_CMD=$(which apt-get 2> /dev/null);
 
-    # Check to see if we have Python3 installed.
-    if ! type "python3" > /dev/null; then
-    
-        # Cent / RHEL
-        if [[ ! -z $YUM_CMD ]]; then
-            yum install python34 -y
-    
-        # Debian / Ubuntu
-        elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install python3 -y
-    
-        # ???
-        else
-            echo "The package manager for your system was not found"
-            echo "Please report your package manager to the developers so we can add support!"
-            exit 1;
-        fi
-    fi
-    
-    # Check to see if we have dotnet core installed.
-    if ! type "dotnet" > /dev/null; then
-    
-        # Cent / RHEL
-        if [[ ! -z $YUM_CMD ]]; then
-            yum install libunwind-devel libcurl-devel libicu -y
-    
-        # Debian / Ubuntu
-        elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install libunwind-dev libcurl4 -y
-    
-        # ???
-        else
-            echo "The package manager for your system was not found"
-            echo "Please report your package manager to the developers so we can add support!"
-            exit 1;
+        # Check to see if we have Python3 installed.
+        if ! type "python3" > /dev/null; then
+        
+            # Cent / RHEL
+            if [[ ! -z $YUM_CMD ]]; then
+                yum install python34 -y;
+        
+            # Debian / Ubuntu
+            elif [[ ! -z $APT_GET_CMD ]]; then
+                apt-get install python3 -y;
+        
+            # ???
+            else
+                echo "The package manager for your system was not found";
+                echo "Please report your package manager to the developers so we can add support!";
+                exit 1;
+            fi
         fi
         
-        # Download dotnet installation script and execute it
-        wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
-        bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 1> /dev/null
+        # Check to see if we have dotnet core installed.
+        if ! type "dotnet" > /dev/null; then
+        
+            # Cent / RHEL
+            if [[ ! -z $YUM_CMD ]]; then
+                yum install libunwind-devel libcurl-devel libicu -y;
+        
+            # Debian / Ubuntu
+            elif [[ ! -z $APT_GET_CMD ]]; then
+            
+                if [ $ID == "ubuntu"]; then
+                
+                    # Some versions of ubuntu name the packages differently.
+                    # Please add specifics for each version.
+                    
+                    # Ubuntu 16.04
+                    if [ $VERSION_ID == "16.04" ]; then
+                        apt-get install libunwind-dev libcurl4-openssl-dev -y;
+                        
+                    # Undocumented Ubuntu Version
+                    else
+                        apt-get install libunwind-dev libcurl4 -y;
+                    fi
+                    
+                else 
+                    # Generic Dependency Install
+                    apt-get install libunwind-dev libcurl4 -y;
+                fi
+                
+        
+            # ???
+            else
+                echo "The package manager for your system was not found";
+                echo "Please report your package manager to the developers so we can add support!";
+                exit 1;
+            fi
+            
+            # Download dotnet installation script and execute it
+            wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
+            bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 1> /dev/null
+        fi
+        
+    else
+        echo "Unsupported Operating System";
+        echo "Spectero requires an operating system that uses systemd.";
+        exit 1;
     fi
     
-    
 else
-    echo "Unsupported Operating System"
+    echo "Unsupported Operating System";
+    echo "This installation script supports Linux and MacOS";
 fi
 
 # Launch python script
