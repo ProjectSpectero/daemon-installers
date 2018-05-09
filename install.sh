@@ -99,14 +99,14 @@ fi
 # Launch python script
 cat << EOF > "/tmp/spectero-installer.sh"
 #!/usr/bin/env python3
-
+import json
 import os
 import shutil
 import subprocess
 import sys
 import zipfile
 import traceback
-import requests
+import urllib.request
 
 """
 Spectero Installer
@@ -379,9 +379,10 @@ class SpecteroInstaller:
             # Try to download from the primary mirror
             try:
                 print("Downloading %s from %s..." % (self.channel_version, channel_download_url))
-                with open(projected_zip_path, "wb") as zip:
-                    for chunk in requests.get(channel_download_url).iter_content(chunk_size=1024):
-                        zip.write(chunk)
+
+                with urllib.request.urlopen(channel_download_url) as response, open(projected_zip_path, 'wb') as zip:
+                    shutil.copyfileobj(response, zip)
+
                 print("Download complete.")
             except Exception as e:
                 print("An exception occurred while downloading from the primary mirror.")
@@ -389,9 +390,8 @@ class SpecteroInstaller:
                 # Try to download from the secondary
                 try:
                     print("Downloading %s from %s..." % (self.channel_version, channel_download_url_alt))
-                    with open(projected_zip_path, "wb") as zip:
-                        for chunk in requests.get(channel_download_url_alt).iter_content(chunk_size=1024):
-                            zip.write(chunk)
+                    with urllib.request.urlopen(channel_download_url_alt) as response, open(projected_zip_path, 'wb') as zip:
+                        shutil.copyfileobj(response, zip)
                     print("Download complete.")
                 except Exception as e2:
                     print("The installer failed to download from the primary and secondary mirrors.")
@@ -436,7 +436,6 @@ class SpecteroInstaller:
             print("=" * 50)
             print("Spectero should be installed and running!")
 
-
         except Exception as e:
             print("The installer encountered a problem while retrieving release data from the download server.")
             print("Please try again later.")
@@ -445,7 +444,7 @@ class SpecteroInstaller:
 
     def get_spectero_releases(self):
         if self.release_data is None:
-            self.release_data = requests.get(self.spectero_releases_url).json()
+            self.release_data = json.loads(urllib.request.urlopen(self.spectero_releases_url).read())
         return self.release_data
 
     def systemd_service(self, daemon_path):
