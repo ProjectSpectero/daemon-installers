@@ -46,8 +46,8 @@ if [ "$(uname)" == "Darwin" ]; then
 elif [ "$(uname)" == "Linux" ]; then
     
     # Find the package manager
-    YUM_CMD=$(which yum)
-    APT_GET_CMD=$(which apt-get)
+    YUM_CMD=$(which yum 2> /dev/null)
+    APT_GET_CMD=$(which apt-get 2> /dev/null)
 
     # Check to see if we have Python3 installed.
     if ! type "python3" > /dev/null; then
@@ -87,8 +87,8 @@ elif [ "$(uname)" == "Linux" ]; then
         fi
         
         # Download dotnet installation script and execute it
-        wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh
-        bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/
+        wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
+        bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 1> /dev/null
     fi
     
     
