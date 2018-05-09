@@ -73,7 +73,7 @@ elif [ "$(uname)" == "Linux" ]; then
     
         # Debian/Ubuntu
         if [[ ! -z $YUM_CMD ]]; then
-            yum install libunwind-devel libcurl-devel -y
+            yum install libunwind-devel libcurl-devel libicu -y
     
         # Cent/RHEL
         elif [[ ! -z $APT_GET_CMD ]]; then
