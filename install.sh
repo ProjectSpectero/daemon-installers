@@ -173,7 +173,7 @@ class SpecteroInstaller:
         self.channel = None
         self.channel_version = None
         self.release_data = None
-        self.spectero_releases_url = "https://spectero.com/releases.json"
+        self.spectero_releases_url = "https://c.spectero.com/releases.json"
         self.spectero_install_path = "/opt/spectero"
         self.suppress_bash_tag = " >/dev/null 2>&1"
         self.systemd_service_destination = "/etc/systemd/system/spectero.service"
