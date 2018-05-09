@@ -444,7 +444,7 @@ class SpecteroInstaller:
 
     def get_spectero_releases(self):
         if self.release_data is None:
-            self.release_data = json.loads(urllib.request.urlopen(self.spectero_releases_url).read().decode("urf-8"))
+            self.release_data = json.loads(urllib.request.urlopen(self.spectero_releases_url).read().decode("utf-8"))
         return self.release_data
 
     def systemd_service(self, daemon_path):
