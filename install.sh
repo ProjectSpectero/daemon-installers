@@ -18,6 +18,7 @@ fi
 
 # Check if we have dependencies
 if [ "$(uname)" == "Darwin" ]; then
+
     # Check to see if python is installed.
     which -s python3;
     if [[ $? != 0 ]]; then
@@ -56,7 +57,7 @@ elif [ "$(uname)" == "Linux" ]; then
         APT_GET_CMD=$(which apt-get 2> /dev/null);
 
         # Check to see if we have Python3 installed.
-        if ! type "python3" > /dev/null; then
+        if ! type "python3" &> /dev/null; then
         
             # Cent / RHEL
             if [[ ! -z $YUM_CMD ]]; then
@@ -75,7 +76,7 @@ elif [ "$(uname)" == "Linux" ]; then
         fi
         
         # Check to see if we have dotnet core installed.
-        if ! type "dotnet" > /dev/null; then
+        if ! type "dotnet" &> /dev/null; then
         
             # Cent / RHEL
             if [[ ! -z $YUM_CMD ]]; then
@@ -113,7 +114,7 @@ elif [ "$(uname)" == "Linux" ]; then
             
             # Download dotnet installation script and execute it
             wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
-            bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 1> /dev/null
+            bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
         fi
         
     else
