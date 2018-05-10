@@ -1,57 +1,56 @@
+# Spectero Unix Installer
 
-# Spectero Installer
-Copyright (c) 2018 Spectero - All Rights Reserved  
-https://spectero.com/  
+This is a repository of a multiplatform installer written in `bash` and `python3	`.  
+It is designed for easy deployment and automation.
 
-### Description:  
-    This utility serves the purpose to install the daemon and command line tools into your operating system  
-    It supports Mac OS X and Linux variants.  
 
-### Supported Operating Systems:
-    Ubuntu 16.04 LTS
-    Ubuntu 18.04 LTS
-    CentOS 7
-    Fedora 26+ (Operating systems that require `compat-openssl10`)
-    MacOS (Work in progress)
+## Compatability Matrix
 
-### Supported Package Managers:
-    apt-get
-    yum
+|Operating System  |Package Manager |Tested |
+|-------------------|---------------|-------|
+|Debian 8           |apt-get        |✔️    |
+|Debian 9           |apt-get        |✔️    |
+|Ubuntu 16.04 LTS   |apt-get        |✔️    |
+|Ubuntu 18.04 LTS   |apt-get        |✔️    |  
+|CentOS 7           |yum            |✔️    |
+|Fedora 26          |yum            |      |
+|Fedora 27          |yum            |      |
+|Fedora 28          |yum            |✔️    |
 
-### Warranty:  
-    This software is provided without warranty.  
-    
-### Liability:  
-    The user runs this application at their own risk, and takes responsibility for any system changes.  
-    You will be promoted to read the terms service upon execution and installation.      
-    
-### Command Line Arguments:  
-    Release Channels:  
-        Release channels are categorized based on how stable the builds are.  
-        
-        --alpha  
-            Use the alpha channel and get bleeding edge builds of the daemon.  
-            It is ill-advised to use this channel as bugs may be present.  
-        
-        --beta  
-            Use the beta channel and get semi-stable builds that contain new features.  
-            This channel also may contain bugs.  
-            
-        --stable  
-            Use the stable channel and get release candidates that are deemed suitable for production  
-            (this flag is used by default)  
-        
-    Other:  
-        --agree  
-            Agree to the Spectero Terms of Service located at https://spectero.com/tos.  
-            
-        --install-dotnet  
-            Automatically install the .NET Core Framework if it does not exist.  
-            
-        --no-prompt  
-            Disable all Spectero related prompts and automatically install into /opt/spectero
+<sub><sup>At this time we only currently support operating systems that have `systemd` and either the `yum` or `apt-get` package managers.</sup></sub>
 
-        --overwrite
-            By default Spectero's installer will only try to perform an upgrade if Spectero is installed.
-            Providing this argument will allow the installer to overwrite the installation.
-        
+
+## Quick Install
+Copy this command into your terminal to install spectero:
+```
+$ sudo bash <(curl -s https://spectero.com/installer)
+```
+
+## Command Line Arguments
+Please view the [Command Line Arguments]() Wiki Page.
+
+## License
+```
+Spectero, Inc
+Copyright (c) 2018 - All Rights Reserved
+https://spectero.com
+
+INTRODUCTION:
+This license serves to establish what the end user cannot 
+and can do with the scripts in this repository.
+
+USE AND DISTRIBUTION:
+The installation scripts provided with this repostory
+are able to be freely distributed among private entities 
+and personal use to allow easy installation and distribution 
+of the software provided by Spectero.
+
+MODIFICATION:
+The end user is free to modify the `install.sh` to fit their needs 
+for deployment purposes only.
+
+WARRANTY:
+This software and dependencies are installed under the discression
+of the end user and is provided without warranty at the end user's
+own risk.
+```
