@@ -6,7 +6,18 @@ https://spectero.com/
 ### Description:  
     This utility serves the purpose to install the daemon and command line tools into your operating system  
     It supports Mac OS X and Linux variants.  
-    
+
+### Supported Operating Systems:
+    Ubuntu 16.04 LTS
+    Ubuntu 18.04 LTS
+    CentOS 7
+    Fedora 23
+    MacOS (Work in progress)
+
+### Supported Package Managers:
+    apt-get
+    yum
+
 ### Warranty:  
     This software is provided without warranty.  
     
