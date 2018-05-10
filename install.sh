@@ -101,7 +101,7 @@ elif [ "$(uname)" == "Linux" ]; then
                     
                 else 
                     # Generic Dependency Install
-                    apt-get install libunwind-dev libcurl4 -y;
+                    apt-get install libunwind-dev libcurl4-openssl-dev -y;
                 fi
                 
         
