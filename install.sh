@@ -14,14 +14,15 @@
 ##
 ###############################################################################
 
-# Check if we are root
-if [[ $EUID -ne 0 ]]; then
-    echo "This script must be ran as root.";
-    exit 1;
-fi
-
 # Check if we have dependencies
 if [ "$(uname)" == "Darwin" ]; then
+
+    # Check if we are root.
+    if [[ $EUID -e 0 ]]; then
+        echo "This installation requires brew, which cannot be ran as root.";
+        echo "Please run this script as a normal user.";
+        exit 1;
+    fi
 
     # Check to see if python is installed.
     which -s python3;
@@ -31,10 +32,7 @@ if [ "$(uname)" == "Darwin" ]; then
         which -s brew;
         if [[ $? != 0 ]]; then
             # Download and install
-            ruby -e "$(curl -FsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-            
-            # chown
-            chown root /usr/local/bin/brew;
+            sudo ruby -e "$(curl -FsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         fi
         
         # Install Python3
@@ -49,6 +47,12 @@ if [ "$(uname)" == "Darwin" ]; then
     fi
     
 elif [ "$(uname)" == "Linux" ]; then
+    # Check if we are root.
+    if [[ $EUID -ne 0 ]]; then
+        echo "This script must be ran as root for the linux installation.";
+        exit 1;
+    fi
+    
     
     # Check for Systemd
     if [ -e /etc/os-release ]; then
@@ -543,7 +547,7 @@ if __name__ == "__main__":
 EOF
 
 # Run the installer.
-python3 /tmp/spectero-installer.sh $@
+sudo python3 /tmp/spectero-installer.sh $@
 
 # Exit gracefully.
 exit 0;
