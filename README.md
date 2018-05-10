@@ -52,5 +52,6 @@ https://spectero.com/
             Disable all Spectero related prompts and automatically install into /opt/spectero
 
         --overwrite
-            By default spectero's installer
+            By default Spectero's installer will only try to perform an upgrade if Spectero is installed.
+            Providing this argument will allow the installer to overwrite the installation if it is the latest version.
         
