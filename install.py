@@ -139,11 +139,12 @@ class SpecteroInstaller:
             os.system("usermod -a -G spectero spectero" + self.suppress_bash_tag)
 
         elif sys.platform in ["darwin"]:
-            os.system("dscl . -create /Users/spectero")
-            os.system("dscl . -create /Users/spectero UniqueID GROUP_ID")
+            os.system("dscl . -create /Groups/spectero")
+            os.system("dscl . -create /Groups/spectero PrimaryGroupID 13370")
+
+            os.system("dscl . -create /Users/spectero UniqueID 13370")
+            os.system("dscl . -create /Users/spectero PrimaryGroupID 13370")
             os.system("dscl . -create /Users/spectero UserShell /bin/bash")
-            os.system("dscl . -create /Users/spectero RealName \"Spectero User\"")
-            os.system("dseditgroup -o edit -a spectero -t user spectero")
 
         print("Spectero User and Group have been created.")
 
