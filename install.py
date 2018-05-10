@@ -278,8 +278,12 @@ class SpecteroInstaller:
                 print(e2)
                 sys.exit(9)
 
-            # Create the service.
-            self.systemd_service(self.spectero_install_path + "/" + self.channel_version + "/daemon")
+            # Create the service if we're linux.
+            if sys.platform in ["linux", "linux2"]:
+                self.systemd_service()
+            else:
+                # TODO: Implement MacOS Service.
+                print("OS X Service is not implemented yet.")
 
             # Create the command
             self.build_usr_sbin_script()
@@ -298,9 +302,9 @@ class SpecteroInstaller:
             self.release_data = json.loads(urllib.request.urlopen(self.spectero_releases_url).read().decode("utf-8"))
         return self.release_data
 
-    def systemd_service(self, daemon_path):
+    def systemd_service(self):
         try:
-            systemd_script = daemon_path + "/Tooling/Linux/spectero.service"
+            systemd_script = self.spectero_install_path + "/" + self.channel_version + "/daemon/Tooling/Linux/spectero.service"
 
             # String replacement.
             with open(systemd_script, 'r') as file:
