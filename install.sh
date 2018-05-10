@@ -90,13 +90,13 @@ elif [ "$(uname)" == "Linux" ]; then
                     # Some versions of ubuntu name the packages differently.
                     # Please add specifics for each version.
                     
-                    # Ubuntu 16.04
-                    if [ $VERSION_ID == "16.04" ]; then
-                        apt-get install libunwind-dev libcurl4-openssl-dev -y;
+                    # Ubuntu 18.04
+                    if [ $VERSION_ID == "18.04" ]; then
+                        apt-get install libunwind-dev libcurl4 -y;
                         
                     # Undocumented Ubuntu Version
                     else
-                        apt-get install libunwind-dev libcurl4 -y;
+                        apt-get install libunwind-dev libcurl4-openssl-dev -y;
                     fi
                     
                 else 
