@@ -488,7 +488,7 @@ class SpecteroInstaller:
             filedata = file.read()
 
         filedata = filedata.replace("{install_location}", self.spectero_install_path)
-        filedata = filedata.replace("{install_version}", self.spectero_install_path)
+        filedata = filedata.replace("{install_version}", self.channel_version)
 
         with open(startscript, 'w') as file:
             file.write(filedata)
@@ -503,7 +503,7 @@ class SpecteroInstaller:
             filedata = file.read()
 
         filedata = filedata.replace("{install_location}", self.spectero_install_path)
-        filedata = filedata.replace("{install_version}", self.spectero_install_path)
+        filedata = filedata.replace("{install_version}", self.channel_version)
 
         with open(plsit_template, 'w') as file:
             file.write(filedata)
