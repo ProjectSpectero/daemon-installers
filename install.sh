@@ -18,7 +18,7 @@
 if [ "$(uname)" == "Darwin" ]; then
 
     # Check if we are root.
-    if [[ $EUID -e 0 ]]; then
+    if (( EUID == 0 ));; then
         echo "This installation requires brew, which cannot be ran as root.";
         echo "Please run this script as a normal user.";
         exit 1;
