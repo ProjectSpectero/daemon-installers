@@ -175,7 +175,8 @@ class SpecteroInstaller:
                     self.spectero_install_path = prompted_install_path
                     try:
                         if not os.path.exists(self.spectero_install_path):
-                            os.mkdir(self.spectero_install_path)
+                            mkdir = subprocess.Popen(['mkdir', '-p', self.spectero_install_path])
+                            mkdir.communicate()
                             print("Created directory: %s" % self.spectero_install_path)
                             return
                     except:
