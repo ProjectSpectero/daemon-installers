@@ -16,8 +16,9 @@ It is designed for easy deployment and automation.
 |Fedora 26          |yum            |      |
 |Fedora 27          |yum            |      |
 |Fedora 28          |yum            |✔️    |
+|macOS High Sierra  |brew           |      |
 
-<sub><sup>At this time we only currently support operating systems that have `systemd` and either the `yum` or `apt-get` package managers.</sup></sub>
+<sub><sup>At this time we only currently support operating systems that have `systemd` and either the `yum`, `apt-get` or `brew` package managers.</sup></sub>
 
 
 ## Quick Install
