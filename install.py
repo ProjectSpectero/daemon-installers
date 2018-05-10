@@ -142,9 +142,9 @@ class SpecteroInstaller:
             os.system("dscl . -create /Groups/spectero")
             os.system("dscl . -create /Groups/spectero PrimaryGroupID 13370")
 
-            os.system("dscl . -create /Users/spectero UniqueID 13370")
-            os.system("dscl . -create /Users/spectero PrimaryGroupID 13370")
-            os.system("dscl . -create /Users/spectero UserShell /bin/bash")
+            os.system("dscl . -create /Users/spectero UniqueID 13370" + self.suppress_bash_tag)
+            os.system("dscl . -create /Users/spectero PrimaryGroupID 13370" + self.suppress_bash_tag)
+            os.system("dscl . -create /Users/spectero UserShell /bin/bash" + self.suppress_bash_tag)
 
         print("Spectero User and Group have been created.")
 
