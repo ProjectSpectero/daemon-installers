@@ -282,9 +282,8 @@ class SpecteroInstaller:
             # Create the service if we're linux.
             if sys.platform in ["linux", "linux2"]:
                 self.systemd_service()
-            else:
-                # TODO: Implement MacOS Service.
-                print("OS X Service is not implemented yet.")
+            elif sys.platform in ["darwin"]:
+                self.launchctl_service()
 
             # Create the command
             self.build_usr_sbin_script()
@@ -305,7 +304,7 @@ class SpecteroInstaller:
 
     def systemd_service(self):
         try:
-            systemd_script = self.spectero_install_path + "/" + self.channel_version + "/daemon/Tooling/Linux/spectero.service"
+            systemd_script = os.path.join(self.spectero_install_path, self.channel_version, "/daemon/Tooling/Linux/spectero.service")
 
             # String replacement.
             with open(systemd_script, 'r') as file:
@@ -330,6 +329,42 @@ class SpecteroInstaller:
             traceback.print_exc()
             print("The installer encountered a problem while configuring the systemd service.")
             print("Please report this problem.")
+
+    def launchctl_service(self):
+        # /Library/LauunchDaemons/
+        filename = "com.spectero.daemon.plist"
+        plist_dest = "/Library/LaunchDaemons/" + filename
+        plsit_template = os.path.join(self.spectero_install_path, self.channel_version, "/daemon/Tooling/Mac/", filename)
+        startscript = os.path.join(self.spectero_install_path, self.channel_version, "/daemon/Tooling/Mac/", "spectero-startup.sh")
+
+
+        with open(startscript, 'r') as file:
+            filedata = file.read()
+
+        filedata = filedata.replace("{install_location}", self.spectero_install_path)
+        filedata = filedata.replace("{install_version}", self.spectero_install_path)
+
+        with open(startscript, 'w') as file:
+            file.write(filedata)
+
+        os.system("chmod a+x " + startscript)
+
+        if os.path.exists("/Library/LaunchDaemons/com.spectero.daemon.plist"):
+            os.system("launchctl unload -w " + plist_dest)
+
+            # String replacement.
+        with open(plsit_template, 'r') as file:
+            filedata = file.read()
+
+        filedata = filedata.replace("{install_location}", self.spectero_install_path)
+        filedata = filedata.replace("{install_version}", self.spectero_install_path)
+
+        with open(plsit_template, 'w') as file:
+            file.write(filedata)
+
+        shutil.copy(plsit_template, plist_dest)
+        os.system("launchctl load -w " + plist_dest)
+
 
     def build_usr_sbin_script(self):
         try:
