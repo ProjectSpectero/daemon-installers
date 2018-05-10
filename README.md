@@ -27,7 +27,7 @@ $ sudo bash <(curl -s https://spectero.com/installer)
 ```
 
 ## Command Line Arguments
-Please view the [Command Line Arguments]() Wiki Page.
+Please view the [Command Line Arguments](https://github.com/ProjectSpectero/daemon-installer-nix/wiki/Command-Line-Arguments) Wiki Page.
 
 ## License
 ```
