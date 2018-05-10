@@ -304,7 +304,7 @@ class SpecteroInstaller:
 
     def systemd_service(self):
         try:
-            systemd_script = os.path.join(self.spectero_install_path, self.channel_version, "/daemon/Tooling/Linux/spectero.service")
+            systemd_script = os.path.join(os.path.join(self.spectero_install_path, self.channel_version), "/daemon/Tooling/Linux/spectero.service")
 
             # String replacement.
             with open(systemd_script, 'r') as file:
@@ -363,7 +363,6 @@ class SpecteroInstaller:
 
         shutil.copy(plist_template, plist_dest)
         os.system("launchctl load -w " + plist_dest)
-
 
     def build_usr_sbin_script(self):
         try:
