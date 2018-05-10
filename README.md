@@ -22,7 +22,7 @@ It is designed for easy deployment and automation.
 
 ## Quick Install
 Copy this command into your terminal to install spectero:
-```
+```sh
 $ sudo bash <(curl -s https://spectero.com/installer)
 ```
 
