@@ -63,7 +63,7 @@ elif [ "$(uname)" == "Linux" ]; then
         # Check to see if we have Python3 installed.
         if ! type "python3" &> /dev/null; then
         
-            # Cent / RHEL
+            # Cent / RHEL / Fedora
             if [[ ! -z $YUM_CMD ]]; then
                 yum install python34 -y;
         
@@ -84,8 +84,18 @@ elif [ "$(uname)" == "Linux" ]; then
         
             # Cent / RHEL
             if [[ ! -z $YUM_CMD ]]; then
-                yum install libunwind-devel libcurl-devel libicu -y;
-        
+            
+                # Fedora Workstation and Server
+                if [[ $ID == "fedora" ]]; then
+                    yum install libunwind-devel libcurl-devel libicu compat-openssl10 -y;
+                    
+                # Generic YUM based OS.
+                else
+                    yum install libunwind-devel libcurl-devel libicu -y;
+                fi
+                        
+            fi
+            
             # Debian / Ubuntu
             elif [[ ! -z $APT_GET_CMD ]]; then
             

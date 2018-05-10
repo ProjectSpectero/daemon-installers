@@ -11,7 +11,7 @@ https://spectero.com/
     Ubuntu 16.04 LTS
     Ubuntu 18.04 LTS
     CentOS 7
-    Fedora 23
+    Fedora 26+ (Operating systems that require `compat-openssl10`)
     MacOS (Work in progress)
 
 ### Supported Package Managers:
@@ -53,5 +53,5 @@ https://spectero.com/
 
         --overwrite
             By default Spectero's installer will only try to perform an upgrade if Spectero is installed.
-            Providing this argument will allow the installer to overwrite the installation if it is the latest version.
+            Providing this argument will allow the installer to overwrite the installation.
         
