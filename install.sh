@@ -290,11 +290,12 @@ class SpecteroInstaller:
             os.system("usermod -a -G spectero spectero" + self.suppress_bash_tag)
 
         elif sys.platform in ["darwin"]:
-            os.system("dscl . -create /Users/spectero")
-            os.system("dscl . -create /Users/spectero UniqueID GROUP_ID")
-            os.system("dscl . -create /Users/spectero UserShell /bin/bash")
-            os.system("dscl . -create /Users/spectero RealName \"Spectero User\"")
-            os.system("dseditgroup -o edit -a spectero -t user spectero")
+            os.system("dscl . -create /Groups/spectero")
+            os.system("dscl . -create /Groups/spectero PrimaryGroupID 13370")
+
+            os.system("dscl . -create /Users/spectero UniqueID 13370" + self.suppress_bash_tag)
+            os.system("dscl . -create /Users/spectero PrimaryGroupID 13370" + self.suppress_bash_tag)
+            os.system("dscl . -create /Users/spectero UserShell /bin/bash" + self.suppress_bash_tag)
 
         print("Spectero User and Group have been created.")
 
@@ -455,7 +456,7 @@ class SpecteroInstaller:
 
     def systemd_service(self):
         try:
-            systemd_script = os.path.join(self.spectero_install_path, self.channel_version, "/daemon/Tooling/Linux/spectero.service")
+            systemd_script = os.path.join(os.path.join(self.spectero_install_path, self.channel_version), "/daemon/Tooling/Linux/spectero.service")
 
             # String replacement.
             with open(systemd_script, 'r') as file:
@@ -485,9 +486,8 @@ class SpecteroInstaller:
         # /Library/LauunchDaemons/
         filename = "com.spectero.daemon.plist"
         plist_dest = "/Library/LaunchDaemons/" + filename
-        plsit_template = os.path.join(self.spectero_install_path, self.channel_version, "/daemon/Tooling/Mac/", filename)
-        startscript = os.path.join(self.spectero_install_path, self.channel_version, "/daemon/Tooling/Mac/", "spectero-startup.sh")
-
+        plist_template = os.path.join(os.path.join(os.path.join(self.spectero_install_path, self.channel_version), "daemon/Tooling/Mac/"), filename)
+        startscript = os.path.join(os.path.join(os.path.join(self.spectero_install_path, self.channel_version), "daemon/Tooling/Mac/"), "spectero-startup.sh")
 
         with open(startscript, 'r') as file:
             filedata = file.read()
@@ -504,18 +504,17 @@ class SpecteroInstaller:
             os.system("launchctl unload -w " + plist_dest)
 
             # String replacement.
-        with open(plsit_template, 'r') as file:
+        with open(plist_template, 'r') as file:
             filedata = file.read()
 
         filedata = filedata.replace("{install_location}", self.spectero_install_path)
         filedata = filedata.replace("{install_version}", self.channel_version)
 
-        with open(plsit_template, 'w') as file:
+        with open(plist_template, 'w') as file:
             file.write(filedata)
 
-        shutil.copy(plsit_template, plist_dest)
+        shutil.copy(plist_template, plist_dest)
         os.system("launchctl load -w " + plist_dest)
-
 
     def build_usr_sbin_script(self):
         try:
