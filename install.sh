@@ -39,11 +39,18 @@ if [ "$(uname)" == "Darwin" ]; then
         brew install python3;
     fi
     
+    # Download wget if it doesn't exist.
+    which -s wget;
+    if [[ $? != 0 ]]; then
+        brew install wget;
+    fi
+    
     # Check to see if dotnet core is installed
     which -s dotnet;
     if [[ $? != 0 ]]; then
-        # Install dotnet core
-        brew install dotnet;
+        # Download dotnet installation script and execute it
+        sudo wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
+        bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
     fi
     
 elif [ "$(uname)" == "Linux" ]; then
@@ -52,89 +59,83 @@ elif [ "$(uname)" == "Linux" ]; then
         echo "This script must be ran as root for the linux installation.";
         exit 1;
     fi
-    
-    
+
+
     # Check for Systemd
     if [ -e /etc/os-release ]; then
-    
+
         # Load OS Variables
         source /etc/os-release;
-    
+
         # Find the package manager
         YUM_CMD=$(which yum 2> /dev/null);
         APT_GET_CMD=$(which apt-get 2> /dev/null);
 
         # Check to see if we have Python3 installed.
         if ! type "python3" &> /dev/null; then
-        
-            # Cent / RHEL / Fedora
+
             if [[ ! -z $YUM_CMD ]]; then
+                # Cent / RHEL / Fedora
                 yum install python34 -y;
-        
-            # Debian / Ubuntu
+
             elif [[ ! -z $APT_GET_CMD ]]; then
+                # Debian / Ubuntu
                 apt-get install python3 -y;
-        
-            # ???
+
             else
+                # ???
                 echo "The package manager for your system was not found";
                 echo "Please report your package manager to the developers so we can add support!";
                 exit 1;
             fi
         fi
-        
+
         # Check to see if we have dotnet core installed.
         if ! type "dotnet" &> /dev/null; then
-        
             # Cent / RHEL
             if [[ ! -z $YUM_CMD ]]; then
-            
                 # Fedora Workstation and Server
                 if [[ $ID == "fedora" ]]; then
                     yum install libunwind-devel libcurl-devel libicu compat-openssl10 -y;
-                    
+
                 # Generic YUM based OS.
                 else
                     yum install libunwind-devel libcurl-devel libicu -y;
                 fi
-                        
-            fi
-            
+
             # Debian / Ubuntu
             elif [[ ! -z $APT_GET_CMD ]]; then
-            
                 if [ $ID == "ubuntu" ]; then
-                
+
                     # Some versions of ubuntu name the packages differently.
                     # Please add specifics for each version.
-                    
+
                     # Ubuntu 18.04
                     if [ $VERSION_ID == "18.04" ]; then
                         apt-get install libunwind-dev libcurl4 -y;
-                        
+
                     # Undocumented Ubuntu Version
                     else
                         apt-get install libunwind-dev libcurl4-openssl-dev -y;
                     fi
-                    
-                else 
+
+                else
                     # Generic Dependency Install
                     apt-get install libunwind-dev libcurl4-openssl-dev -y;
                 fi
-                
-        
+
             # ???
             else
                 echo "The package manager for your system was not found";
                 echo "Please report your package manager to the developers so we can add support!";
                 exit 1;
             fi
-            
+
             # Download dotnet installation script and execute it
             wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
             bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
         fi
-        
+
     else
         echo "Unsupported Operating System";
         echo "Spectero requires an operating system that uses systemd.";
