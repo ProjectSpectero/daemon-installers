@@ -487,18 +487,7 @@ class SpecteroInstaller:
         filename = "com.spectero.daemon.plist"
         plist_dest = "/Library/LaunchDaemons/" + filename
         plist_template = os.path.join(os.path.join(os.path.join(self.spectero_install_path, self.channel_version), "daemon/Tooling/Mac/"), filename)
-        startscript = os.path.join(os.path.join(os.path.join(self.spectero_install_path, self.channel_version), "daemon/Tooling/Mac/"), "spectero-startup.sh")
 
-        with open(startscript, 'r') as file:
-            filedata = file.read()
-
-        filedata = filedata.replace("{install_location}", self.spectero_install_path)
-        filedata = filedata.replace("{install_version}", self.channel_version)
-
-        with open(startscript, 'w') as file:
-            file.write(filedata)
-
-        os.system("chmod a+x " + startscript)
 
         if os.path.exists("/Library/LaunchDaemons/com.spectero.daemon.plist"):
             os.system("launchctl unload -w " + plist_dest)
