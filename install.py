@@ -287,7 +287,7 @@ class SpecteroInstaller:
                 self.launchctl_service()
 
             # Create the command
-            self.build_usr_sbin_script()
+            self.build_usr_local_bin_script()
 
             print("=" * 50)
             print("Spectero should be installed and running!")
@@ -365,7 +365,7 @@ class SpecteroInstaller:
         shutil.copy(plist_template, plist_dest)
         os.system("launchctl load -w " + plist_dest)
 
-    def build_usr_sbin_script(self):
+    def build_usr_local_bin_script(self):
         try:
             cli_script = self.spectero_install_path + "/latest/cli/Tooling/spectero"
 
@@ -380,9 +380,9 @@ class SpecteroInstaller:
             with open(cli_script, 'w') as file:
                 file.write(filedata)
 
-            print("Copying console management interface shell script to /usr/sbin/spectero")
-            shutil.copyfile(cli_script, "/usr/sbin/spectero")
-            os.system("chmod +x /usr/sbin/spectero")
+            print("Copying console management interface shell script to /usr/local/bin/spectero")
+            shutil.copyfile(cli_script, "/usr/local/bin/spectero")
+            os.system("chmod +x /usr/local/bin/spectero")
         except Exception as e:
             traceback.print_exc()
             print("The installer encountered a problem while copying the CLI script.")
