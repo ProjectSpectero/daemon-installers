@@ -155,9 +155,9 @@ import os
 import shutil
 import subprocess
 import sys
-import zipfile
 import traceback
 import urllib.request
+import zipfile
 
 INSTALLER_VERSION = 1
 
@@ -289,15 +289,7 @@ class SpecteroInstaller:
             os.system("groupadd spectero" + self.suppress_bash_tag)
             os.system("usermod -a -G spectero spectero" + self.suppress_bash_tag)
 
-        elif sys.platform in ["darwin"]:
-            os.system("dscl . -create /Groups/spectero")
-            os.system("dscl . -create /Groups/spectero PrimaryGroupID 13370")
-
-            os.system("dscl . -create /Users/spectero UniqueID 13370" + self.suppress_bash_tag)
-            os.system("dscl . -create /Users/spectero PrimaryGroupID 13370" + self.suppress_bash_tag)
-            os.system("dscl . -create /Users/spectero UserShell /bin/bash" + self.suppress_bash_tag)
-
-        print("Spectero User and Group have been created.")
+            print("Spectero User and Group have been created.")
 
     def prompt_install_location(self):
         lines = [
@@ -424,7 +416,10 @@ class SpecteroInstaller:
             try:
                 self.create_user_and_groups()
                 print("Changing ownership for installation directory: %s" % self.spectero_install_path)
-                os.system("chown -R spectero:spectero %s" % self.spectero_install_path)
+                if sys.platform in ["linux", "linux2"]:
+                    os.system("chown -R spectero:spectero %s" % self.spectero_install_path)
+                elif sys.platform in ["darwin"]:
+                    os.system("chown -R daemon:daemon %s" % self.spectero_install_path)
             except Exception as e2:
                 print("An error occurred while attempting to change directory ownership")
                 print("Does the spectero user exist?")
@@ -483,11 +478,9 @@ class SpecteroInstaller:
             print("Please report this problem.")
 
     def launchctl_service(self):
-        # /Library/LauunchDaemons/
         filename = "com.spectero.daemon.plist"
         plist_dest = "/Library/LaunchDaemons/" + filename
         plist_template = os.path.join(os.path.join(os.path.join(self.spectero_install_path, self.channel_version), "daemon/Tooling/Mac/"), filename)
-
 
         if os.path.exists("/Library/LaunchDaemons/com.spectero.daemon.plist"):
             os.system("launchctl unload -w " + plist_dest)
