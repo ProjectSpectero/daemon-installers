@@ -4,7 +4,7 @@ This is a repository of a multiplatform installer written in `bash` and `python3
 It is designed for easy deployment and automation.
 
 
-## Compatability Matrix
+## Compatability Matrices
 
 |Operating System  |Package Manager |Tested |
 |-------------------|---------------|-------|
@@ -17,6 +17,12 @@ It is designed for easy deployment and automation.
 |Fedora 27          |yum            |      |
 |Fedora 28          |yum            |✔️    |
 |macOS High Sierra  |brew           |      |
+
+### Virtualization
+|Virtualization Type|Tested |
+|-------------------|-------|
+|OpenVZ             |✔️     |
+|KVM                |✔️     |
 
 <sub><sup>At this time we only currently support operating systems that have `systemd` and either the `yum`, `apt-get` or `brew` package managers.</sup></sub>
 
