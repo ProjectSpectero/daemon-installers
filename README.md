@@ -1,7 +1,6 @@
 # Spectero Installers
-This repository is a collection of installers designed to install the [Spectero Daemon](https://).
+This repository is a collection of installers designed to install the [Spectero Daemon](https://).  
 Each directory in this repository is for a designated operating system.
-
 
 ## License
 ```
