@@ -274,11 +274,6 @@ class SpecteroInstaller:
         except:
             pass
 
-        # Check local installation
-        if os.path.isfile(os.path.join(self.spectero_install_path, "/dotnet/dotnet")):
-            self.dotnet_framework_path = self.spectero_install_path + "/dotnet/dotnet"
-            return True
-
         # No installation
         return False
 
@@ -317,6 +312,11 @@ class SpecteroInstaller:
             else:
                 if prompted_install_path[0] == "/":
                     self.spectero_install_path = prompted_install_path
+
+                    # Check for trailing slash
+                    if self.spectero_install_path.endswith('/'):
+                        self.spectero_install_path = self.spectero_install_path[:-1]  # Remove last character
+
                     try:
                         if not os.path.exists(self.spectero_install_path):
                             mkdir = subprocess.Popen(['mkdir', '-p', self.spectero_install_path])
@@ -363,7 +363,7 @@ class SpecteroInstaller:
             self.channel_version = releases["channels"][self.channel]
 
             print("Found %s release: %s" % (self.channel, self.channel_version))
-            if not execution_contains_cli_flag("--overwrite") and os.path.exists(os.path.join(self.spectero_install_path, self.channel_version)):
+            if not execution_contains_cli_flag("--overwrite") and os.path.exists("%s/%s" % (self.spectero_install_path, self.channel_version)):
                 print("You are running the latest version of spectero.")
                 sys.exit(0)
 
@@ -451,7 +451,7 @@ class SpecteroInstaller:
 
     def systemd_service(self):
         try:
-            systemd_script = os.path.join(os.path.join(self.spectero_install_path, self.channel_version), "/daemon/Tooling/Linux/spectero.service")
+            systemd_script = "%s/%s/daemon/Tooling/Linux/spectero.service" % (self.spectero_install_path, self.channel_version)
 
             # String replacement.
             with open(systemd_script, 'r') as file:
@@ -478,9 +478,12 @@ class SpecteroInstaller:
             print("Please report this problem.")
 
     def launchctl_service(self):
-        filename = "com.spectero.daemon.plist"
-        plist_dest = "/Library/LaunchDaemons/" + filename
-        plist_template = os.path.join(os.path.join(os.path.join(self.spectero_install_path, self.channel_version), "daemon/Tooling/Mac/"), filename)
+        tooling_basepath = "%s/%s/daemon/Tooling/Mac" % (self.spectero_install_path, self.channel_version)
+        plist_filename = "com.spectero.daemon.plist"
+        plist_dest = "/Library/LaunchDaemons/" + plist_filename
+
+        plist_template = "%s/%s" % (tooling_basepath, plist_filename)
+        start_shell = "%s/%s" % (tooling_basepath, plist_filename)
 
         if os.path.exists("/Library/LaunchDaemons/com.spectero.daemon.plist"):
             os.system("launchctl unload -w " + plist_dest)
