@@ -179,7 +179,7 @@ class SpecteroInstaller:
         self.spectero_install_path = "/opt/spectero"
         self.suppress_bash_tag = " >/dev/null 2>&1"
         self.systemd_service_destination = "/etc/systemd/system/spectero.service"
-        self.use_local_dotnet = False
+        self.dotnet_framework_path = False
 
         # Determine which release channel to download from.
         self.determine_channel()
@@ -273,6 +273,16 @@ class SpecteroInstaller:
                 return True
         except:
             pass
+
+        potential_paths = [
+            "/usr/bin/dotnet",
+            "/usr/local/bin/dotnet"
+        ]
+
+        for path in potential_paths:
+            if os.path.exists(path):
+                self.dotnet_framework_path = path
+                return True
 
         # No installation
         return False
