@@ -72,7 +72,7 @@ namespace installer
 
         private void ChannelVersion_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Program.version = ChannelVersion.SelectedText;
+            Program.version = ChannelVersion.Text;
         }
 
         private void ExitButton_Click(object sender, EventArgs e)

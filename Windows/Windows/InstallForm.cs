@@ -36,10 +36,11 @@ namespace installer
             WebClient webClient = new WebClient();
 
             // Store the download link in an easy to access variable
+
             string downloadLink = Program.ReleaseInformationJObject["versions"][Program.version]["download"].ToString();
 
             // Create the installation directory if it doesn't exist.
-            if (Directory.Exists(Program.installLocation))
+            if (!Directory.Exists(Program.installLocation))
                 Directory.CreateDirectory(Program.installLocation);
                 EasyLog("Created Directory: " + Program.installLocation);
 
@@ -66,7 +67,7 @@ namespace installer
             progressBar1.Style = ProgressBarStyle.Continuous;
 
             // Create Version Directory
-            if (Directory.Exists(versionDirectory))
+            if (!Directory.Exists(versionDirectory))
             {
                 EasyLog("Created version directory: " + versionDirectory);
                 Directory.CreateDirectory(versionDirectory);
