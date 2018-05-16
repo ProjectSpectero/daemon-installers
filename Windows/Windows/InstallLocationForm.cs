@@ -18,16 +18,21 @@ namespace installer
             InitializeComponent();
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
         private void InstallLocationForm_Load(object sender, EventArgs e)
         {
-            InstallLocation.Text = Program.GetInstallationPath();
+            // Set a default path to install
+            if (Program.installLocation == null)
+                Program.installLocation = Program.GetInstallationPath();
+
+            // Restore the install location.
+            InstallLocation.Text = Program.installLocation;
         }
 
+        /// <summary>
+        /// Allow the user to change the directory of where to install spectero.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChangeDirectory_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folderBrowser = new FolderBrowserDialog())
@@ -35,21 +40,34 @@ namespace installer
                 folderBrowser.Description = "Select a folder";
                 if (folderBrowser.ShowDialog() == DialogResult.OK)
                 {
-                    InstallLocation.Text = Path.Combine(folderBrowser.SelectedPath, "Spectero");
+                    var newPath = Path.Combine(folderBrowser.SelectedPath, "Spectero");
+
+                    Program.installLocation = newPath;
+                    InstallLocation.Text = newPath;
                 }
             }
         }
 
+        /// <summary>
+        /// Go back to the previous form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BackButton_Click(object sender, EventArgs e)
         {
             new SelectChannelForm().Show();
             this.Close();
         }
 
+        /// <summary>
+        /// Go to the next form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NextButton_Click(object sender, EventArgs e)
         {
-            if (Directory.Exists(InstallLocation.Text))
-                Directory.CreateDirectory(InstallLocation.Text);
+            new InstallForm().Show();
+            this.Close();
         }
     }
 }

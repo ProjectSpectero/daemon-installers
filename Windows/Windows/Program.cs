@@ -16,6 +16,7 @@ namespace Windows
         public static string TermsOfServices;
         public static string channel;
         public static string version;
+        public static string installLocation;
 
         /// <summary>
         /// The main entry point for the application.
