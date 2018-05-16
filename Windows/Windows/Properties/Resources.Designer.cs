@@ -59,5 +59,78 @@ namespace installer.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I Agree.
+        /// </summary>
+        internal static string agree {
+            get {
+                return ResourceManager.GetString("agree", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to exit the installation wizard?.
+        /// </summary>
+        internal static string exit_message {
+            get {
+                return ResourceManager.GetString("exit_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap installshield {
+            get {
+                object obj = ResourceManager.GetObject("installshield", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spectero Installer.
+        /// </summary>
+        internal static string messagebox_title {
+            get {
+                return ResourceManager.GetString("messagebox_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://c.spectero.com/releases.json.
+        /// </summary>
+        internal static string spectero_releases_url {
+            get {
+                return ResourceManager.GetString("spectero_releases_url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/LICENSE.md?token=AgV5yRRsJNlX8IMyzjnQBqDNCrZVBEpaks5bBKjLwA%3D%3D.
+        /// </summary>
+        internal static string terms_of_service_url {
+            get {
+                return ResourceManager.GetString("terms_of_service_url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please wait, the installer is gathering information..
+        /// </summary>
+        internal static string welcome_gathering_information {
+            get {
+                return ResourceManager.GetString("welcome_gathering_information", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This wizard will install Spectero on your computer. To contiunue, click Next..
+        /// </summary>
+        internal static string welcome_next_text {
+            get {
+                return ResourceManager.GetString("welcome_next_text", resourceCulture);
+            }
+        }
     }
 }
