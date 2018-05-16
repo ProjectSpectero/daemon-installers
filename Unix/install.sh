@@ -71,6 +71,25 @@ elif [ "$(uname)" == "Linux" ]; then
         YUM_CMD=$(which yum 2> /dev/null);
         APT_GET_CMD=$(which apt-get 2> /dev/null);
 
+        # Check to see if we have the sudo tool, we will ned it later.
+        if ! type "sudo" &> /dev/null; then
+
+            if [[ ! -z $YUM_CMD ]]; then
+                # Cent / RHEL / Fedora
+                yum install sudo -y;
+
+            elif [[ ! -z $APT_GET_CMD ]]; then
+                # Debian / Ubuntu
+                apt-get install sudo -y;
+
+            else
+                # ???
+                echo "The package manager for your system was not found";
+                echo "Please report your package manager to the developers so we can add support!";
+                exit 1;
+            fi
+        fi
+
         # Check to see if we have Python3 installed.
         if ! type "python3" &> /dev/null; then
 
@@ -105,6 +124,7 @@ elif [ "$(uname)" == "Linux" ]; then
 
             # Debian / Ubuntu
             elif [[ ! -z $APT_GET_CMD ]]; then
+            # Ubuntu
                 if [ $ID == "ubuntu" ]; then
 
                     # Some versions of ubuntu name the packages differently.
@@ -115,6 +135,18 @@ elif [ "$(uname)" == "Linux" ]; then
                         apt-get install libunwind-dev libcurl4 -y;
 
                     # Undocumented Ubuntu Version
+                    else
+                        apt-get install libunwind-dev libcurl4-openssl-dev -y;
+                    fi
+
+                # Debian
+                elif [ $ID == "debian" ]; then
+
+                    # Starch
+                    if [ $VERSION_ID == "9" ]; then
+                        apt-get install libicu-dev libunwind-dev libcurl4-openssl-dev -y;
+
+                    # Undocumented Debian Version.
                     else
                         apt-get install libunwind-dev libcurl4-openssl-dev -y;
                     fi
