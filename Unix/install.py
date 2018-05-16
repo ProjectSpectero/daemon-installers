@@ -123,6 +123,16 @@ class SpecteroInstaller:
         except:
             pass
 
+        potential_paths = [
+            "/usr/bin/dotnet",
+            "/usr/local/bin/dotnet"
+        ]
+
+        for path in potential_paths:
+            if os.path.exists(path):
+                self.dotnet_framework_path = path
+                return True
+
         # No installation
         return False
 
