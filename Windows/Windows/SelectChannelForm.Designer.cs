@@ -85,7 +85,7 @@
             this.StableRadio.TabIndex = 5;
             this.StableRadio.Text = "Stable (Intended for Production)";
             this.StableRadio.UseVisualStyleBackColor = true;
-            this.StableRadio.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
+            this.StableRadio.CheckedChanged += new System.EventHandler(this.StableRadio_CheckChanged);
             // 
             // label3
             // 
@@ -108,7 +108,7 @@
             this.BetaRadio.TabIndex = 6;
             this.BetaRadio.Text = "Beta (Test the newest features, problems may occur)\r\n";
             this.BetaRadio.UseVisualStyleBackColor = true;
-            this.BetaRadio.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            this.BetaRadio.CheckedChanged += new System.EventHandler(this.BetaRadio_CheckChanged);
             // 
             // AlphaRadio
             // 
@@ -120,7 +120,7 @@
             this.AlphaRadio.Text = "Alpha (Test the newest features before the beta channel, but may run into issues " +
     "more frequently)\r\n";
             this.AlphaRadio.UseVisualStyleBackColor = true;
-            this.AlphaRadio.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            this.AlphaRadio.CheckedChanged += new System.EventHandler(this.AlphaRadio_CheckChanged);
             // 
             // ChannelVersion
             // 
@@ -200,6 +200,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SelectChannelForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Spectero Installation Wizard";
             this.Load += new System.EventHandler(this.SelectChannelForm_Load);
             this.panel1.ResumeLayout(false);

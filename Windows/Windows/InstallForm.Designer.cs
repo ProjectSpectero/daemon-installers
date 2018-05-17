@@ -34,7 +34,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.OverallProgress = new System.Windows.Forms.ProgressBar();
             this.Logger = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -102,12 +102,12 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Please wait...";
             // 
-            // progressBar1
+            // OverallProgress
             // 
-            this.progressBar1.Location = new System.Drawing.Point(12, 97);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(621, 23);
-            this.progressBar1.TabIndex = 19;
+            this.OverallProgress.Location = new System.Drawing.Point(12, 97);
+            this.OverallProgress.Name = "OverallProgress";
+            this.OverallProgress.Size = new System.Drawing.Size(621, 23);
+            this.OverallProgress.TabIndex = 19;
             // 
             // Logger
             // 
@@ -147,7 +147,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.Logger);
-            this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.OverallProgress);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -173,7 +173,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.ProgressBar OverallProgress;
         private System.Windows.Forms.RichTextBox Logger;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;

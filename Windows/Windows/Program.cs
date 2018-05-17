@@ -12,11 +12,18 @@ namespace Windows
     static class Program
     {
 
-        public static JObject ReleaseInformationJObject;
-        public static string TermsOfServices;
-        public static string channel;
-        public static string version;
-        public static string installLocation;
+        /*
+         * Installer Varaibles
+         * Due to the nature of which the installer can go back and forth,
+         * we assign these variables so in the event the user goes back
+         * we remember where we left off.
+         */
+        public static JObject ReleaseInformationJObject; // Get release information from the server.
+        public static string TermsOfServices; // Placeholder to store the terms of services for the richtextbox.
+        public static string Channel; // Stable, Alpha, Beta
+        public static string Version; // The version the user has selected.
+        public static string InstallLocation; // The path of where spectero should be installed.
+        public static bool CreateService = true; // Where to install spectero
 
         /// <summary>
         /// The main entry point for the application.

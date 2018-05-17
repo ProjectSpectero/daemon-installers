@@ -39,6 +39,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.ChangeDirectory = new System.Windows.Forms.Button();
+            this.InstallAsService = new System.Windows.Forms.CheckBox();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -116,7 +117,7 @@
             // 
             // InstallLocation
             // 
-            this.InstallLocation.Location = new System.Drawing.Point(85, 230);
+            this.InstallLocation.Location = new System.Drawing.Point(85, 206);
             this.InstallLocation.Name = "InstallLocation";
             this.InstallLocation.Size = new System.Drawing.Size(477, 20);
             this.InstallLocation.TabIndex = 17;
@@ -124,7 +125,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(82, 124);
+            this.label3.Location = new System.Drawing.Point(82, 100);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(292, 65);
             this.label3.TabIndex = 18;
@@ -134,7 +135,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(82, 214);
+            this.label4.Location = new System.Drawing.Point(82, 190);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(96, 13);
             this.label4.TabIndex = 19;
@@ -142,7 +143,7 @@
             // 
             // ChangeDirectory
             // 
-            this.ChangeDirectory.Location = new System.Drawing.Point(446, 256);
+            this.ChangeDirectory.Location = new System.Drawing.Point(446, 232);
             this.ChangeDirectory.Name = "ChangeDirectory";
             this.ChangeDirectory.Size = new System.Drawing.Size(116, 23);
             this.ChangeDirectory.TabIndex = 3;
@@ -150,12 +151,24 @@
             this.ChangeDirectory.UseVisualStyleBackColor = true;
             this.ChangeDirectory.Click += new System.EventHandler(this.ChangeDirectory_Click);
             // 
+            // InstallAsService
+            // 
+            this.InstallAsService.AutoSize = true;
+            this.InstallAsService.Location = new System.Drawing.Point(85, 268);
+            this.InstallAsService.Name = "InstallAsService";
+            this.InstallAsService.Size = new System.Drawing.Size(194, 17);
+            this.InstallAsService.TabIndex = 20;
+            this.InstallAsService.Text = "Install Spectero as a system service\r\n";
+            this.InstallAsService.UseVisualStyleBackColor = true;
+            this.InstallAsService.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // InstallLocationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(645, 402);
             this.ControlBox = false;
+            this.Controls.Add(this.InstallAsService);
             this.Controls.Add(this.ChangeDirectory);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -190,5 +203,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button ChangeDirectory;
+        private System.Windows.Forms.CheckBox InstallAsService;
     }
 }

@@ -13,6 +13,9 @@ namespace installer
 {
     public partial class InstallLocationForm : Form
     {
+
+        public bool formLoaded = false;
+
         public InstallLocationForm()
         {
             InitializeComponent();
@@ -21,11 +24,16 @@ namespace installer
         private void InstallLocationForm_Load(object sender, EventArgs e)
         {
             // Set a default path to install
-            if (Program.installLocation == null)
-                Program.installLocation = Program.GetInstallationPath();
+            if (Program.InstallLocation == null)
+                Program.InstallLocation = Program.GetInstallationPath();
 
             // Restore the install location.
-            InstallLocation.Text = Program.installLocation;
+            InstallLocation.Text = Program.InstallLocation;
+
+            // Restore the checkbot
+            InstallAsService.Checked = Program.CreateService;
+
+            formLoaded = true;
         }
 
         /// <summary>
@@ -42,7 +50,7 @@ namespace installer
                 {
                     var newPath = Path.Combine(folderBrowser.SelectedPath, "Spectero");
 
-                    Program.installLocation = newPath;
+                    Program.InstallLocation = newPath;
                     InstallLocation.Text = newPath;
                 }
             }
@@ -68,6 +76,11 @@ namespace installer
         {
             new InstallForm().Show();
             this.Close();
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (formLoaded) Program.CreateService = InstallAsService.Checked;
         }
     }
 }
