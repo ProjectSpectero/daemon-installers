@@ -98,7 +98,7 @@ namespace Windows
             if (InstallSliently == true && CommandLineArgumentExists("--version"))
             {
                 int versionPosition = GetAfterArgument("--version");
-
+                Version = Environment.GetCommandLineArgs()[versionPosition];
             }
             else if (InstallSliently != true && CommandLineArgumentExists("--version"))
             {
