@@ -57,7 +57,7 @@ namespace installer
         /// <summary>
         /// The thread that will do most of the logic for the form.
         /// </summary>
-        private void Worker()
+        public void Worker()
         {
             // Store the download link in an easy to access variable
             _downloadLink = Program.ReleaseInformation["versions"][Program.Version]["download"].ToString();

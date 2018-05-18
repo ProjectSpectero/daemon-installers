@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using installer;
 using installer.Properties;
 using Newtonsoft.Json.Linq;
 
@@ -37,15 +38,36 @@ namespace Windows
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Download information
-            WebClient dataClient = new WebClient();
-            Program.ReleaseInformation = JObject.Parse(dataClient.DownloadString(Resources.spectero_releases_url));
-            Program.TermsOfServices = dataClient.DownloadString(Resources.terms_of_service_url);
+            try
+            {
+                WebClient dataClient = new WebClient();
+                Program.ReleaseInformation = JObject.Parse(dataClient.DownloadString(Resources.spectero_releases_url));
+                Program.TermsOfServices = dataClient.DownloadString(Resources.terms_of_service_url);
+
+                
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Failed to download release data. Are you connected to the internet?",
+                    "Spectero Installer", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            }
 
             // Handle the arguments
             HandleArguments();
 
-            new WelcomeForm().Show();
+            // Make sure the channel can be used.
+            //TODO: ValidateAvailability();
+
+            if (!InstallSliently)
+            {
+                new WelcomeForm().Show();
+            }
+            else
+            {
+                new InstallForm().Worker();
+            }
             Application.Run();
+            HarshExit();
         }
 
         /// <summary>
@@ -87,12 +109,20 @@ namespace Windows
         private static void HandleArguments()
         {
             // Check if we should install silently.
-            if (CommandLineArgumentExists("--silent")) InstallSliently = true;
+            if (CommandLineArgumentExists("--silent"))
+                InstallSliently = true;
+
 
             // Channels - Most dangerous to safe.
-            if (CommandLineArgumentExists("--alpha")) Channel = "alpha";
-            if (CommandLineArgumentExists("--beta")) Channel = "beta";
-            if (CommandLineArgumentExists("--stable")) Channel = "stable";
+            if (CommandLineArgumentExists("--alpha"))
+                Channel = "alpha";
+
+            if (CommandLineArgumentExists("--beta"))
+                Channel = "beta";
+
+            if (CommandLineArgumentExists("--stable"))
+                Channel = "stable";
+
 
             // Check if the user provided a version
             if (InstallSliently == true && CommandLineArgumentExists("--version"))
@@ -120,10 +150,8 @@ namespace Windows
         private static int GetAfterArgument(string passedArg)
         {
             for (var index = 0; index < Environment.GetCommandLineArgs().Length; index++)
-            {
-                string arg = Environment.GetCommandLineArgs()[index];
-                if (arg == passedArg) return index;
-            }
+                if (Environment.GetCommandLineArgs()[index] == passedArg)
+                    return index;
 
             return -1;
         }
