@@ -1,62 +1,82 @@
 {
-   "Windows":{
-      "Windows 10":{
-         "tested":true
-      },
-      "Windows 8.1":{
-         "tested":false
-      },
-      "Windows 8":{
-         "tested":false
-      },
-      "Windows 7":{
-         "tested":false
-      }
-   },
-   "MacOS":{
-      "High Sierra":{
-         "tested":false
-      },
-      "Sierra":{
-         "tested":false
-      }
-   },
-   "Linux":{
-      "Debian 8":{
-         "package-manager":"apt-get",
-         "tested":true
-      },
-      "Debian 9":{
-         "package-manager":"apt-get",
-         "tested":true
-      },
-      "Ubuntu 16.04 LTS":{
-         "package-manager":"apt-get",
-         "tested":true
-      },
-      "Ubuntu 17.04":{
-         "package-manager":"apt-get",
-         "tested":false
-      },
-      "Ubuntu 17.10":{
-         "package-manager":"apt-get",
-         "tested":false
-      },
-      "Ubuntu 18.04 LTS":{
-         "package-manager":"apt-get",
-         "tested":true
-      },
-      "Fedora 26":{
-         "package-manager":"yum",
-         "tested":false
-      },
-      "Fedora 27":{
-         "package-manager":"yum",
-         "tested":false
-      },
-      "Fedora 28":{
-         "package-manager":"yum",
-         "tested":false
-      }
-   }
+    "Windows":{
+        "Windows 10":{
+            "tested":true
+        },
+        "Windows 8.1":{
+            "tested":false
+        },
+        "Windows 8":{
+            "tested":false
+        },
+        "Windows 7":{
+            "tested":false
+        }
+    },
+    "MacOS":{
+        "High Sierra":{
+            "tested":false
+        },
+        "Sierra":{
+            "tested":false
+        }
+    },
+    "Linux":{
+        "Debian":{
+            "Distributions":{
+                "8":{
+                    "tested":true
+                },
+                "9":{
+                    "tested":true
+                }
+            },
+            "Package Manager":"apt-get"
+        },
+        "Ubuntu":{
+            "Distributions":{
+                "16.04 LTS":{
+                    "tested":true
+                },
+                "16.10":{
+                    "tested":false
+                },
+                "17.04":{
+                    "tested":false
+                },
+                "17.10":{
+                    "tested":false
+                },
+                "18.04 LTS":{
+                    "tested":true
+                }
+            },
+            "Package Manager":"apt-get"
+        },
+        "CentOS":{
+            "Distributions":{
+                "7":{
+                    "tested":true
+                },
+                "8":{
+                    "tested":true
+                }
+            },
+            "Package Manager":"yum"
+        },
+        "Fedora":{
+            "Distributions":{
+                "26":{
+                    "tested":false
+                },
+                "27":{
+                    "tested":false
+                },
+                "28":{
+                    "tested":true
+                }
+            },
+            "Package Manager":"yum"
+        }
+    }
 }
