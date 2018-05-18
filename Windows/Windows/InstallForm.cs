@@ -140,6 +140,9 @@ namespace installer
                 Application.DoEvents();
             }
 
+            // Disable the cancel button.
+            ExitButton.Enabled = false;
+
             // Mark as complete and enable the progress bar
             EasyLog("Installation is complete.");
             NextButton.Enabled = true;
@@ -229,7 +232,8 @@ namespace installer
         /// <param name="e"></param>
         private void NextButton_Click(object sender, EventArgs e)
         {
-
+            new FinishForm().Show();
+            this.Close();
         }
 
         private void Logger_TextChanged(object sender, EventArgs e)

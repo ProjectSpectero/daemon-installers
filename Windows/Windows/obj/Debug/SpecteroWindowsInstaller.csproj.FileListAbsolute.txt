@@ -12,3 +12,7 @@ C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\bin\Debug\Spectero
 C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\bin\Debug\Spectero Installer.pdb
 C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\obj\Debug\Spectero Installer.exe
 C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\obj\Debug\Spectero Installer.pdb
+C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\bin\Debug\Newtonsoft.Json.dll
+C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\bin\Debug\Newtonsoft.Json.xml
+C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\obj\Debug\SpecteroWindowsInstaller.csprojResolveAssemblyReference.cache

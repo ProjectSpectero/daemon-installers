@@ -57,20 +57,20 @@ namespace Windows
             // Handle the arguments
             HandleArguments();
 
-            // Make sure the channel can be used.
-            ValidateAvailability();
 
             if (!InstallSliently)
             {
+                ValidateAllChannelAvailability();
                 new WelcomeForm().Show();
             }
             else
             {
+                // Make sure we can use the current channel.
+                ValidateChhannelAvailability();
                 new InstallForm().Worker();
             }
 
             Application.Run();
-            HarshExit();
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Windows
                 if (Environment.GetCommandLineArgs()[index] == passedArg)
                     return index;
 
-            
+
             HarshExit();
             return -1;
         }
@@ -190,13 +190,24 @@ namespace Windows
         /// <summary>
         /// Make sure the release channel is available.
         /// </summary>
-        private static void ValidateAvailability()
+        private static void ValidateChhannelAvailability()
         {
             if (ReleaseInformation["channels"][Channel].Type == JTokenType.Null)
             {
                 MessageBox.Show("Spectero has not released a version for this release channel.", "Spectero Installer",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 HarshExit();
+            }
+        }
+
+        private static void ValidateAllChannelAvailability()
+        {
+            if (ReleaseInformation["channels"]["stable"].Type == JTokenType.Null &&
+                ReleaseInformation["channels"]["beta"].Type == JTokenType.Null &&
+                ReleaseInformation["channels"]["alpha"].Type == JTokenType.Null)
+            {
+                MessageBox.Show("There are no available releases of Spectero.", "Spectero Installer",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
