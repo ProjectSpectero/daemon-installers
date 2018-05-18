@@ -25,8 +25,8 @@ namespace Windows
         public static string Channel; // Stable, Alpha, Beta
         public static string Version; // The version the user has selected.
         public static string InstallLocation; // The path of where spectero should be installed.
-        public static bool CreateService = true; // Where to install spectero
-        public static bool InstallSliently = false;
+        public static bool CreateService = true; // Should we install spectero as a service?
+        public static bool InstallSliently = false; // Should the installer run silently?
 
         /// <summary>
         /// The main entry point for the application.
@@ -163,6 +163,11 @@ namespace Windows
                     Resources.silent_install_requires_path,
                     Resources.messagebox_title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
+
+
+            // Check if we should install the service
+            if (CommandLineArgumentExists("--service"))
+                CreateService = true;
         }
 
         /// <summary>
