@@ -156,4 +156,7 @@
   <data name="version_not_silent" xml:space="preserve">
     <value>You attempted to specify a specific version through the command line. This flag is unsupported in GUI mode.</value>
   </data>
+  <data name="release_data_error" xml:space="preserve">
+    <value>Failed to download release data. Are you connected to the internet?</value>
+  </data>
 </root>

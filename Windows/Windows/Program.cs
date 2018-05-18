@@ -46,8 +46,12 @@ namespace Windows
             }
             catch (Exception e)
             {
-                MessageBox.Show("Failed to download release data. Are you connected to the internet?",
-                    "Spectero Installer", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show(
+                    Resources.release_data_error, 
+                    Resources.messagebox_title,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Stop
+                    );
             }
 
             // Handle the arguments

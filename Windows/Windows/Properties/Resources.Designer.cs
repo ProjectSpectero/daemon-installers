@@ -107,6 +107,15 @@ namespace installer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to download release data. Are you connected to the internet?.
+        /// </summary>
+        internal static string release_data_error {
+            get {
+                return ResourceManager.GetString("release_data_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Silent installation requires a installation path, please provide it using the --install-path argument..
         /// </summary>
         internal static string silent_install_requires_path {
