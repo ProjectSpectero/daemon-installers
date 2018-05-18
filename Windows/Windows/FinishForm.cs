@@ -19,7 +19,7 @@ namespace installer
 
         private void ExitButton_Click(object sender, EventArgs e)
         {
-            Program.HarshExit();
+            Program.HarshExit(false);
         }
 
         private void FinishForm_Load(object sender, EventArgs e)
