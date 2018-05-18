@@ -78,9 +78,24 @@ namespace installer
             this.Close();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             if (formLoaded) Program.CreateService = InstallAsService.Checked;
+        }
+
+        /// <summary>
+        /// Exit the application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitButton_Click(object sender, EventArgs e)
+        {
+            Program.HarshExit();
         }
     }
 }

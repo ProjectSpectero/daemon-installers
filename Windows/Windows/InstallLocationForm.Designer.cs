@@ -83,6 +83,7 @@
             this.ExitButton.TabIndex = 0;
             this.ExitButton.Text = "Cancel";
             this.ExitButton.UseVisualStyleBackColor = true;
+            this.ExitButton.Click += new System.EventHandler(this.ExitButton_Click);
             // 
             // panel1
             // 

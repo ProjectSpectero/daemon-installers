@@ -42,7 +42,10 @@ namespace installer
         /// <param name="e"></param>
         private void InstallForm_Load(object sender, EventArgs e)
         {
+            // allow illegal thread access to the UI, doesn't mater here
             CheckForIllegalCrossThreadCalls = false;
+            
+            // Show the form and get to work.
             this.Show();
 
             // Do our work in a thread, so the user has some form of interactivity.
@@ -105,7 +108,7 @@ namespace installer
                 string currentPath = Path.Combine(Program.InstallLocation, zipEntry.Name);
 
                 // Create the directory if needed.
-                if (zipEntry.IsDirectory && !Directory.Exists(currentPath))
+                if (zipEntry.IsDirectory)
                 {
                     Directory.CreateDirectory(currentPath);
                     EasyLog("Created Directory: " + currentPath);
@@ -211,11 +214,21 @@ namespace installer
             // User said yes, stop.
             if (prompt == DialogResult.Yes)
             {
-                Application.Exit();
+                Program.HarshExit(false);
             }
 
             // If we didn't get the result we needed, continue.
             _pauseActions = false;
+        }
+
+        /// <summary>
+        /// The next button.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NextButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

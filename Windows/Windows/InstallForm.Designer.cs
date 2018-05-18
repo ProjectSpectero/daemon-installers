@@ -56,12 +56,14 @@
             // 
             // NextButton
             // 
+            this.NextButton.Enabled = false;
             this.NextButton.Location = new System.Drawing.Point(446, 8);
             this.NextButton.Name = "NextButton";
             this.NextButton.Size = new System.Drawing.Size(91, 23);
             this.NextButton.TabIndex = 1;
             this.NextButton.Text = "Finish";
             this.NextButton.UseVisualStyleBackColor = true;
+            this.NextButton.Click += new System.EventHandler(this.NextButton_Click);
             // 
             // ExitButton
             // 

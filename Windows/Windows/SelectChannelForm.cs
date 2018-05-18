@@ -115,8 +115,7 @@ namespace installer
         /// <param name="e"></param>
         private void ExitButton_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show(Resources.exit_message, Resources.messagebox_title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
-                Application.Exit();
+            Program.HarshExit();
         }
 
         /// <summary>

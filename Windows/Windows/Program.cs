@@ -5,13 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using installer.Properties;
 using Newtonsoft.Json.Linq;
 
 namespace Windows
 {
     static class Program
     {
-
         /*
          * Installer Varaibles
          * Due to the nature of which the installer can go back and forth,
@@ -54,6 +54,23 @@ namespace Windows
         public static string GetInstallationPath()
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Spectero");
+        }
+
+        /// <summary>
+        /// Agressive workaround since Application.exit doesn't work.
+        /// </summary>
+        public static void HarshExit(bool prompt = true)
+        {
+            if (prompt)
+            {
+                if (MessageBox.Show(Resources.exit_message, Resources.messagebox_title, MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning) == DialogResult.Yes)
+                    Process.GetCurrentProcess().Kill();
+            }
+            else
+            {
+                Process.GetCurrentProcess().Kill();
+            }
         }
     }
 }
