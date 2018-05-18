@@ -26,6 +26,7 @@ namespace installer
         private bool _downloaded = false;
         private DateTime _timeStarted;
         private bool _pauseActions = false;
+        private long _lastBytesDownlaoded;
 
         /// <summary>
         /// Class constructor
@@ -59,7 +60,7 @@ namespace installer
         private void Worker()
         {
             // Store the download link in an easy to access variable
-            _downloadLink = Program.ReleaseInformationJObject["versions"][Program.Version]["download"].ToString();
+            _downloadLink = Program.ReleaseInformation["versions"][Program.Version]["download"].ToString();
 
             // Create the installation directory if it doesn't exist.
             if (!Directory.Exists(Program.InstallLocation))
@@ -229,6 +230,15 @@ namespace installer
         private void NextButton_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void Logger_TextChanged(object sender, EventArgs e)
+        {
+            // set the current caret position to the end
+            Logger.SelectionStart = Logger.Text.Length;
+
+            // scroll it automatically
+            Logger.ScrollToCaret();
         }
     }
 }

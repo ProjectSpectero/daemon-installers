@@ -25,13 +25,13 @@ namespace installer
         private void SelectChannelForm_Load(object sender, EventArgs e)
         {
             // Disable channels that are null.
-            if (Program.ReleaseInformationJObject["channels"]["stable"].Type == JTokenType.Null)
+            if (Program.ReleaseInformation["channels"]["stable"].Type == JTokenType.Null)
                 StableRadio.Enabled = false;
 
-            if (Program.ReleaseInformationJObject["channels"]["beta"].Type == JTokenType.Null)
+            if (Program.ReleaseInformation["channels"]["beta"].Type == JTokenType.Null)
                 BetaRadio.Enabled = false;
 
-            if (Program.ReleaseInformationJObject["channels"]["alpha"].Type == JTokenType.Null)
+            if (Program.ReleaseInformation["channels"]["alpha"].Type == JTokenType.Null)
                 AlphaRadio.Enabled = false;
 
             // Check if we should just exit
@@ -85,14 +85,14 @@ namespace installer
             ChannelVersion.Items.Clear();
 
             // Iterate over each version to provide choice for this channel.
-            foreach (var jToken in Program.ReleaseInformationJObject["versions"])
+            foreach (var jToken in Program.ReleaseInformation["versions"])
             {
                 var currentVersion = (JProperty)jToken;
                 ChannelVersion.Items.Add(currentVersion.Name);
             }
 
             // Select the combobox to the latest value.
-            ChannelVersion.SelectedText = Program.ReleaseInformationJObject["channels"][channel].ToString();
+            ChannelVersion.SelectedText = Program.ReleaseInformation["channels"][channel].ToString();
 
             // Remember the selected channel.
             Program.Channel = channel;

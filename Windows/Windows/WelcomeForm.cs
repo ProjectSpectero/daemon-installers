@@ -16,8 +16,6 @@ namespace Windows
 {
     public partial class WelcomeForm : Form
     {
-        WebClient dataClient = new WebClient();
-
         public WelcomeForm()
         {
             InitializeComponent();
@@ -30,10 +28,6 @@ namespace Windows
 
             // Change status text to gathering data
             StatusLabel.Text = Resources.welcome_gathering_information;
-
-            // Download data
-            Program.ReleaseInformationJObject = JObject.Parse(dataClient.DownloadString(Resources.spectero_releases_url));
-            Program.TermsOfServices = dataClient.DownloadString(Resources.terms_of_service_url);
 
             // Change status text to ready
             StatusLabel.Text = Resources.welcome_next_text;

@@ -123,6 +123,7 @@
             this.Logger.Size = new System.Drawing.Size(621, 191);
             this.Logger.TabIndex = 20;
             this.Logger.Text = "";
+            this.Logger.TextChanged += new System.EventHandler(this.Logger_TextChanged);
             // 
             // label3
             // 
