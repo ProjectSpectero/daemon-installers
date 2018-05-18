@@ -47,11 +47,11 @@ namespace Windows
             catch (Exception e)
             {
                 MessageBox.Show(
-                    Resources.release_data_error, 
+                    Resources.release_data_error,
                     Resources.messagebox_title,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Stop
-                    );
+                );
             }
 
             // Handle the arguments
@@ -126,9 +126,12 @@ namespace Windows
             if (CommandLineArgumentExists("--stable"))
                 Channel = "stable";
 
+            // If a channel wasn't provided, use stable by deafult.
+            if (InstallSliently && Channel == null)
+                Channel = "stable";
 
             // Check if the user provided a version
-            if (InstallSliently  && CommandLineArgumentExists("--version"))
+            if (InstallSliently && CommandLineArgumentExists("--version"))
             {
                 Version = Environment.GetCommandLineArgs()[GetAfterArgument("--version")];
             }
