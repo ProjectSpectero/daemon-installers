@@ -58,7 +58,7 @@ namespace Windows
             HandleArguments();
 
             // Make sure the channel can be used.
-            //TODO: ValidateAvailability();
+            ValidateAvailability();
 
             if (!InstallSliently)
             {
@@ -178,6 +178,19 @@ namespace Windows
                     return index;
 
             return -1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void ValidateAvailability()
+        {
+            if (ReleaseInformation["channels"][Channel].Type == JTokenType.Null)
+            {
+                MessageBox.Show("Spectero has not released a version for this release channel.", "Spectero Installer",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                HarshExit();
+            }
         }
     }
 }
