@@ -128,11 +128,11 @@ namespace Windows
 
 
             // Check if the user provided a version
-            if (InstallSliently == true && CommandLineArgumentExists("--version"))
+            if (InstallSliently  && CommandLineArgumentExists("--version"))
             {
                 Version = Environment.GetCommandLineArgs()[GetAfterArgument("--version")];
             }
-            else if (InstallSliently != true && CommandLineArgumentExists("--version"))
+            else if (!InstallSliently && CommandLineArgumentExists("--version"))
             {
                 MessageBox.Show(
                     Resources.version_not_silent,
@@ -140,7 +140,7 @@ namespace Windows
                 );
                 HarshExit(false);
             }
-            else if (InstallSliently == true && !CommandLineArgumentExists("--version"))
+            else if (InstallSliently && !CommandLineArgumentExists("--version"))
             {
                 // Determine if we should use the stable by default, or the provided channel.
                 Version = (Channel == null)
