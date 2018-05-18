@@ -162,6 +162,12 @@ namespace Windows
             }
         }
 
+        /// <summary>
+        /// Get the next argument after the passed.
+        /// This is a quick way to determine the --version and --install-path
+        /// </summary>
+        /// <param name="passedArg"></param>
+        /// <returns></returns>
         private static int GetAfterArgument(string passedArg)
         {
             for (var index = 0; index < Environment.GetCommandLineArgs().Length; index++)
