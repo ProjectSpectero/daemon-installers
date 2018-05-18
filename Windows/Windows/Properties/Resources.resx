@@ -150,4 +150,10 @@
   <data name="cancel_installation_prompt" xml:space="preserve">
     <value>Are you sure you want to cancel the installation?</value>
   </data>
+  <data name="silent_install_requires_path" xml:space="preserve">
+    <value>Silent installation requires a installation path, please provide it using the --install-path argument.</value>
+  </data>
+  <data name="version_not_silent" xml:space="preserve">
+    <value>You attempted to specify a specific version through the command line. This flag is unsupported in GUI mode.</value>
+  </data>
 </root>

@@ -107,6 +107,15 @@ namespace installer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Silent installation requires a installation path, please provide it using the --install-path argument..
+        /// </summary>
+        internal static string silent_install_requires_path {
+            get {
+                return ResourceManager.GetString("silent_install_requires_path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://c.spectero.com/releases.json.
         /// </summary>
         internal static string spectero_releases_url {
@@ -121,6 +130,15 @@ namespace installer.Properties {
         internal static string terms_of_service_url {
             get {
                 return ResourceManager.GetString("terms_of_service_url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You attempted to specify a specific version through the command line. This flag is unsupported in GUI mode..
+        /// </summary>
+        internal static string version_not_silent {
+            get {
+                return ResourceManager.GetString("version_not_silent", resourceCulture);
             }
         }
         

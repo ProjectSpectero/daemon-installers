@@ -43,8 +43,6 @@ namespace Windows
                 WebClient dataClient = new WebClient();
                 Program.ReleaseInformation = JObject.Parse(dataClient.DownloadString(Resources.spectero_releases_url));
                 Program.TermsOfServices = dataClient.DownloadString(Resources.terms_of_service_url);
-
-                
             }
             catch (Exception e)
             {
@@ -66,6 +64,7 @@ namespace Windows
             {
                 new InstallForm().Worker();
             }
+
             Application.Run();
             HarshExit();
         }
@@ -127,14 +126,13 @@ namespace Windows
             // Check if the user provided a version
             if (InstallSliently == true && CommandLineArgumentExists("--version"))
             {
-                int versionPosition = GetAfterArgument("--version");
-                Version = Environment.GetCommandLineArgs()[versionPosition];
+                Version = Environment.GetCommandLineArgs()[GetAfterArgument("--version")];
             }
             else if (InstallSliently != true && CommandLineArgumentExists("--version"))
             {
                 MessageBox.Show(
-                    "You attempted to specify a specific version through the command line. This flag is unsupported in GUI mode.",
-                    "Spectero Installer", MessageBoxButtons.OK, MessageBoxIcon.Stop
+                    Resources.version_not_silent,
+                    Resources.messagebox_title, MessageBoxButtons.OK, MessageBoxIcon.Stop
                 );
                 HarshExit(false);
             }
@@ -144,6 +142,19 @@ namespace Windows
                 Version = (Channel == null)
                     ? ReleaseInformation["channels"]["stable"].ToString() // Use the stable, the user didn't provide.
                     : ReleaseInformation["channels"][Channel].ToString(); // Use the provided channel.
+            }
+
+
+            // Check for install location
+            if (InstallSliently == true && CommandLineArgumentExists("--install-path"))
+            {
+                InstallLocation = Environment.GetCommandLineArgs()[GetAfterArgument("--install-path")];
+            }
+            else if (InstallSliently == true && !CommandLineArgumentExists("--install-path"))
+            {
+                MessageBox.Show(
+                    Resources.silent_install_requires_path,
+                    Resources.messagebox_title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
         }
 

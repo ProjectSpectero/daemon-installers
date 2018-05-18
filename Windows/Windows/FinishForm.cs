@@ -21,5 +21,10 @@ namespace installer
         {
             Program.HarshExit();
         }
+
+        private void FinishForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
