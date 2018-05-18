@@ -20,12 +20,12 @@ namespace installer
     public partial class InstallForm : Form
     {
         // Palceholder variables
-        private string zipFilename;
-        private string absoluteZipPath;
-        private string downloadLink;
-        private bool downloaded = false;
-        private DateTime TimeStarted;
-        private bool PauseActions = false;
+        private string _zipFilename;
+        private string _absoluteZipPath;
+        private string _downloadLink;
+        private bool _downloaded = false;
+        private DateTime _timeStarted;
+        private bool _pauseActions = false;
 
         /// <summary>
         /// Class constructor
@@ -56,7 +56,7 @@ namespace installer
         private void Worker()
         {
             // Store the download link in an easy to access variable
-            downloadLink = Program.ReleaseInformationJObject["versions"][Program.Version]["download"].ToString();
+            _downloadLink = Program.ReleaseInformationJObject["versions"][Program.Version]["download"].ToString();
 
             // Create the installation directory if it doesn't exist.
             if (!Directory.Exists(Program.InstallLocation))
@@ -69,26 +69,26 @@ namespace installer
             EasyLog(string.Format("Downloading version {0} ({1} release) from {2}",
                 Program.Version,
                 Program.Channel,
-                downloadLink
+                _downloadLink
             ));
 
             // Update the progres sbar to an unknown state.
             //OverallProgress.Style = ProgressBarStyle.Marquee;
 
             // Create shorthand variables to use rather than redundant functions.
-            zipFilename = Program.Version + ".zip";
-            absoluteZipPath = Path.Combine(Program.InstallLocation, zipFilename);
+            _zipFilename = Program.Version + ".zip";
+            _absoluteZipPath = Path.Combine(Program.InstallLocation, _zipFilename);
 
             DownloadBackgroundWorker.RunWorkerAsync();
 
             // Waiting for the download to complete.
-            while (!downloaded)
+            while (!_downloaded)
             {
                 Thread.Sleep(10);
             }
 
             // Extract the archive
-            ZipFile versionZipFile = new ZipFile(File.OpenRead(absoluteZipPath));
+            ZipFile versionZipFile = new ZipFile(File.OpenRead(_absoluteZipPath));
 
             // Reset the progress bar.
             OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
@@ -98,7 +98,7 @@ namespace installer
             foreach (ZipEntry zipEntry in versionZipFile)
             {
                 // Check if we should pause
-                while (PauseActions)
+                while (_pauseActions)
                     Thread.Sleep(10);
 
                 // Get the current absolute path
@@ -160,7 +160,7 @@ namespace installer
             // Webclient for file donwloading.
             WebClient webClient = new WebClient();
 
-            TimeStarted = DateTime.Now;
+            _timeStarted = DateTime.Now;
 
             // Update the progress bar.
             webClient.DownloadProgressChanged += (senderChild, eChild) =>
@@ -170,7 +170,7 @@ namespace installer
                 ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
                     Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
                     Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
-                    Math.Round(eChild.BytesReceived / (DateTime.Now - TimeStarted).TotalSeconds / Math.Pow(1024, 1), 2
+                    Math.Round(eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
                     )
                 );
             };
@@ -179,14 +179,14 @@ namespace installer
             webClient.DownloadFileCompleted += (senderChild, eChild) =>
             {
                 // Set the continuation boolean.
-                downloaded = true;
+                _downloaded = true;
 
                 // Tell the user where the file was saved.
-                EasyLog(string.Format("{0} was saved to {1}", zipFilename, absoluteZipPath));
+                EasyLog(string.Format("{0} was saved to {1}", _zipFilename, _absoluteZipPath));
             };
 
             // Download the file asyncronously.
-            webClient.DownloadFileAsync(new Uri(downloadLink), absoluteZipPath);
+            webClient.DownloadFileAsync(new Uri(_downloadLink), _absoluteZipPath);
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace installer
         private void ExitButton_Click(object sender, EventArgs e)
         {
             // Pause the for-each loop.
-            PauseActions = true;
+            _pauseActions = true;
 
             // Update the progress text to waiting on user interaction
             ProgressText.Text = Resources.wait_user;
@@ -215,7 +215,7 @@ namespace installer
             }
 
             // If we didn't get the result we needed, continue.
-            PauseActions = false;
+            _pauseActions = false;
         }
     }
 }
