@@ -24,11 +24,19 @@ namespace installer
         private string downloadLink;
         private bool downloaded = false;
 
+        /// <summary>
+        /// Class constructor
+        /// </summary>
         public InstallForm()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Form constructor
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void InstallForm_Load(object sender, EventArgs e)
         {
             CheckForIllegalCrossThreadCalls = false;
@@ -39,6 +47,9 @@ namespace installer
             workerThread.Start();
         }
 
+        /// <summary>
+        /// The thread that will do most of the logic for the form.
+        /// </summary>
         private void Worker()
         {
             // Store the download link in an easy to access variable
@@ -122,11 +133,20 @@ namespace installer
             NextButton.Enabled = true;
         }
 
+        /// <summary>
+        /// Helper function to enable easy logging to the output window on the form
+        /// </summary>
+        /// <param name="appending"></param>
         private void EasyLog(string appending)
         {
             Logger.Text += string.Format("[{0}] {1}\n", DateTime.Now, appending);
         }
 
+        /// <summary>
+        /// The worker that will handle the downloading of the daemon.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DownloadBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             // Webclient for file donwloading.
