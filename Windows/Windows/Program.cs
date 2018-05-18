@@ -182,11 +182,13 @@ namespace Windows
                 if (Environment.GetCommandLineArgs()[index] == passedArg)
                     return index;
 
+            
+            HarshExit();
             return -1;
         }
 
         /// <summary>
-        /// 
+        /// Make sure the release channel is available.
         /// </summary>
         private static void ValidateAvailability()
         {
