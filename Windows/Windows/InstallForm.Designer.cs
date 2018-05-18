@@ -38,6 +38,8 @@
             this.Logger = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.ProgressText = new System.Windows.Forms.Label();
+            this.DownloadBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -80,7 +82,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(643, 63);
             this.panel1.TabIndex = 17;
-            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // label2
             // 
@@ -138,12 +139,26 @@
             this.label4.TabIndex = 22;
             this.label4.Text = "Log";
             // 
+            // ProgressText
+            // 
+            this.ProgressText.Location = new System.Drawing.Point(335, 81);
+            this.ProgressText.Name = "ProgressText";
+            this.ProgressText.Size = new System.Drawing.Size(298, 13);
+            this.ProgressText.TabIndex = 23;
+            this.ProgressText.Text = "0/0";
+            this.ProgressText.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // DownloadBackgroundWorker
+            // 
+            this.DownloadBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.DownloadBackgroundWorker_DoWork);
+            // 
             // InstallForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(645, 402);
             this.ControlBox = false;
+            this.Controls.Add(this.ProgressText);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.Logger);
@@ -177,5 +192,7 @@
         private System.Windows.Forms.RichTextBox Logger;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label ProgressText;
+        private System.ComponentModel.BackgroundWorker DownloadBackgroundWorker;
     }
 }

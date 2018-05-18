@@ -98,23 +98,43 @@ namespace installer
             Program.Channel = channel;
         }
 
+        /// <summary>
+        /// Change the channel version to install.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChannelVersion_SelectedIndexChanged(object sender, EventArgs e)
         {
             Program.Version = ChannelVersion.Text;
         }
 
+        /// <summary>
+        /// Exit the installation.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExitButton_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show(Resources.exit_message, Resources.messagebox_title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 Application.Exit();
         }
 
+        /// <summary>
+        /// Go back a step.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BackButton_Click(object sender, EventArgs e)
         {
             new TermsOfServiceForm().Show();
             this.Close();
         }
 
+        /// <summary>
+        /// Move to the next form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NextButton_Click(object sender, EventArgs e)
         {
             // Make sure the user has a channel and a version selected.
