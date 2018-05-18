@@ -23,6 +23,7 @@ namespace installer
         private string absoluteZipPath;
         private string downloadLink;
         private bool downloaded = false;
+        private DateTime TimeStarted;
 
         /// <summary>
         /// Class constructor
@@ -53,7 +54,7 @@ namespace installer
         private void Worker()
         {
             // Store the download link in an easy to access variable
-             downloadLink = Program.ReleaseInformationJObject["versions"][Program.Version]["download"].ToString();
+            downloadLink = Program.ReleaseInformationJObject["versions"][Program.Version]["download"].ToString();
 
             // Create the installation directory if it doesn't exist.
             if (!Directory.Exists(Program.InstallLocation))
@@ -63,15 +64,15 @@ namespace installer
             }
 
             // Tell the user what's going to happen
-            EasyLog(string.Format("Downloading version {0} ({1} release) from {2}", 
+            EasyLog(string.Format("Downloading version {0} ({1} release) from {2}",
                 Program.Version,
                 Program.Channel,
                 downloadLink
-                ));
+            ));
 
             // Update the progres sbar to an unknown state.
             //OverallProgress.Style = ProgressBarStyle.Marquee;
-            
+
             // Create shorthand variables to use rather than redundant functions.
             zipFilename = Program.Version + ".zip";
             absoluteZipPath = Path.Combine(Program.InstallLocation, zipFilename);
@@ -83,6 +84,7 @@ namespace installer
             {
                 Thread.Sleep(10);
             }
+
             EasyLog(string.Format("{0} was saved to {1}", zipFilename, absoluteZipPath));
 
             // Extract the archive
@@ -91,7 +93,7 @@ namespace installer
             // Reset the progress bar.
             OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
             OverallProgress.Value = 0;
-            
+
             // Iterate through each object in the archive.
             foreach (ZipEntry zipEntry in versionZipFile)
             {
@@ -108,7 +110,7 @@ namespace installer
                 else
                 {
                     // Use a buffer, 4096 bytes seems to be pretty optimal.
-                    byte[] buffer = new byte[4096];    
+                    byte[] buffer = new byte[4096];
                     Stream zipStream = versionZipFile.GetInputStream(zipEntry);
 
                     // Copy to and from the buffer, and then to the disk.
@@ -123,7 +125,8 @@ namespace installer
                 OverallProgress.Value += 1;
 
                 // Update the progress text.
-                ProgressText.Text = string.Format("files Extracted: {0}/{1}", OverallProgress.Value, OverallProgress.Maximum);
+                ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
+                    OverallProgress.Maximum);
 
                 Application.DoEvents();
             }
@@ -152,21 +155,22 @@ namespace installer
             // Webclient for file donwloading.
             WebClient webClient = new WebClient();
 
+            TimeStarted = DateTime.Now;
+
             // Update the progress bar.
             webClient.DownloadProgressChanged += (senderChild, eChild) =>
             {
                 OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
                 OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
-                ProgressText.Text = string.Format("Downloaded {0}/{1} kB", 
-                    eChild.BytesReceived / 1024,
-                    eChild.TotalBytesToReceive / 1024);
+                ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
+                    Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
+                    Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
+                    Math.Round((eChild.BytesReceived / (DateTime.Now - TimeStarted).TotalSeconds) / Math.Pow(1024, 1), 2)
+                    );
             };
 
             // Define a rule to the webclient to change a boolean when the download is done.
-            webClient.DownloadFileCompleted += (senderChild, eChild) =>
-            {
-                downloaded = true;
-            };
+            webClient.DownloadFileCompleted += (senderChild, eChild) => { downloaded = true; };
 
             // Download the file asyncronously.
             webClient.DownloadFileAsync(new Uri(downloadLink), absoluteZipPath);
