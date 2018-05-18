@@ -70,6 +70,15 @@ namespace installer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to cancel the installation?.
+        /// </summary>
+        internal static string cancel_installation_prompt {
+            get {
+                return ResourceManager.GetString("cancel_installation_prompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to exit the installation wizard?.
         /// </summary>
         internal static string exit_message {
@@ -112,6 +121,15 @@ namespace installer.Properties {
         internal static string terms_of_service_url {
             get {
                 return ResourceManager.GetString("terms_of_service_url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting on user input.
+        /// </summary>
+        internal static string wait_user {
+            get {
+                return ResourceManager.GetString("wait_user", resourceCulture);
             }
         }
         

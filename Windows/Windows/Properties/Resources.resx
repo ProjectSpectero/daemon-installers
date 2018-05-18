@@ -144,4 +144,10 @@
   <data name="agree" xml:space="preserve">
     <value>I Agree</value>
   </data>
+  <data name="wait_user" xml:space="preserve">
+    <value>Waiting on user input</value>
+  </data>
+  <data name="cancel_installation_prompt" xml:space="preserve">
+    <value>Are you sure you want to cancel the installation?</value>
+  </data>
 </root>

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Windows;
+using installer.Properties;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 
@@ -24,6 +25,7 @@ namespace installer
         private string downloadLink;
         private bool downloaded = false;
         private DateTime TimeStarted;
+        private bool PauseActions = false;
 
         /// <summary>
         /// Class constructor
@@ -85,8 +87,6 @@ namespace installer
                 Thread.Sleep(10);
             }
 
-            EasyLog(string.Format("{0} was saved to {1}", zipFilename, absoluteZipPath));
-
             // Extract the archive
             ZipFile versionZipFile = new ZipFile(File.OpenRead(absoluteZipPath));
 
@@ -97,14 +97,18 @@ namespace installer
             // Iterate through each object in the archive.
             foreach (ZipEntry zipEntry in versionZipFile)
             {
+                // Check if we should pause
+                while (PauseActions)
+                    Thread.Sleep(10);
+
                 // Get the current absolute path
                 string currentPath = Path.Combine(Program.InstallLocation, zipEntry.Name);
 
                 // Create the directory if needed.
-                if (zipEntry.IsDirectory)
+                if (zipEntry.IsDirectory && !Directory.Exists(currentPath))
                 {
-                    EasyLog("Creating Directory: " + currentPath);
                     Directory.CreateDirectory(currentPath);
+                    EasyLog("Created Directory: " + currentPath);
                 }
                 // Copy the file to the directory.
                 else
@@ -128,6 +132,7 @@ namespace installer
                 ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
                     OverallProgress.Maximum);
 
+                // Perform all needed UI events.
                 Application.DoEvents();
             }
 
@@ -165,15 +170,52 @@ namespace installer
                 ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
                     Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
                     Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
-                    Math.Round((eChild.BytesReceived / (DateTime.Now - TimeStarted).TotalSeconds) / Math.Pow(1024, 1), 2)
-                    );
+                    Math.Round(eChild.BytesReceived / (DateTime.Now - TimeStarted).TotalSeconds / Math.Pow(1024, 1), 2
+                    )
+                );
             };
 
             // Define a rule to the webclient to change a boolean when the download is done.
-            webClient.DownloadFileCompleted += (senderChild, eChild) => { downloaded = true; };
+            webClient.DownloadFileCompleted += (senderChild, eChild) =>
+            {
+                // Set the continuation boolean.
+                downloaded = true;
+
+                // Tell the user where the file was saved.
+                EasyLog(string.Format("{0} was saved to {1}", zipFilename, absoluteZipPath));
+            };
 
             // Download the file asyncronously.
             webClient.DownloadFileAsync(new Uri(downloadLink), absoluteZipPath);
+        }
+
+        /// <summary>
+        /// Exit/Cancel the installation.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitButton_Click(object sender, EventArgs e)
+        {
+            // Pause the for-each loop.
+            PauseActions = true;
+
+            // Update the progress text to waiting on user interaction
+            ProgressText.Text = Resources.wait_user;
+            // Prompt the user if they really want to exit
+            DialogResult prompt = MessageBox.Show(
+                Resources.cancel_installation_prompt,
+                Resources.messagebox_title,
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            // User said yes, stop.
+            if (prompt == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+
+            // If we didn't get the result we needed, continue.
+            PauseActions = false;
         }
     }
 }
