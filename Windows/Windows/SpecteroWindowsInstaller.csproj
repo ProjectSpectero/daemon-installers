@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DotNetCore.cs" />
     <Compile Include="FinishForm.cs">
       <SubType>Form</SubType>
     </Compile>

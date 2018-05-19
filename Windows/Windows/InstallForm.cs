@@ -45,7 +45,7 @@ namespace installer
         {
             // allow illegal thread access to the UI, doesn't mater here
             CheckForIllegalCrossThreadCalls = false;
-            
+
             // Show the form and get to work.
             this.Show();
 
@@ -76,21 +76,24 @@ namespace installer
                 _downloadLink
             ));
 
-            // Update the progres sbar to an unknown state.
-            //OverallProgress.Style = ProgressBarStyle.Marquee;
-
             // Create shorthand variables to use rather than redundant functions.
             _zipFilename = Program.Version + ".zip";
             _absoluteZipPath = Path.Combine(Program.InstallLocation, _zipFilename);
 
+            // Download .NET core if it doesn't exist.
+            DotnetCoreDownloader.RunWorkerAsync();
+
+            // Waiting for the download to complete.
+            while (!_downloaded)
+                Thread.Sleep(10);
+
+            // Download the files.
             DownloadBackgroundWorker.RunWorkerAsync();
 
             // Waiting for the download to complete.
             while (!_downloaded)
-            {
                 Thread.Sleep(10);
-            }
-
+           
             // Extract the archive
             ZipFile versionZipFile = new ZipFile(File.OpenRead(_absoluteZipPath));
 
@@ -98,7 +101,8 @@ namespace installer
             OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
             OverallProgress.Value = 0;
 
-            // Iterate through each object in the archive.
+            // Iterate through each object i
+            // n the archive.
             foreach (ZipEntry zipEntry in versionZipFile)
             {
                 // Check if we should pause
@@ -164,9 +168,12 @@ namespace installer
         /// <param name="e"></param>
         private void DownloadBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            _downloaded = false;
+
             // Webclient for file donwloading.
             WebClient webClient = new WebClient();
 
+            // Start the stopwatch.
             _timeStarted = DateTime.Now;
 
             // Update the progress bar.
@@ -243,6 +250,56 @@ namespace installer
 
             // scroll it automatically
             Logger.ScrollToCaret();
+        }
+
+        private void DotnetCoreDownloader_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _downloaded = false;
+
+            if (!DotNetCore.Exists())
+            {
+                // Remember the directory
+                const string zipName = "dotnet-binary.zip";
+                var dotnetInstallationPath = Path.Combine(Program.InstallLocation, "dotnet");
+                var dotnetZipPath = Path.Combine(Program.InstallLocation, zipName);
+
+                // Make the directory if it doesn't exist.
+                if (!Directory.Exists(dotnetInstallationPath))
+                    Directory.CreateDirectory(dotnetInstallationPath);
+
+                // Webclient for file donwloading.
+                WebClient webClient = new WebClient();
+
+                // Start the download stopwatch.
+                _timeStarted = DateTime.Now;
+
+                // Update the progress bar.
+                webClient.DownloadProgressChanged += (senderChild, eChild) =>
+                {
+                    OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
+                    OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
+                    ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
+                        Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
+                        Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
+                        Math.Round(
+                            eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
+                        )
+                    );
+                };
+
+                // Define a rule to the webclient to change a boolean when the download is done.
+                webClient.DownloadFileCompleted += (senderChild, eChild) =>
+                {
+                    // Set the continuation boolean.
+                    _downloaded = true;
+
+                    // Tell the user where the file was saved.
+                    EasyLog(string.Format("dotnet core runtime was saved to {0}", _absoluteZipPath));
+                };
+
+                // Download the file asyncronously.
+                webClient.DownloadFileAsync(new Uri(DotNetCore.PortableRuntimeDownloadLink), dotnetZipPath);
+            }
         }
     }
 }

@@ -40,6 +40,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.ProgressText = new System.Windows.Forms.Label();
             this.DownloadBackgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.DotnetCoreDownloader = new System.ComponentModel.BackgroundWorker();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -156,6 +157,10 @@
             // 
             this.DownloadBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.DownloadBackgroundWorker_DoWork);
             // 
+            // DotnetCoreDownloader
+            // 
+            this.DotnetCoreDownloader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.DotnetCoreDownloader_DoWork);
+            // 
             // InstallForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -198,5 +203,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label ProgressText;
         private System.ComponentModel.BackgroundWorker DownloadBackgroundWorker;
+        private System.ComponentModel.BackgroundWorker DotnetCoreDownloader;
     }
 }
