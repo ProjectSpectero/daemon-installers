@@ -186,6 +186,61 @@ namespace installer
                     // Tell the user where the file was saved.
                     EasyLog(string.Format("{1} runtime was saved to {0}", dotnetZipPath, zipName));
 
+                    // Extract the archive
+                    ZipFile versionZipFile = new ZipFile(File.OpenRead(dotnetZipPath));
+
+                    // Reset the progress bar.
+                    OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
+                    OverallProgress.Value = 0;
+
+                    // Iterate through each object in the archive
+                    foreach (ZipEntry zipEntry in versionZipFile)
+                    {
+                        // Check if we should pause
+                        while (_pauseActions)
+                            Thread.Sleep(10);
+
+                        // Get the current absolute path
+                        string currentPath = Path.Combine(dotnetInstallationPath, zipEntry.Name);
+
+                        // Create the directory if needed.
+                        if (zipEntry.IsDirectory)
+
+                        {
+                            Directory.CreateDirectory(currentPath);
+                            EasyLog("Created Directory: " + currentPath);
+                        }
+                        // Copy the file to the directory.
+                        else
+                        {
+                            // Redundant path checking
+                            string basepath = new FileInfo(currentPath).Directory.FullName;
+                            if (!Directory.Exists(basepath))
+                            {
+                                Directory.CreateDirectory(basepath);
+                            }
+
+                            // Use a buffer, 4096 bytes seems to be pretty optimal.
+                            byte[] buffer = new byte[4096];
+                            Stream zipStream = versionZipFile.GetInputStream(zipEntry);
+
+                            // Copy to and from the buffer, and then to the disk.
+                            using (FileStream streamWriter = File.Create(currentPath))
+                            {
+                                EasyLog("Copying file: " + currentPath);
+                                StreamUtils.Copy(zipStream, streamWriter, buffer);
+                            }
+                        }
+
+                        // Update the progress bar.
+                        OverallProgress.Value += 1;
+
+                        // Update the progress text.
+                        ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
+                            OverallProgress.Maximum);
+
+                    }
+
                     complete = true;
                 };
 
@@ -300,6 +355,11 @@ namespace installer
             {
                 Thread.Sleep(1);
             }
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

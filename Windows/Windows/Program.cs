@@ -208,5 +208,10 @@ namespace Windows
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private static void NonSuckingServiceManager()
+        {
+
+        }
     }
 }
