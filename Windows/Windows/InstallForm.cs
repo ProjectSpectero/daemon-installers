@@ -23,7 +23,6 @@ namespace installer
         private string _zipFilename;
         private string _absoluteZipPath;
         private string _downloadLink;
-        private bool _downloaded = false;
         private DateTime _timeStarted;
         private bool _pauseActions = false;
         private long _lastBytesDownlaoded;
@@ -62,37 +61,15 @@ namespace installer
             // Store the download link in an easy to access variable
             _downloadLink = Program.ReleaseInformation["versions"][Program.Version]["download"].ToString();
 
-            // Create the installation directory if it doesn't exist.
-            if (!Directory.Exists(Program.InstallLocation))
-            {
-                Directory.CreateDirectory(Program.InstallLocation);
-                EasyLog("Created Directory: " + Program.InstallLocation);
-            }
-
-            // Tell the user what's going to happen
-            EasyLog(string.Format("Downloading version {0} ({1} release) from {2}",
-                Program.Version,
-                Program.Channel,
-                _downloadLink
-            ));
-
             // Create shorthand variables to use rather than redundant functions.
             _zipFilename = Program.Version + ".zip";
             _absoluteZipPath = Path.Combine(Program.InstallLocation, _zipFilename);
 
             // Download .NET core if it doesn't exist.
-            DotnetCoreDownloader.RunWorkerAsync();
-
-            // Waiting for the download to complete.
-            while (!_downloaded)
-                Thread.Sleep(10);
+            DotNetCoreDownloaderSubworker();
 
             // Download the files.
-            DownloadBackgroundWorker.RunWorkerAsync();
-
-            // Waiting for the download to complete.
-            while (!_downloaded)
-                Thread.Sleep(10);
+            SpecteroDownloaderSubworker();
 
             // Disable the cancel button.
             ExitButton.Enabled = false;
@@ -109,97 +86,6 @@ namespace installer
         private void EasyLog(string appending)
         {
             Logger.Text += string.Format("[{0}] {1}\n", DateTime.Now, appending);
-        }
-
-        /// <summary>
-        /// The worker that will handle the downloading of the daemon.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DownloadBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            _downloaded = false;
-
-            // Webclient for file donwloading.
-            WebClient webClient = new WebClient();
-
-            // Start the stopwatch.
-            _timeStarted = DateTime.Now;
-
-            // Update the progress bar.
-            webClient.DownloadProgressChanged += (senderChild, eChild) =>
-            {
-                OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
-                OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
-                ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
-                    Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
-                    Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
-                    Math.Round(eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
-                    )
-                );
-            };
-
-            // Define a rule to the webclient to change a boolean when the download is done.
-            webClient.DownloadFileCompleted += (senderChild, eChild) =>
-            {
-                // Tell the user where the file was saved.
-                EasyLog(string.Format("{0} was saved to {1}", _zipFilename, _absoluteZipPath));
-
-                // Extract the archive
-                ZipFile versionZipFile = new ZipFile(File.OpenRead(_absoluteZipPath));
-
-                // Reset the progress bar.
-                OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
-                OverallProgress.Value = 0;
-
-                // Iterate through each object i
-                // n the archive.
-                foreach (ZipEntry zipEntry in versionZipFile)
-                {
-                    // Check if we should pause
-                    while (_pauseActions)
-                        Thread.Sleep(10);
-
-                    // Get the current absolute path
-                    string currentPath = Path.Combine(Program.InstallLocation, zipEntry.Name);
-
-                    // Create the directory if needed.
-                    if (zipEntry.IsDirectory)
-                    {
-                        Directory.CreateDirectory(currentPath);
-                        EasyLog("Created Directory: " + currentPath);
-                    }
-                    // Copy the file to the directory.
-                    else
-                    {
-                        // Use a buffer, 4096 bytes seems to be pretty optimal.
-                        byte[] buffer = new byte[4096];
-                        Stream zipStream = versionZipFile.GetInputStream(zipEntry);
-
-                        // Copy to and from the buffer, and then to the disk.
-                        using (FileStream streamWriter = File.Create(currentPath))
-                        {
-                            EasyLog("Copying file: " + currentPath);
-                            StreamUtils.Copy(zipStream, streamWriter, buffer);
-                        }
-                    }
-
-                    // Update the progress bar.
-                    OverallProgress.Value += 1;
-
-                    // Update the progress text.
-                    ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
-                        OverallProgress.Maximum);
-
-                    // Perform all needed UI events.
-                    Application.DoEvents();
-                }
-
-                _downloaded = true;
-            };
-
-            // Download the file asyncronously.
-            webClient.DownloadFileAsync(new Uri(_downloadLink), _absoluteZipPath);
         }
 
         /// <summary>
@@ -251,23 +137,31 @@ namespace installer
             Logger.ScrollToCaret();
         }
 
-        private void DotnetCoreDownloader_DoWork(object sender, DoWorkEventArgs e)
+        public void DotNetCoreDownloaderSubworker()
         {
-            _downloaded = false;
+            // Thread signal.
+            bool complete = false;
+
+            // Webclient
+            WebClient webClient = new WebClient();
+
+            // Remember the directory
+            const string zipName = "dotnet-binary.zip";
+            var dotnetInstallationPath = Path.Combine(Program.InstallLocation, "dotnet");
+            var dotnetZipPath = Path.Combine(Program.InstallLocation, zipName);
+
 
             if (!DotNetCore.Exists())
             {
-                // Remember the directory
-                const string zipName = "dotnet-binary.zip";
-                var dotnetInstallationPath = Path.Combine(Program.InstallLocation, "dotnet");
-                var dotnetZipPath = Path.Combine(Program.InstallLocation, zipName);
-
                 // Make the directory if it doesn't exist.
                 if (!Directory.Exists(dotnetInstallationPath))
                     Directory.CreateDirectory(dotnetInstallationPath);
 
-                // Webclient for file donwloading.
-                WebClient webClient = new WebClient();
+                // Tell the user what's going to happen
+                EasyLog(string.Format("Downloading {0} from {1}",
+                    zipName,
+                    DotNetCore.PortableRuntimeDownloadLink
+                ));
 
                 // Start the download stopwatch.
                 _timeStarted = DateTime.Now;
@@ -289,15 +183,122 @@ namespace installer
                 // Define a rule to the webclient to change a boolean when the download is done.
                 webClient.DownloadFileCompleted += (senderChild, eChild) =>
                 {
-                    // Set the continuation boolean.
-                    _downloaded = true;
-
                     // Tell the user where the file was saved.
-                    EasyLog(string.Format("{1} runtime was saved to {0}", _absoluteZipPath, "dotnet-binary.zip"));
+                    EasyLog(string.Format("{1} runtime was saved to {0}", dotnetZipPath, zipName));
+
+                    complete = true;
                 };
 
                 // Download the file asyncronously.
                 webClient.DownloadFileAsync(new Uri(DotNetCore.PortableRuntimeDownloadLink), dotnetZipPath);
+
+                while (webClient.IsBusy || !complete)
+                {
+                    Thread.Sleep(1);
+                }
+            }
+        }
+
+        public void SpecteroDownloaderSubworker()
+        {
+            // Thread signal.
+            bool complete = false;
+
+            // Create the installation directory if it doesn't exist.
+            if (!Directory.Exists(Program.InstallLocation))
+            {
+                Directory.CreateDirectory(Program.InstallLocation);
+                EasyLog("Created Directory: " + Program.InstallLocation);
+            }
+
+            // Tell the user what's going to happen
+            EasyLog(string.Format("Downloading version {0} ({1} release) from {2}",
+                Program.Version,
+                Program.Channel,
+                _downloadLink
+            ));
+
+            // Webclient for file donwloading.
+            WebClient webClient = new WebClient();
+
+            // Start the stopwatch.
+            _timeStarted = DateTime.Now;
+
+            // Update the progress bar.
+            webClient.DownloadProgressChanged += (senderChild, eChild) =>
+            {
+                OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
+                OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
+                ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
+                    Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
+                    Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
+                    Math.Round(eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
+                    )
+                );
+            };
+
+            // Define a rule to the webclient to change a boolean when the download is done.
+            webClient.DownloadFileCompleted += (senderChild, eChild) =>
+            {
+                // Tell the user where the file was saved.
+                EasyLog(string.Format("{0} was saved to {1}", _zipFilename, _absoluteZipPath));
+
+                // Extract the archive
+                ZipFile versionZipFile = new ZipFile(File.OpenRead(_absoluteZipPath));
+
+                // Reset the progress bar.
+                OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
+                OverallProgress.Value = 0;
+
+                // Iterate through each object in the archive
+                foreach (ZipEntry zipEntry in versionZipFile)
+                {
+                    // Check if we should pause
+                    while (_pauseActions)
+                        Thread.Sleep(10);
+
+                    // Get the current absolute path
+                    string currentPath = Path.Combine(Program.InstallLocation, zipEntry.Name);
+
+                    // Create the directory if needed.
+                    if (zipEntry.IsDirectory)
+                    {
+                        Directory.CreateDirectory(currentPath);
+                        EasyLog("Created Directory: " + currentPath);
+                    }
+                    // Copy the file to the directory.
+                    else
+                    {
+                        // Use a buffer, 4096 bytes seems to be pretty optimal.
+                        byte[] buffer = new byte[4096];
+                        Stream zipStream = versionZipFile.GetInputStream(zipEntry);
+
+                        // Copy to and from the buffer, and then to the disk.
+                        using (FileStream streamWriter = File.Create(currentPath))
+                        {
+                            EasyLog("Copying file: " + currentPath);
+                            StreamUtils.Copy(zipStream, streamWriter, buffer);
+                        }
+                    }
+
+                    // Update the progress bar.
+                    OverallProgress.Value += 1;
+
+                    // Update the progress text.
+                    ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
+                        OverallProgress.Maximum);
+                    
+                }
+
+                complete = true;
+            };
+
+            // Download the file asyncronously.
+            webClient.DownloadFileAsync(new Uri(_downloadLink), _absoluteZipPath);
+
+            while (webClient.IsBusy || !complete)
+            {
+                Thread.Sleep(1);
             }
         }
     }
