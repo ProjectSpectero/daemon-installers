@@ -159,9 +159,7 @@ namespace Windows
             }
             else if (InstallSliently == true && !CommandLineArgumentExists("--install-path"))
             {
-                MessageBox.Show(
-                    Resources.silent_install_requires_path,
-                    Resources.messagebox_title, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                InstallLocation = GetInstallationPath();
             }
 
 
@@ -179,11 +177,11 @@ namespace Windows
         private static int GetAfterArgument(string passedArg)
         {
             for (var index = 0; index < Environment.GetCommandLineArgs().Length; index++)
-                if (Environment.GetCommandLineArgs()[index] == passedArg)
+                if (Environment.GetCommandLineArgs()[index + 1] == passedArg)
                     return index;
 
 
-            HarshExit();
+            HarshExit(false);
             return -1;
         }
 
@@ -196,7 +194,7 @@ namespace Windows
             {
                 MessageBox.Show("Spectero has not released a version for this release channel.", "Spectero Installer",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                HarshExit();
+                HarshExit(false);
             }
         }
 
