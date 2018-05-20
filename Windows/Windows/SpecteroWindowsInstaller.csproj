@@ -73,6 +73,7 @@
     <Compile Include="InstallLocationForm.Designer.cs">
       <DependentUpon>InstallLocationForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="NonSuckingServiceManager.cs" />
     <Compile Include="SelectChannelForm.cs">
       <SubType>Form</SubType>
     </Compile>
