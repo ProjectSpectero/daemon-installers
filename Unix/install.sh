@@ -50,7 +50,12 @@ if [ "$(uname)" == "Darwin" ]; then
     if [[ $? != 0 ]]; then
         # Download dotnet installation script and execute it
         sudo wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
-        bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
+        sudo bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
+    fi
+
+    which -s openvpn;
+    if [[ $? != 0 ]]; then
+        brew install openvpn;
     fi
     
 elif [ "$(uname)" == "Linux" ]; then
@@ -92,7 +97,6 @@ elif [ "$(uname)" == "Linux" ]; then
 
         # Check to see if we have Python3 installed.
         if ! type "python3" &> /dev/null; then
-
             if [[ ! -z $YUM_CMD ]]; then
                 # Cent / RHEL / Fedora
                 yum install python34 -y;
@@ -100,6 +104,24 @@ elif [ "$(uname)" == "Linux" ]; then
             elif [[ ! -z $APT_GET_CMD ]]; then
                 # Debian / Ubuntu
                 apt-get install python3 -y;
+
+            else
+                # ???
+                echo "The package manager for your system was not found";
+                echo "Please report your package manager to the developers so we can add support!";
+                exit 1;
+            fi
+        fi
+
+        # Check to see if we have openvpn installed.
+        if ! type "openvpn" &> /dev/null; then
+            if [[ ! -z $YUM_CMD ]]; then
+                # Cent / RHEL / Fedora
+                yum install openvpn -y;
+
+            elif [[ ! -z $APT_GET_CMD ]]; then
+                # Debian / Ubuntu
+                apt-get install openvpn -y;
 
             else
                 # ???
