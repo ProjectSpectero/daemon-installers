@@ -46,16 +46,18 @@ namespace Windows
             catch (Exception e)
             {
                 MessageBox.Show(
-                    Resources.release_data_error,
+                    Resources.release_data_error + "\n" + e.ToString(),
                     Resources.messagebox_title,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Stop
                 );
+
             }
 
             // Handle the arguments
             HandleArguments();
 
+            // Should we install silently?
             if (!InstallSliently)
             {
                 ValidateAllChannelAvailability();

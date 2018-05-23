@@ -20,6 +20,7 @@ namespace installer
         private DateTime _timeStarted;
         private bool _pauseActions = false;
         private long _lastBytesDownlaoded;
+        private string nssmInstallPath;
 
         /// <summary>
         /// Class constructor
@@ -68,7 +69,8 @@ namespace installer
             // Check service things.
             if (Program.CreateService)
             {
-                ServiceManager sm = new ServiceManager()
+                NonSuckingServiceManagerSubworker();
+                ServiceManager sm = new ServiceManager(nssmInstallPath);
                 if (sm.Exists())
                 {
                     // Update the service
@@ -268,6 +270,113 @@ namespace installer
             else
             {
                 Program.DotnetPath = DotNetCore.GetDotnetPath();
+            }
+        }
+
+        public void NonSuckingServiceManagerSubworker()
+        {
+            // Thread signal.
+            bool complete = false;
+
+            // Webclient
+            WebClient webClient = new WebClient();
+
+            // Remember the directory
+            const string nssmDownloadLink = "http://nssm.cc/release/nssm-2.24.zip";
+            const string zipName = "nssm-2.24.zip";
+            nssmInstallPath = Path.Combine(Program.InstallLocation, "nssm-2.24");
+            var nssmZipPath = Path.Combine(Program.InstallLocation, zipName);
+
+            // Tell the user what's going to happen
+            EasyLog(string.Format("Downloading {0} from {1}",
+                zipName,
+                nssmDownloadLink
+            ));
+
+            // Start the stopwatch.
+            _timeStarted = DateTime.Now;
+
+            // Download Percent Changed Event - Update the progress bar
+            webClient.DownloadProgressChanged += (senderChild, eChild) =>
+            {
+                OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
+                OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
+                ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
+                    Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
+                    Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
+                    Math.Round(eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
+                    )
+                );
+            };
+
+            // Download Complete Event
+            webClient.DownloadFileCompleted += (senderChild, eChild) =>
+            {
+                // Tell the user where the file was saved.
+                EasyLog(string.Format("{0} was saved to {1}", zipName, nssmZipPath));
+
+                // Create the installation directory if it doesn't exist.
+                if (!Directory.Exists(Program.InstallLocation))
+                {
+                    Directory.CreateDirectory(nssmInstallPath);
+                    EasyLog("Created Directory: " + nssmInstallPath);
+                }
+
+                // Extract the archive
+                ZipFile versionZipFile = new ZipFile(File.OpenRead(_absoluteZipPath));
+
+                // Reset the progress bar.
+                OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
+                OverallProgress.Value = 0;
+
+                // Iterate through each object in the archive
+                foreach (ZipEntry zipEntry in versionZipFile)
+                {
+                    // Check if we should pause
+                    while (_pauseActions)
+                        Thread.Sleep(10);
+
+                    // Get the current absolute path
+                    string currentPath = Path.Combine(Program.InstallLocation, zipEntry.Name);
+
+                    // Create the directory if needed.
+                    if (zipEntry.IsDirectory)
+                    {
+                        Directory.CreateDirectory(currentPath);
+                        EasyLog("Created Directory: " + currentPath);
+                    }
+                    // Copy the file to the directory.
+                    else
+                    {
+                        // Use a buffer, 4096 bytes seems to be pretty optimal.
+                        byte[] buffer = new byte[4096];
+                        Stream zipStream = versionZipFile.GetInputStream(zipEntry);
+
+                        // Copy to and from the buffer, and then to the disk.
+                        using (FileStream streamWriter = File.Create(currentPath))
+                        {
+                            EasyLog("Copying file: " + currentPath);
+                            StreamUtils.Copy(zipStream, streamWriter, buffer);
+                        }
+                    }
+
+                    // Update the progress bar.
+                    OverallProgress.Value += 1;
+
+                    // Update the progress text.
+                    ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
+                        OverallProgress.Maximum);
+                }
+
+                complete = true;
+            };
+
+            // Download the file asyncronously.
+            webClient.DownloadFileAsync(new Uri(nssmDownloadLink), nssmZipPath);
+
+            while (webClient.IsBusy || !complete)
+            {
+                Thread.Sleep(1);
             }
         }
 
