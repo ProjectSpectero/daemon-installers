@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using installer;
+using installer.Properties;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using installer;
-using installer.Properties;
-using Newtonsoft.Json.Linq;
 
 namespace Windows
 {
-    static class Program
+    internal static class Program
     {
         /*
          * Installer Varaibles
@@ -27,12 +25,13 @@ namespace Windows
         public static string InstallLocation; // The path of where spectero should be installed.
         public static bool CreateService = true; // Should we install spectero as a service?
         public static bool InstallSliently = false; // Should the installer run silently?
+        public static string DotnetPath;
 
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        private static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -56,7 +55,6 @@ namespace Windows
 
             // Handle the arguments
             HandleArguments();
-
 
             if (!InstallSliently)
             {
@@ -83,7 +81,7 @@ namespace Windows
             return Environment.GetCommandLineArgs().Any(currentArgument => currentArgument.Contains(argument));
         }
 
-        /// <summary> 
+        /// <summary>
         /// Determine the folder that we should install in by deafult, it depends on the bits of the system.
         /// </summary>
         /// <returns></returns>
@@ -114,7 +112,6 @@ namespace Windows
             // Check if we should install silently.
             if (CommandLineArgumentExists("--silent"))
                 InstallSliently = true;
-
 
             // Channels - Most dangerous to safe.
             if (CommandLineArgumentExists("--alpha"))
@@ -151,7 +148,6 @@ namespace Windows
                     : ReleaseInformation["channels"][Channel].ToString(); // Use the provided channel.
             }
 
-
             // Check for install location
             if (InstallSliently == true && CommandLineArgumentExists("--install-path"))
             {
@@ -161,7 +157,6 @@ namespace Windows
             {
                 InstallLocation = GetInstallationPath();
             }
-
 
             // Check if we should install the service
             if (CommandLineArgumentExists("--service"))
@@ -179,7 +174,6 @@ namespace Windows
             for (var index = 0; index < Environment.GetCommandLineArgs().Length; index++)
                 if (Environment.GetCommandLineArgs()[index + 1] == passedArg)
                     return index;
-
 
             HarshExit(false);
             return -1;
@@ -211,7 +205,6 @@ namespace Windows
 
         private static void NonSuckingServiceManager()
         {
-
         }
     }
 }

@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+﻿using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
+using installer.Properties;
+using System;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Security.AccessControl;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Windows;
-using installer.Properties;
-using ICSharpCode.SharpZipLib.Core;
-using ICSharpCode.SharpZipLib.Zip;
 
 namespace installer
 {
@@ -21,6 +14,7 @@ namespace installer
     {
         // Palceholder variables
         private string _zipFilename;
+
         private string _absoluteZipPath;
         private string _downloadLink;
         private DateTime _timeStarted;
@@ -70,6 +64,23 @@ namespace installer
 
             // Download the files.
             SpecteroDownloaderSubworker();
+
+            // Check service things.
+            if (Program.CreateService)
+            {
+                ServiceManager sm = new ServiceManager()
+                if (sm.Exists())
+                {
+                    // Update the service
+                    sm.Delete();
+                    sm.Create();
+                }
+                else
+                {
+                    // Create the service.
+                    sm.Create();
+                }
+            }
 
             // Disable the cancel button.
             ExitButton.Enabled = false;
@@ -149,7 +160,6 @@ namespace installer
             const string zipName = "dotnet-binary.zip";
             var dotnetInstallationPath = Path.Combine(Program.InstallLocation, "dotnet");
             var dotnetZipPath = Path.Combine(Program.InstallLocation, zipName);
-
 
             if (!DotNetCore.Exists())
             {
@@ -238,9 +248,12 @@ namespace installer
                         // Update the progress text.
                         ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
                             OverallProgress.Maximum);
-
                     }
 
+                    // Assign where dotnet is.
+                    Program.DotnetPath = Path.Combine(dotnetInstallationPath, "dotnet.exe");
+
+                    // Mark the process as complete.
                     complete = true;
                 };
 
@@ -251,6 +264,10 @@ namespace installer
                 {
                     Thread.Sleep(1);
                 }
+            }
+            else
+            {
+                Program.DotnetPath = DotNetCore.GetDotnetPath();
             }
         }
 
@@ -342,7 +359,6 @@ namespace installer
                     // Update the progress text.
                     ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
                         OverallProgress.Maximum);
-                    
                 }
 
                 complete = true;
@@ -359,7 +375,6 @@ namespace installer
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-
         }
     }
 }
