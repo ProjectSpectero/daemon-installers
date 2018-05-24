@@ -1,6 +1,3 @@
-# License
-
-```
 Spectero, Inc
 Copyright (c) 2018 - All Rights Reserved
 https://spectero.com
@@ -16,11 +13,11 @@ and personal use to allow easy installation and distribution
 of the software provided by Spectero.
 
 MODIFICATION:
-The end user is free to modify the `install.sh` to fit their needs
-for deployment purposes only.
+The end user is free to modify the scripts and projects provided  
+in the download repository to fit their needs for deployment purposes 
+only.
 
 WARRANTY:
 This software and dependencies are installed under the digression
 of the end user and is provided without warranty at the end user's
 own risk.
-```
