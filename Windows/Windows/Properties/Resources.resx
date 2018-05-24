@@ -132,7 +132,7 @@
     <comment>The link of the releases.</comment>
   </data>
   <data name="terms_of_service_url" xml:space="preserve">
-    <value>https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/LICENSE.md?token=AgV5yRRsJNlX8IMyzjnQBqDNCrZVBEpaks5bBKjLwA%3D%3D</value>
+    <value>https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/LICENSE.md</value>
     <comment>The link to the licenses.</comment>
   </data>
   <data name="welcome_gathering_information" xml:space="preserve">

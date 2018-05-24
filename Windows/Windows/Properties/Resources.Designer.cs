@@ -134,7 +134,7 @@ namespace installer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/LICENSE.md?token=AgV5yRRsJNlX8IMyzjnQBqDNCrZVBEpaks5bBKjLwA%3D%3D.
+        ///   Looks up a localized string similar to https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/LICENSE.md.
         /// </summary>
         internal static string terms_of_service_url {
             get {

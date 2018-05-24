@@ -36,22 +36,31 @@ namespace Windows
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Download information
+            // Try to get the release data
+            WebClient dataClient = new WebClient();
             try
             {
-                WebClient dataClient = new WebClient();
                 Program.ReleaseInformation = JObject.Parse(dataClient.DownloadString(Resources.spectero_releases_url));
-                Program.TermsOfServices = dataClient.DownloadString(Resources.terms_of_service_url);
             }
             catch (Exception e)
             {
                 MessageBox.Show(
-                    Resources.release_data_error + "\n" + e.ToString(),
+                    string.Format("{0}\n{1}", Resources.release_data_error, e),
                     Resources.messagebox_title,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Stop
                 );
+                HarshExit();
+            }
 
+            // Try to get the terms of services.
+            try
+            {
+                Program.TermsOfServices = dataClient.DownloadString(Resources.terms_of_service_url);
+            }
+            catch (Exception ex2)
+            {
+                Program.TermsOfServices += "Failed to download Terms of Service\n" + ex2;
             }
 
             // Handle the arguments

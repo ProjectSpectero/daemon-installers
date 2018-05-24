@@ -20,7 +20,7 @@ namespace installer
 
         public string GetExecutablePath()
         {
-            return Path.Combine(_nssmPath, "nssm-2.24/win64/nssm.exe");
+            return Path.Combine(_nssmPath, "win64/nssm.exe");
         }
 
         public bool Exists()
@@ -68,6 +68,16 @@ namespace installer
         public void Delete()
         {
             Process.Start(GetExecutablePath(), "remove spectero.daemon confirm");
+        }
+
+        public void Stop()
+        {
+            Process.Start(GetExecutablePath(), "stop spectero.daemon");
+        }
+
+        public void Start()
+        {
+            Process.Start(GetExecutablePath(), "start spectero.daemon");
         }
     }
 }

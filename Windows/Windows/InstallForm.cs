@@ -67,21 +67,35 @@ namespace installer
             SpecteroDownloaderSubworker();
 
             // Check service things.
-            if (Program.CreateService)
+            try
             {
-                NonSuckingServiceManagerSubworker();
-                ServiceManager sm = new ServiceManager(nssmInstallPath);
-                if (sm.Exists())
+                if (Program.CreateService)
                 {
-                    // Update the service
-                    sm.Delete();
-                    sm.Create();
+                    NonSuckingServiceManagerSubworker();
+                    ServiceManager sm = new ServiceManager(nssmInstallPath);
+                    if (sm.Exists())
+                    {
+                        EasyLog("Service already exists - will be updated.");
+                        sm.Stop();
+                        EasyLog("Stopped old service...");
+                        // Update the service
+                        sm.Delete();
+                        EasyLog("The old spectero.daemon service has been deleted.");
+                        sm.Create();
+                        EasyLog("Created newer spectero.daemon service successfully.");
+                    }
+                    else
+                    {
+                        // Create the service.
+                        sm.Create();
+                        EasyLog("Created widnows service: spectero.daemon");
+                        sm.Start();
+                    }
                 }
-                else
-                {
-                    // Create the service.
-                    sm.Create();
-                }
+            }
+            catch (Exception exception)
+            {
+                EasyLog("An exception occured while trying ot create the service\n" + exception);
             }
 
             // Disable the cancel button.
@@ -323,7 +337,7 @@ namespace installer
                 }
 
                 // Extract the archive
-                ZipFile versionZipFile = new ZipFile(File.OpenRead(_absoluteZipPath));
+                ZipFile versionZipFile = new ZipFile(File.OpenRead(nssmZipPath));
 
                 // Reset the progress bar.
                 OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
