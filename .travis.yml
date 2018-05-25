@@ -1,5 +1,0 @@
-language: csharp
-solution: "./Windows/Windows.sln"
-
-script:
-  - xbuild /p:Configuration=Release "./Windows/Windows.sln"
