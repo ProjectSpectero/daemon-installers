@@ -30,7 +30,7 @@ It is designed for easy deployment and automation.
 ## Quick Install
 Copy this command into your terminal to install spectero:
 ```sh
-$ sudo bash <(curl -s https://spectero.com/unix-installer)
+$ sudo bash <(curl -s https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.sh)
 ```
 
 ## Command Line Arguments
