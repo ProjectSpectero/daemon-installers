@@ -59,7 +59,7 @@ namespace Windows
             // Try to get data from the sources url
             try
             {
-                Program.SourcesInformation = JObject.Parse(dataClient.DownloadString(Resources.sources));
+                Program.SourcesInformation = JObject.Parse(dataClient.DownloadString(Resources.sources_url));
             }
             catch (Exception e)
             {
@@ -233,35 +233,41 @@ namespace Windows
             }
         }
 
-        static bool is64BitProcess = (IntPtr.Size == 8);
-        static bool is64BitOperatingSystem = is64BitProcess || InternalCheckIsWow64();
-
-        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool IsWow64Process(
-            [In] IntPtr hProcess,
-            [Out] out bool wow64Process
-        );
-
-        public static bool InternalCheckIsWow64()
+        public static bool Is64BitProcess
         {
-            if ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1) ||
-                Environment.OSVersion.Version.Major >= 6)
+            get { return IntPtr.Size == 8; }
+        }
+
+        public static bool Is64BitOperatingSystem
+        {
+            get
             {
-                using (Process p = Process.GetCurrentProcess())
-                {
-                    bool retVal;
-                    if (!IsWow64Process(p.Handle, out retVal))
-                    {
-                        return false;
-                    }
-                    return retVal;
-                }
-            }
-            else
-            {
-                return false;
+                // Clearly if this is a 64-bit process we must be on a 64-bit OS.
+                if (Is64BitProcess)
+                    return true;
+                // Ok, so we are a 32-bit process, but is the OS 64-bit?
+                // If we are running under Wow64 than the OS is 64-bit.
+                bool isWow64;
+                return ModuleContainsFunction("kernel32.dll", "IsWow64Process") && IsWow64Process(GetCurrentProcess(), out isWow64) && isWow64;
             }
         }
+
+        static bool ModuleContainsFunction(string moduleName, string methodName)
+        {
+            IntPtr hModule = GetModuleHandle(moduleName);
+            if (hModule != IntPtr.Zero)
+                return GetProcAddress(hModule, methodName) != IntPtr.Zero;
+            return false;
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        extern static bool IsWow64Process(IntPtr hProcess, [MarshalAs(UnmanagedType.Bool)] out bool isWow64);
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        extern static IntPtr GetCurrentProcess();
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        extern static IntPtr GetModuleHandle(string moduleName);
+        [DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
+        extern static IntPtr GetProcAddress(IntPtr hModule, string methodName);
     }
 }

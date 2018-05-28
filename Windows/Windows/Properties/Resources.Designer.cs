@@ -127,9 +127,9 @@ namespace installer.Properties {
         /// <summary>
         ///   Looks up a localized string similar to https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Windows/SOURCES.json.
         /// </summary>
-        internal static string sources {
+        internal static string sources_url {
             get {
-                return ResourceManager.GetString("sources", resourceCulture);
+                return ResourceManager.GetString("sources_url", resourceCulture);
             }
         }
         

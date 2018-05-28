@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\elyci\.Rider2018.1\system\resharper-host\local\Transient\ReSharperHost\v12\SolutionCaches\_Windows.316901751.00" t="ExcludeRecursive" />
+    <e p="C:\Users\elyci\source\repos\daemon-installers\Windows" t="IncludeFlat">
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Windows" t="IncludeRecursive">
+        <e p="App.config" t="Include" />
+        <e p="app.manifest" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="DotNetCore.cs" t="Include" />
+        <e p="FinishForm.cs" t="Include" />
+        <e p="FinishForm.Designer.cs" t="Include" />
+        <e p="FinishForm.resx" t="Include" />
+        <e p="FodyWeavers.xml" t="Include" />
+        <e p="InstallForm.cs" t="Include" />
+        <e p="InstallForm.Designer.cs" t="Include" />
+        <e p="InstallForm.resx" t="Include" />
+        <e p="InstallLocationForm.cs" t="Include" />
+        <e p="InstallLocationForm.Designer.cs" t="Include" />
+        <e p="InstallLocationForm.resx" t="Include" />
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="packages.config" t="Include" />
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+          <e p="Resources.Designer.cs" t="Include" />
+          <e p="Resources.resx" t="Include" />
+          <e p="Settings.Designer.cs" t="Include" />
+          <e p="Settings.settings" t="Include" />
+        </e>
+        <e p="Resources" t="Include">
+          <e p="installshield.png" t="Include" />
+        </e>
+        <e p="SelectChannelForm.cs" t="Include" />
+        <e p="SelectChannelForm.Designer.cs" t="Include" />
+        <e p="SelectChannelForm.resx" t="Include" />
+        <e p="ServiceManager.cs" t="Include" />
+        <e p="SpecteroWindowsInstaller.csproj" t="IncludeRecursive" />
+        <e p="TermsOfServiceForm.cs" t="Include" />
+        <e p="TermsOfServiceForm.Designer.cs" t="Include" />
+        <e p="TermsOfServiceForm.resx" t="Include" />
+        <e p="WelcomeForm.cs" t="Include" />
+        <e p="WelcomeForm.Designer.cs" t="Include" />
+        <e p="WelcomeForm.resx" t="Include" />
+      </e>
+      <e p="Windows.sln" t="IncludeFlat" />
+    </e>
+  </component>
+</project>

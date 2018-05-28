@@ -21,7 +21,7 @@ namespace installer
         public string GetExecutablePath()
         {
             return Path.Combine(_nssmPath,
-                string.Format("{0}/nssm.exe", (Program.InternalCheckIsWow64()) ? "win64" : "win32"));
+                string.Format("{0}/nssm.exe", (Program.Is64BitOperatingSystem) ? "win64" : "win32"));
         }
 
         public bool Exists()
