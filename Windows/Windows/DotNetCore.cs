@@ -10,6 +10,7 @@ namespace installer
         private static readonly string[] DotnetPotentialPaths =
         {
             "C:\\Program Files\\dotnet\\dotnet.exe",
+            "C:\\Program Files (x86)\\dotnet\\dotnet.exe",
         };
 
         public static bool Exists() => DotnetPotentialPaths.Any(File.Exists);
