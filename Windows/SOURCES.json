@@ -1,5 +1,5 @@
 {
-  "terms-of-service": "",
+  "terms-of-service": "https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/LICENSE.md",
   "dotnet": 
     {
       "x64": "https://download.microsoft.com/download/1/1/0/11046135-4207-40D3-A795-13ECEA741B32/dotnet-runtime-2.0.5-win-x64.zip",
