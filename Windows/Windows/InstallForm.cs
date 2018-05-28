@@ -186,7 +186,7 @@ namespace installer
                 // Tell the user what's going to happen
                 EasyLog(string.Format("Downloading {0} from {1}",
                     zipName,
-                    DotNetCore.PortableRuntimeDownloadLink
+                    DotNetCore.GetDownloadLinkFromArch()
                 ));
 
                 // Start the download stopwatch.
@@ -274,7 +274,7 @@ namespace installer
                 };
 
                 // Download the file asyncronously.
-                webClient.DownloadFileAsync(new Uri(DotNetCore.PortableRuntimeDownloadLink), dotnetZipPath);
+                webClient.DownloadFileAsync(new Uri(DotNetCore.GetDownloadLinkFromArch()), dotnetZipPath);
 
                 while (webClient.IsBusy || !complete)
                 {
