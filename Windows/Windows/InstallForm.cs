@@ -296,9 +296,10 @@ namespace installer
             WebClient webClient = new WebClient();
 
             // Remember the directory
-            const string nssmDownloadLink = "http://nssm.cc/release/nssm-2.24.zip";
-            const string zipName = "nssm-2.24.zip";
-            nssmInstallPath = Path.Combine(Program.InstallLocation, "nssm-2.24");
+            string nssmDownloadLink = Program.SourcesInformation["nssm"].ToString();
+            string[] brokenUrlStrings = nssmDownloadLink.Split('/');
+            string zipName = brokenUrlStrings[brokenUrlStrings.Length - 1];
+            nssmInstallPath = Path.Combine(Program.InstallLocation, zipName.Substring(zipName.Length - 4));
             var nssmZipPath = Path.Combine(Program.InstallLocation, zipName);
 
             // Tell the user what's going to happen

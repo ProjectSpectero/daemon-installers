@@ -7,14 +7,6 @@ namespace installer
 {
     internal class DotNetCore
     {
-        // 32 bit download link for dotnet core
-        public static string X86DownloadLink =
-            "https://download.microsoft.com/download/1/1/0/11046135-4207-40D3-A795-13ECEA741B32/dotnet-runtime-2.0.5-win-x64.zip";
-
-        // 64 bit download link for dotnet core
-        public static string X64DownloadLink =
-            "https://download.microsoft.com/download/1/1/0/11046135-4207-40D3-A795-13ECEA741B32/dotnet-runtime-2.0.5-win-x64.zip";
-
         // List of potential paths where dotnet core can be installed in the system.
         private static readonly string[] DotnetPotentialPaths =
         {
@@ -22,18 +14,31 @@ namespace installer
             "C:\\Program Files\\dotnet\\dotnet.exe" // 64 bit path
         };
 
+        /// <summary>
+        /// Oterate pver each of the potential paths to see if any exist.
+        /// </summary>
+        /// <returns></returns>
         public static bool Exists() => DotnetPotentialPaths.Any(File.Exists);
 
+        /// <summary>
+        /// Iterate over each of the potential paths to find the valid one.
+        /// </summary>
+        /// <returns></returns>
         public static string GetDotnetPath()
         {
             foreach (var dotnetPotentialPath in DotnetPotentialPaths)
                 if (File.Exists(dotnetPotentialPath))
                     return dotnetPotentialPath;
-
             return null;
         }
 
+        /// <summary>
+        /// Get the download link dynamically based on the architecture of the system.
+        /// </summary>
+        /// <returns></returns>
         public static string GetDownloadLinkFromArch() =>
-            (Program.InternalCheckIsWow64()) ? X64DownloadLink : X86DownloadLink;
+            (Program.InternalCheckIsWow64())
+                ? Program.SourcesInformation["dotnet"]["x64"].ToString()
+                : Program.SourcesInformation["dotnet"]["x86"].ToString();
     }
 }

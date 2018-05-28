@@ -125,20 +125,20 @@ namespace installer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Windows/SOURCES.json.
+        /// </summary>
+        internal static string sources {
+            get {
+                return ResourceManager.GetString("sources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://c.spectero.com/releases.json.
         /// </summary>
         internal static string spectero_releases_url {
             get {
                 return ResourceManager.GetString("spectero_releases_url", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/LICENSE.md.
-        /// </summary>
-        internal static string terms_of_service_url {
-            get {
-                return ResourceManager.GetString("terms_of_service_url", resourceCulture);
             }
         }
         

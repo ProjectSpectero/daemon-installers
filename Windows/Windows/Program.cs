@@ -20,6 +20,8 @@ namespace Windows
          * we remember where we left off.
          */
         public static JObject ReleaseInformation; // Get release information from the server.
+        public static JObject SourcesInformation;
+
         public static string TermsOfServices; // Placeholder to store the terms of services for the richtextbox.
         public static string Channel; // Stable, Alpha, Beta
         public static string Version; // The version the user has selected.
@@ -54,10 +56,26 @@ namespace Windows
                 HarshExit();
             }
 
+            // Try to get data from the sources url
+            try
+            {
+                Program.SourcesInformation = JObject.Parse(dataClient.DownloadString(Resources.sources));
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(
+                    string.Format("{0}\n{1}", Resources.release_data_error, e),
+                    Resources.messagebox_title,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Stop
+                );
+                HarshExit();
+            }
+
             // Try to get the terms of services.
             try
             {
-                Program.TermsOfServices = dataClient.DownloadString(Resources.terms_of_service_url);
+                Program.TermsOfServices = dataClient.DownloadString(SourcesInformation["terms-of-service"].ToString());
             }
             catch (Exception ex2)
             {
