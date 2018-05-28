@@ -31,6 +31,9 @@ namespace installer
             return null;
         }
         
-        public static string GetDownloadLinkFromArch() => () ? X64DownloadLink : X86DownloadLink 
+        public static string GetDownloadLinkFromArch() => 
+            (Environment.Is64BitOperatingSystem) ? 
+                X64DownloadLink : 
+                X86DownloadLink 
     }
 }
