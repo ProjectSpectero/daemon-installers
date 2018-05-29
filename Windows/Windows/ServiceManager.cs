@@ -50,7 +50,6 @@ namespace installer
 
         public void Create()
         {
-            MessageBox.Show(GetExecutablePath());
             Process.Start(
                 GetExecutablePath(),
                 string.Format("install \"spectero.daemon\" \"{0}\" \"{1}\"",
