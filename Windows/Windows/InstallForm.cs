@@ -517,7 +517,7 @@ namespace installer
             const string name = "PATH";
 
             // Get the absolute path of the directory we need to add to the path
-            string cliPath = Path.Combine(installLocation, "cli\\Tooling");
+            string cliPath = Path.Combine(installLocation, Program.Version + "\\cli\\Tooling");
 
             // Get the previous value for the PATH.
             string currentEnvironmentVariableValue = System.Environment.GetEnvironmentVariable(name);
