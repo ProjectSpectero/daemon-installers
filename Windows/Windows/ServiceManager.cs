@@ -21,7 +21,7 @@ namespace installer
         public string GetExecutablePath()
         {
             return Path.Combine(_nssmPath,
-                string.Format("{0}/nssm.exe", (Program.Is64BitOperatingSystem) ? "win64" : "win32"));
+                string.Format("{0}\\nssm.exe", (Program.Is64BitOperatingSystem) ? "win64" : "win32"));
         }
 
         public bool Exists()
@@ -50,6 +50,7 @@ namespace installer
 
         public void Create()
         {
+            MessageBox.Show(GetExecutablePath());
             Process.Start(
                 GetExecutablePath(),
                 string.Format("install \"spectero.daemon\" \"{0}\" \"{1}\"",

@@ -88,14 +88,28 @@ namespace installer
                     {
                         // Create the service.
                         sm.Create();
-                        EasyLog("Created widnows service: spectero.daemon");
+                        EasyLog("Created widnows service: spectero.daemon.");
                         sm.Start();
                     }
                 }
             }
             catch (Exception exception)
             {
-                EasyLog("An exception occured while trying ot create the service\n" + exception);
+                EasyLog("An exception occured while trying to create the service.\n" + exception);
+            }
+
+            // Try to add to path
+            try
+            {
+                // Check to see if we should add to the path of the system.
+                if (Program.AddToPath)
+                {
+                    AddToPath(Program.InstallLocation);
+                }
+            }
+            catch (Exception exception)
+            {
+                EasyLog("An exception occured while adding to PATH.\n" + exception);
             }
 
             // Disable the cancel button.
@@ -299,7 +313,7 @@ namespace installer
             string nssmDownloadLink = Program.SourcesInformation["nssm"].ToString();
             string[] brokenUrlStrings = nssmDownloadLink.Split('/');
             string zipName = brokenUrlStrings[brokenUrlStrings.Length - 1];
-            nssmInstallPath = Path.Combine(Program.InstallLocation, zipName.Substring(zipName.Length - 4));
+            nssmInstallPath = Path.Combine(Program.InstallLocation, zipName.Substring(0, zipName.Length - 4));
             var nssmZipPath = Path.Combine(Program.InstallLocation, zipName);
 
             // Tell the user what's going to happen
@@ -497,8 +511,28 @@ namespace installer
             }
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
+        public void AddToPath(string installLocation)
         {
+            // PATH Variable
+            const string name = "PATH";
+
+            // Get the absolute path of the directory we need to add to the path
+            string cliPath = Path.Combine(installLocation, "cli\\Tooling");
+
+            // Get the previous value for the PATH.
+            string currentEnvironmentVariableValue = System.Environment.GetEnvironmentVariable(name);
+
+            // If it doesn't already exist, add.
+            if (!currentEnvironmentVariableValue.Contains(cliPath))
+            {
+                EasyLog("Adding Spectero CLI to PATH...");
+                string newValue = currentEnvironmentVariableValue + @";" + cliPath;
+                Environment.SetEnvironmentVariable(name, newValue, EnvironmentVariableTarget.User);
+            }
+            else
+            {
+                EasyLog("Spectero CLI already exists in the PATH.");
+            }
         }
     }
 }

@@ -13,7 +13,6 @@ namespace installer
 {
     public partial class InstallLocationForm : Form
     {
-
         public bool formLoaded = false;
 
         public InstallLocationForm()
@@ -86,6 +85,16 @@ namespace installer
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             if (formLoaded) Program.CreateService = InstallAsService.Checked;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void addToEnv_CheckedChanged(object sender, EventArgs e)
+        {
+            if (formLoaded) Program.AddToPath = addToEnv.Checked;
         }
 
         /// <summary>

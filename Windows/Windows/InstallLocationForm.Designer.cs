@@ -40,6 +40,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.ChangeDirectory = new System.Windows.Forms.Button();
             this.InstallAsService = new System.Windows.Forms.CheckBox();
+            this.addToEnv = new System.Windows.Forms.CheckBox();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -163,12 +164,24 @@
             this.InstallAsService.UseVisualStyleBackColor = true;
             this.InstallAsService.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // addToEnv
+            // 
+            this.addToEnv.AutoSize = true;
+            this.addToEnv.Location = new System.Drawing.Point(85, 291);
+            this.addToEnv.Name = "addToEnv";
+            this.addToEnv.Size = new System.Drawing.Size(240, 17);
+            this.addToEnv.TabIndex = 21;
+            this.addToEnv.Text = "Add to System Environment Variables (PATH)";
+            this.addToEnv.UseVisualStyleBackColor = true;
+            this.addToEnv.CheckedChanged += new System.EventHandler(this.addToEnv_CheckedChanged);
+            // 
             // InstallLocationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(645, 402);
             this.ControlBox = false;
+            this.Controls.Add(this.addToEnv);
             this.Controls.Add(this.InstallAsService);
             this.Controls.Add(this.ChangeDirectory);
             this.Controls.Add(this.label4);
@@ -205,5 +218,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button ChangeDirectory;
         private System.Windows.Forms.CheckBox InstallAsService;
+        private System.Windows.Forms.CheckBox addToEnv;
     }
 }
