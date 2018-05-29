@@ -112,6 +112,20 @@ namespace installer
                 EasyLog("An exception occured while adding to PATH.\n" + exception);
             }
 
+            // Try to create a symbolic link.
+            try
+            {
+                Program.CreateSymbolicLink(
+                    Path.Combine(Program.InstallLocation, "latest"),
+                    Path.Combine(Program.InstallLocation, Program.Version),
+                    Program.SymbolicLink.Directory
+                );
+            }
+            catch (Exception exception)
+            {
+                EasyLog("An exception occured while creating a symbolic link.\n" + exception);
+            }
+
             // Disable the cancel button.
             ExitButton.Enabled = false;
 
@@ -517,7 +531,7 @@ namespace installer
             const string name = "PATH";
 
             // Get the absolute path of the directory we need to add to the path
-            string cliPath = Path.Combine(installLocation, Program.Version + "\\cli\\Tooling");
+            string cliPath = Path.Combine(installLocation, "latest\\cli\\Tooling");
 
             // Get the previous value for the PATH.
             string currentEnvironmentVariableValue = System.Environment.GetEnvironmentVariable(name);
