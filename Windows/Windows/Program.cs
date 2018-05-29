@@ -54,7 +54,7 @@ namespace Windows
         public static string Version; // The version the user has selected.
         public static string InstallLocation; // The path of where spectero should be installed.
         public static bool CreateService = true; // Should we install spectero as a service?
-        public static bool AddToPath = false;
+        public static bool AddToPath = true;
         public static bool InstallSliently = false; // Should the installer run silently?
         public static string DotnetPath;
 

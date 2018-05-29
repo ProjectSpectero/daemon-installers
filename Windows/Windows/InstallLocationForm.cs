@@ -29,8 +29,9 @@ namespace installer
             // Restore the install location.
             InstallLocation.Text = Program.InstallLocation;
 
-            // Restore the checkbot
+            // Restore the checkboxes
             InstallAsService.Checked = Program.CreateService;
+            addToEnv.Checked = Program.AddToPath;
 
             formLoaded = true;
         }
