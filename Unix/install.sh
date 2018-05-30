@@ -223,6 +223,10 @@ def execution_contains_cli_flag(flag):
     return False
 
 
+def is_root():
+    return os.getuid() == 0
+
+
 class SpecteroInstaller:
     def __init__(self):
         # Initialize Variables
@@ -240,11 +244,6 @@ class SpecteroInstaller:
 
         # Check to see if the installer needs updated or if there's a release for the channel.
         self.check_release_available()
-
-        # Check if we're root.
-        if not self.is_root():
-            print("This script must be ran as root.")
-            sys.exit(1)
 
         # Show the welcome
         self.welcome()
@@ -279,9 +278,6 @@ class SpecteroInstaller:
 
         # Install.
         self.install()
-
-    def is_root(self):
-        return os.getuid() == 0
 
     def welcome(self):
         print("Welcome to the installation script for Spectero.")
@@ -590,8 +586,83 @@ class SpecteroInstaller:
             sys.exit(12)
 
 
+class SpecteroUninstaller:
+    def __init__(self):
+        self.systemd_variables = {}
+        self.systemd_service_path = "/etc/systemd/system/spectero.service"
+        self.cli_path = "/usr/local/bin/spectero"
+        self.spectero_install_location = "/opt/spectero"
+
+        # Check to make sure the service is installed
+        if os.path.exists(self.systemd_service_path):
+
+            # Read the systemd script
+            with open(self.systemd_service_path, 'r') as config_reader:
+                for line in config_reader:
+                    if "=" in line:
+                        split_line = line.split("=")
+                        self.systemd_variables[split_line[0]] = split_line[1]
+
+            # Get Spectero's installation location.
+            self.spectero_install_location = self.auto_abspath(self.auto_abspath(self.systemd_variables["WorkingDirectory"]))
+
+            # Check to see if the CLI tool is installed.
+            if os.path.isfile(self.cli_path):
+                self.delete_cli_command()
+
+            # Prompt the user to delete the systemd service
+            self.delete_systemd_service()
+
+            # Offer to delete the spectero folder.
+            self.delete_spectero_folder()
+
+        else:
+            print("Failed to find a active installation of Spectero.")
+            sys.exit(13)
+
+    def delete_spectero_folder(self):
+        print("Your spectero installation is located at:")
+        print(self.spectero_install_location)
+        print("If you choose to continue, doing so will erase the following information related to spectero:")
+        print(" - All server configurations")
+        print(" - All database information")
+        response = input("Delete? (Yes/no)\n> ")
+
+        if response.lower() in ["y", "ye", "yes", ""]:
+            shutil.rmtree(self.spectero_install_location)
+            print("Spectero's working directory has been uninstalled successfully.")
+            sys.exit(0)
+        else:
+            sys.exit(0)
+
+    def delete_systemd_service(self):
+        response = input("Do you want to delete the Spectero Service? (Yes/no)\n> ")
+        if response.lower() in ["y", "ye", "yes", ""]:
+            os.system("systemctl stop spectero")
+            os.system("systemctl disable spectero")
+            os.unlink(self.systemd_service_path)
+            print("%s has been deleted successfully." % self.systemd_service_path)
+
+    def delete_cli_command(self):
+        response = input("Do you want to delete the Spectero CLI Command? (Yes/no)\n> ")
+        if response.lower() in ["y", "ye", "yes", ""]:
+            os.unlink(self.cli_path)
+            print("%s has been deleted successfully." % self.cli_path)
+
+    def auto_abspath(self, path):
+        return os.path.abspath(os.path.join(path, os.pardir))
+
+
 if __name__ == "__main__":
-    SpecteroInstaller()
+    # Check if we're root.
+    if not is_root():
+        print("This script must be ran as root.")
+        sys.exit(1)
+
+    if execution_contains_cli_flag("--uninstall"):
+        SpecteroUninstaller()
+    else:
+        SpecteroInstaller()
 
 EOF
 
