@@ -104,7 +104,7 @@ namespace installer
                 // Check to see if we should add to the path of the system.
                 if (Program.AddToPath)
                 {
-                    AddToPath(Program.InstallLocation);
+                    AddToPath(Path.Combine(Program.InstallLocation, "latest\\cli\\Tooling"));
                 }
             }
             catch (Exception exception)
@@ -296,6 +296,9 @@ namespace installer
 
                     // Assign where dotnet is.
                     Program.DotnetPath = Path.Combine(dotnetInstallationPath, "dotnet.exe");
+
+                    // ADd the installation path to the PATH varaible.
+                    AddToPath(dotnetInstallationPath);
 
                     // Mark the process as complete.
                     complete = true;
@@ -525,22 +528,19 @@ namespace installer
             }
         }
 
-        public void AddToPath(string installLocation)
+        public void AddToPath(string pathToAdd)
         {
             // PATH Variable
             const string name = "PATH";
-
-            // Get the absolute path of the directory we need to add to the path
-            string cliPath = Path.Combine(installLocation, "latest\\cli\\Tooling");
 
             // Get the previous value for the PATH.
             string currentEnvironmentVariableValue = System.Environment.GetEnvironmentVariable(name);
 
             // If it doesn't already exist, add.
-            if (!currentEnvironmentVariableValue.Contains(cliPath))
+            if (!currentEnvironmentVariableValue.Contains(pathToAdd))
             {
                 EasyLog("Adding Spectero CLI to PATH...");
-                string newValue = currentEnvironmentVariableValue + @";" + cliPath;
+                string newValue = currentEnvironmentVariableValue + @";" + pathToAdd;
                 Environment.SetEnvironmentVariable(name, newValue, EnvironmentVariableTarget.User);
             }
             else
