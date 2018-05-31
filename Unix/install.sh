@@ -10,9 +10,13 @@
 ##  provided to the end user at https://spectero.com/tos
 ##
 ##  For command line arguments, please refer to the readme in the GitHub Repo
-##  https://github.com/ProjectSpectero/daemon-installer-nix
+##  https://github.com/ProjectSpectero/daemon-installers
 ##
 ###############################################################################
+
+# VARIABLES
+DOTNET_CORE_VERSION="2.1";
+
 
 # Check if we have dependencies
 if [ "$(uname)" == "Darwin" ]; then
@@ -50,7 +54,7 @@ if [ "$(uname)" == "Darwin" ]; then
     if [[ $? != 0 ]]; then
         # Download dotnet installation script and execute it
         sudo wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
-        sudo bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
+        sudo bash /tmp/dotnet-install.sh --channel $DOTNET_CORE_VERSION --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
     fi
 
     which -s openvpn;
@@ -187,7 +191,7 @@ elif [ "$(uname)" == "Linux" ]; then
 
             # Download dotnet installation script and execute it
             wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
-            bash /tmp/dotnet-install.sh --channel 2.0 --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
+            bash /tmp/dotnet-install.sh --channel $DOTNET_CORE_VERSION --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
         fi
 
     else
