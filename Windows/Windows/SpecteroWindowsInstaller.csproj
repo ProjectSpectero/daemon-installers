@@ -94,6 +94,7 @@
     <Compile Include="TermsOfServiceForm.Designer.cs">
       <DependentUpon>TermsOfServiceForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Uninstaller.cs" />
     <Compile Include="WelcomeForm.cs">
       <SubType>Form</SubType>
     </Compile>

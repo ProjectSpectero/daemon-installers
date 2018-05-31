@@ -15,7 +15,8 @@ namespace Windows
     {
         // Kernel Functions
         [DllImport("kernel32.dll")]
-        public static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SymbolicLink dwFlags);
+        public static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName,
+            SymbolicLink dwFlags);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -66,6 +67,23 @@ namespace Windows
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            // Check if an active installation exists.
+            if (Uninstaller.InstallationExists())
+            {
+                // Prompt the user.
+                DialogResult uninstallResult = MessageBox.Show(
+                    Resources.uninstall_prompt, Resources.messagebox_title, MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                // If the user specifies yes, then uninstall spectero.
+                if (uninstallResult == DialogResult.Yes)
+                {
+                    // Uninstall.
+                    new Uninstaller();
+                }
+            }
+
 
             // Try to get the release data
             WebClient dataClient = new WebClient();
@@ -288,6 +306,5 @@ namespace Windows
                 return GetProcAddress(hModule, methodName) != IntPtr.Zero;
             return false;
         }
-
     }
 }

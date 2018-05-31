@@ -159,4 +159,11 @@
     <value>https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Windows/SOURCES.json</value>
     <comment>URL for getting data dynamically</comment>
   </data>
+  <data name="removal_success" xml:space="preserve">
+    <value>Spectero has successfully been deleted and removed from your system.</value>
+  </data>
+  <data name="uninstall_prompt" xml:space="preserve">
+    <value>An active installation of Spectero has been found in your computer.
+Would you like to uninstall Spectero?</value>
+  </data>
 </root>
