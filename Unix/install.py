@@ -32,6 +32,7 @@ class SpecteroInstaller:
         self.spectero_install_path = "/opt/spectero"
         self.suppress_bash_tag = " >/dev/null 2>&1"
         self.systemd_service_destination = "/etc/systemd/system/spectero.service"
+        self.sudoers_string = "Cmnd_Alias SPECTERO_CMDS = /bin/systemctl start spectero, /bin/systemctl stop spectero"
         self.dotnet_framework_path = False
 
         # Determine which release channel to download from.
@@ -179,7 +180,8 @@ class SpecteroInstaller:
                             print("Created directory: %s" % self.spectero_install_path)
                             return
                     except:
-                        print("Failed to make the directory, please validate the path and ensure the parent directory exists.")
+                        print(
+                            "Failed to make the directory, please validate the path and ensure the parent directory exists.")
                         continue
 
     def prompt_install_ready(self):
@@ -218,7 +220,8 @@ class SpecteroInstaller:
             self.channel_version = releases["channels"][self.channel]
 
             print("Found %s release: %s" % (self.channel, self.channel_version))
-            if not execution_contains_cli_flag("--overwrite") and os.path.exists("%s/%s" % (self.spectero_install_path, self.channel_version)):
+            if not execution_contains_cli_flag("--overwrite") and os.path.exists(
+                    "%s/%s" % (self.spectero_install_path, self.channel_version)):
                 print("You are running the latest version of spectero.")
                 sys.exit(0)
 
@@ -241,7 +244,8 @@ class SpecteroInstaller:
                 # Try to download from the secondary
                 try:
                     print("Downloading %s from %s..." % (self.channel_version, channel_download_url_alt))
-                    with urllib.request.urlopen(channel_download_url_alt) as response, open(projected_zip_path, 'wb') as zip:
+                    with urllib.request.urlopen(channel_download_url_alt) as response, open(projected_zip_path,
+                                                                                            'wb') as zip:
                         shutil.copyfileobj(response, zip)
                     print("Download complete.")
                 except Exception as e2:
@@ -266,7 +270,8 @@ class SpecteroInstaller:
                 os.system("unlink " + self.spectero_install_path + "/latest")
 
             print("Symlinking latest to version %s" % self.channel_version)
-            os.system("ln -s %s/%s %s/latest" % (self.spectero_install_path, self.channel_version, self.spectero_install_path))
+            os.system("ln -s %s/%s %s/latest" % (
+            self.spectero_install_path, self.channel_version, self.spectero_install_path))
 
             try:
                 self.create_user_and_groups()
@@ -281,9 +286,12 @@ class SpecteroInstaller:
                 print(e2)
                 sys.exit(9)
 
+
+
             # Create the service if we're linux.
             if sys.platform in ["linux", "linux2"]:
                 self.systemd_service()
+                self.sudoers_automation()
             elif sys.platform in ["darwin"]:
                 self.launchctl_service()
 
@@ -306,7 +314,8 @@ class SpecteroInstaller:
 
     def systemd_service(self):
         try:
-            systemd_script = "%s/%s/daemon/Tooling/Linux/spectero.service" % (self.spectero_install_path, self.channel_version)
+            systemd_script = "%s/%s/daemon/Tooling/Linux/spectero.service" % (
+            self.spectero_install_path, self.channel_version)
 
             # String replacement.
             with open(systemd_script, 'r') as file:
@@ -380,6 +389,12 @@ class SpecteroInstaller:
             print("Please report this problem.")
             sys.exit(12)
 
+    def sudoers_automation(self):
+        # Check if sudoers exists
+        if os.path.exists('/etc/sudoers'):
+            if self.sudoers_string not in open('/etc/sudoers').read():
+                with open('/etc/sudoers', "a") as sudoers:
+                    sudoers.write(self.sudoers_string + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
 
 class SpecteroUninstaller:
     def __init__(self):
@@ -399,7 +414,8 @@ class SpecteroUninstaller:
                         self.systemd_variables[split_line[0]] = split_line[1]
 
             # Get Spectero's installation location.
-            self.spectero_install_location = self.auto_abspath(self.auto_abspath(self.systemd_variables["WorkingDirectory"]))
+            self.spectero_install_location = self.auto_abspath(
+                self.auto_abspath(self.systemd_variables["WorkingDirectory"]))
 
             # Check to see if the CLI tool is installed.
             if os.path.isfile(self.cli_path):
