@@ -180,8 +180,7 @@ class SpecteroInstaller:
                             print("Created directory: %s" % self.spectero_install_path)
                             return
                     except:
-                        print(
-                            "Failed to make the directory, please validate the path and ensure the parent directory exists.")
+                        print("Failed to make the directory, please validate the path and ensure the parent directory exists.")
                         continue
 
     def prompt_install_ready(self):
@@ -271,7 +270,7 @@ class SpecteroInstaller:
 
             print("Symlinking latest to version %s" % self.channel_version)
             os.system("ln -s %s/%s %s/latest" % (
-            self.spectero_install_path, self.channel_version, self.spectero_install_path))
+                self.spectero_install_path, self.channel_version, self.spectero_install_path))
 
             try:
                 self.create_user_and_groups()
@@ -285,8 +284,6 @@ class SpecteroInstaller:
                 print("Does the spectero user exist?")
                 print(e2)
                 sys.exit(9)
-
-
 
             # Create the service if we're linux.
             if sys.platform in ["linux", "linux2"]:
@@ -314,8 +311,7 @@ class SpecteroInstaller:
 
     def systemd_service(self):
         try:
-            systemd_script = "%s/%s/daemon/Tooling/Linux/spectero.service" % (
-            self.spectero_install_path, self.channel_version)
+            systemd_script = "%s/%s/daemon/Tooling/Linux/spectero.service" % (self.spectero_install_path, self.channel_version)
 
             # String replacement.
             with open(systemd_script, 'r') as file:
@@ -396,6 +392,7 @@ class SpecteroInstaller:
                 with open('/etc/sudoers', "a") as sudoers:
                     sudoers.write(self.sudoers_string + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
 
+
 class SpecteroUninstaller:
     def __init__(self):
         self.systemd_variables = {}
@@ -414,8 +411,7 @@ class SpecteroUninstaller:
                         self.systemd_variables[split_line[0]] = split_line[1]
 
             # Get Spectero's installation location.
-            self.spectero_install_location = self.auto_abspath(
-                self.auto_abspath(self.systemd_variables["WorkingDirectory"]))
+            self.spectero_install_location = self.auto_abspath(self.auto_abspath(self.systemd_variables["WorkingDirectory"]))
 
             # Check to see if the CLI tool is installed.
             if os.path.isfile(self.cli_path):
