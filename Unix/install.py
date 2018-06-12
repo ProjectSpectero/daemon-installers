@@ -32,7 +32,8 @@ class SpecteroInstaller:
         self.spectero_install_path = "/opt/spectero"
         self.suppress_bash_tag = " >/dev/null 2>&1"
         self.systemd_service_destination = "/etc/systemd/system/spectero.service"
-        self.sudoers_string = "Cmnd_Alias SPECTERO_CMDS = /bin/systemctl start spectero, /bin/systemctl stop spectero"
+        self.sudoers_string = "Cmnd_Alias SPECTERO_CMDS = /bin/systemctl start spectero, /bin/systemctl stop spectero, /bin/systemctl status spectero, " \
+                              "/bin/systemctl restart spectero, /sbin/iptables -L"
         self.dotnet_framework_path = False
 
         # Determine which release channel to download from.
