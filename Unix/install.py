@@ -32,8 +32,8 @@ class SpecteroInstaller:
         self.spectero_install_path = "/opt/spectero"
         self.suppress_bash_tag = " >/dev/null 2>&1"
         self.systemd_service_destination = "/etc/systemd/system/spectero.service"
-        self.sudoers_string = "Cmnd_Alias SPECTERO_CMDS = /bin/systemctl start spectero, /bin/systemctl stop spectero, /bin/systemctl status spectero, " \
-                              "/bin/systemctl restart spectero, /sbin/iptables -L"
+        self.sudoers_template = "Cmnd_Alias SPECTERO_CMDS = {systemctl} start spectero, {systemctl} stop spectero, {systemctl} status spectero, " \
+                                "{systemctl} restart spectero, {iptables}, {openvpn}"
         self.dotnet_framework_path = False
 
         # Determine which release channel to download from.
@@ -112,8 +112,7 @@ class SpecteroInstaller:
     def find_dotnet_core(self):
         # Check system installation
         try:
-            with open(os.devnull, 'w') as devnull:
-                which_path = (subprocess.check_output(["which", "dotnet"], stderr=devnull)[:-1]).decode("utf-8")
+            which_path = self.which("dotnet");
 
             if 'dotnet' in which_path:
                 self.dotnet_framework_path = which_path
@@ -386,12 +385,20 @@ class SpecteroInstaller:
             print("Please report this problem.")
             sys.exit(12)
 
+    def which(self, command):
+        with open(os.devnull, 'w') as devnull:
+            return (subprocess.check_output(["which", command], stderr=devnull)[:-1]).decode("utf-8")
+
     def sudoers_automation(self):
+        # Replace the string templates.
+        for command in ["systemctl", "iptables", "openvpn"]:
+            self.sudoers_template.replace("{%s}" % command, self.which(command))
+
         # Check if sudoers exists
         if os.path.exists('/etc/sudoers'):
-            if self.sudoers_string not in open('/etc/sudoers').read():
+            if self.sudoers_template not in open('/etc/sudoers').read():
                 with open('/etc/sudoers', "a") as sudoers:
-                    sudoers.write(self.sudoers_string + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
+                    sudoers.write(self.sudoers_template + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
 
 
 class SpecteroUninstaller:
