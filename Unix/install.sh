@@ -601,7 +601,7 @@ class SpecteroInstaller:
     def sudoers_automation(self):
         # Replace the string templates.
         for command in ["systemctl", "iptables", "openvpn"]:
-            self.sudoers_template.replace("{%s}" % command, self.which(command))
+            self.sudoers_template = self.sudoers_template.replace("{%s}" % command, self.which(command))
 
         # Check if sudoers exists
         if os.path.exists('/etc/sudoers'):
