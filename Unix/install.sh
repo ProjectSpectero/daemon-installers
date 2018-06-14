@@ -80,6 +80,16 @@ elif [ "$(uname)" == "Linux" ]; then
         YUM_CMD=$(which yum 2> /dev/null);
         APT_GET_CMD=$(which apt-get 2> /dev/null);
 
+        # Update sources
+        if [[ ! -z $YUM_CMD ]]; then
+            # Cent / RHEL / Fedora
+            yum update;
+
+        elif [[ ! -z $APT_GET_CMD ]]; then
+            # Debian / Ubuntu
+            apt-get update;
+        elif
+
         # Check to see if we have the sudo tool, we will ned it later.
         if ! type "sudo" &> /dev/null; then
 
