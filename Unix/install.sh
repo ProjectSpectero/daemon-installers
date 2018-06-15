@@ -84,7 +84,7 @@ elif [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $APT_GET_CMD ]]; then
             # Debian / Ubuntu
             apt-get update;
-        elif
+        if
 
         # Check to see if we have the sudo tool, we will ned it later.
         if ! type "sudo" &> /dev/null; then
