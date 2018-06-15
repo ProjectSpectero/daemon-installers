@@ -161,12 +161,17 @@ elif [ "$(uname)" == "Linux" ]; then
         if ! type "dotnet" &> /dev/null; then
             # Cent / RHEL
             if [[ ! -z $YUM_CMD ]]; then
-                # Fedora Workstation and Server
                 if [[ $ID == "fedora" ]]; then
+                    # Fedora Workstation and Server
                     yum install libunwind-devel libcurl-devel libicu compat-openssl10 -y;
 
-                # Generic YUM based OS.
                 else
+                    # Generic Dependency Install
+                    echo "The installer was unable to determine the variant of linux."
+                    echo "Your package manager is yum, and we will try to install the required dependencies."
+                    echo "If the installation fails, please report the issue to"
+                    echo "https://github.com/ProjectSpectero/daemon-installers/issues"
+                    ehco "So Spectero can implement support for your operating system."
                     yum install libunwind-devel libcurl-devel libicu -y;
                 fi
 
