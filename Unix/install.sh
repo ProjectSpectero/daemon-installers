@@ -80,15 +80,20 @@ elif [ "$(uname)" == "Linux" ]; then
         YUM_CMD=$(which yum 2> /dev/null);
         APT_GET_CMD=$(which apt-get 2> /dev/null);
 
-        # Update sources if debian
+        # Update sources if apt-get based package manager exists.
         if [[ ! -z $APT_GET_CMD ]]; then
             # Debian / Ubuntu
+            echo "Detected APT-GET as the operating system's package manager."
             apt-get update;
+
+        elif [[ ! -z $YUM_CMD ]]; then
+            # CentOS/RHEL.
+            echo "Detected YUM as the operating system's package manager."
         fi
 
         # Check to see if we have the sudo tool, we will ned it later.
         if ! type "sudo" &> /dev/null; then
-
+            echo "Dependency Check: sudo will be installed."
             if [[ ! -z $YUM_CMD ]]; then
                 # Cent / RHEL / Fedora
                 yum install sudo -y;
@@ -103,16 +108,21 @@ elif [ "$(uname)" == "Linux" ]; then
                 echo "Please report your package manager to the developers so we can add support!";
                 exit 1;
             fi
+        else
+            echo "Dependency Check: sudo is installed."
         fi
 
         # Check to see if we have Python3 installed.
         if ! type "python3" &> /dev/null; then
+            echo "Dependency Check: python3 will be installed."
             if [[ ! -z $YUM_CMD ]]; then
                 # Cent / RHEL / Fedora
+                echo "Invoking package manager."
                 yum install python34 -y;
 
             elif [[ ! -z $APT_GET_CMD ]]; then
                 # Debian / Ubuntu
+                echo "Invoking package manager."
                 apt-get install python3 -y;
 
             else
@@ -121,10 +131,14 @@ elif [ "$(uname)" == "Linux" ]; then
                 echo "Please report your package manager to the developers so we can add support!";
                 exit 1;
             fi
+
+        else
+            echo "Dependency Check: python3 is present in the system."
         fi
 
         # Check to see if we have openvpn installed.
         if ! type "openvpn" &> /dev/null; then
+            echo "Dependency Check: OpenVPN will be installed."
             if [[ ! -z $YUM_CMD ]]; then
                 # Cent / RHEL / Fedora
                 yum install openvpn -y;
@@ -139,6 +153,8 @@ elif [ "$(uname)" == "Linux" ]; then
                 echo "Please report your package manager to the developers so we can add support!";
                 exit 1;
             fi
+        else
+            echo "Dependency Check: OpenVPN is present in the system."
         fi
 
         # Check to see if we have dotnet core installed.
@@ -156,7 +172,7 @@ elif [ "$(uname)" == "Linux" ]; then
 
             # Debian / Ubuntu
             elif [[ ! -z $APT_GET_CMD ]]; then
-            # Ubuntu
+                # Ubuntu
                 if [ $ID == "ubuntu" ]; then
 
                     # Some versions of ubuntu name the packages differently.
@@ -164,10 +180,14 @@ elif [ "$(uname)" == "Linux" ]; then
 
                     # Ubuntu 18.04
                     if [ $VERSION_ID == "18.04" ]; then
+                        echo "Detected Operating System: Ubuntu 18.04 LTS";
+                        echo "Installing dependencies for dotnet core framework."
                         apt-get install libunwind-dev libcurl4 -y;
 
                     # Undocumented Ubuntu Version
                     else
+                        echo "Detected Operating System: Ubuntu (unknown version)";
+                        echo "Installing dependencies for dotnet core framework."
                         apt-get install libunwind-dev libcurl4-openssl-dev -y;
                     fi
 
@@ -176,15 +196,24 @@ elif [ "$(uname)" == "Linux" ]; then
 
                     # Starch
                     if [ $VERSION_ID == "9" ]; then
+                        echo "Detected Operating System: Debian 9";
+                        echo "Installing dependencies for dotnet core framework."
                         apt-get install libicu-dev libunwind-dev libcurl4-openssl-dev -y;
 
                     # Undocumented Debian Version.
                     else
+                        echo "Detected Operating System: Debian (unknown version)";
+                        echo "Installing dependencies for dotnet core framework."
                         apt-get install libunwind-dev libcurl4-openssl-dev -y;
                     fi
 
                 else
                     # Generic Dependency Install
+                    echo "The installer was unable to determine the variant of linux."
+                    echo "Your package manager is apt-get, and we will try to install the required dependencies."
+                    echo "If the installation fails, please report the issue to"
+                    echo "https://github.com/ProjectSpectero/daemon-installers/issues"
+                    ehco "So Spectero can implement support for your operating system."
                     apt-get install libunwind-dev libcurl4-openssl-dev -y;
                 fi
 
@@ -196,7 +225,10 @@ elif [ "$(uname)" == "Linux" ]; then
             fi
 
             # Download dotnet installation script and execute it
+            echo "Downloading dotnet core installation script."
             wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
+
+            echo "Installing dotnet core version $DOTNET_CORE_VERSION...";
             bash /tmp/dotnet-install.sh --channel $DOTNET_CORE_VERSION --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
         fi
 
