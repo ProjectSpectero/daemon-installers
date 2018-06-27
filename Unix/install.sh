@@ -257,8 +257,9 @@ import shutil
 import subprocess
 import sys
 import traceback
-import urllib.request
 import zipfile
+
+import urllib.request
 
 INSTALLER_VERSION = 1
 
@@ -432,7 +433,8 @@ class SpecteroInstaller:
                             print("Created directory: %s" % self.spectero_install_path)
                             return
                     except:
-                        print("Failed to make the directory, please validate the path and ensure the parent directory exists.")
+                        print(
+                            "Failed to make the directory, please validate the path and ensure the parent directory exists.")
                         continue
 
     def prompt_install_ready(self):
@@ -537,6 +539,11 @@ class SpecteroInstaller:
                 print(e2)
                 sys.exit(9)
 
+            # Chmod the auth.sh
+            thirdPartyPath = "%s/latest/daemon/3rdParty/OpenVPN/auth.sh" % self.spectero_install_path
+            if (os.path.exists(thirdPartyPath)):
+                os.system("chmod +x %s" % thirdPartyPath)
+
             # Create the service if we're linux.
             if sys.platform in ["linux", "linux2"]:
                 self.systemd_service()
@@ -563,7 +570,8 @@ class SpecteroInstaller:
 
     def systemd_service(self):
         try:
-            systemd_script = "%s/%s/daemon/Tooling/Linux/spectero.service" % (self.spectero_install_path, self.channel_version)
+            systemd_script = "%s/%s/daemon/Tooling/Linux/spectero.service" % (
+                self.spectero_install_path, self.channel_version)
 
             # String replacement.
             with open(systemd_script, 'r') as file:
@@ -671,7 +679,8 @@ class SpecteroUninstaller:
                         self.systemd_variables[split_line[0]] = split_line[1]
 
             # Get Spectero's installation location.
-            self.spectero_install_location = self.auto_abspath(self.auto_abspath(self.systemd_variables["WorkingDirectory"]))
+            self.spectero_install_location = self.auto_abspath(
+                self.auto_abspath(self.systemd_variables["WorkingDirectory"]))
 
             # Check to see if the CLI tool is installed.
             if os.path.isfile(self.cli_path):
