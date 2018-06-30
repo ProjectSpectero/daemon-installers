@@ -222,7 +222,7 @@ class SpecteroInstaller:
 
             print("Found %s release: %s" % (self.channel, self.channel_version))
             if not execution_contains_cli_flag("--overwrite") and os.path.exists(
-                    "%s/%s" % (self.spectero_install_path, self.channel_version)):
+                            "%s/%s" % (self.spectero_install_path, self.channel_version)):
                 print("You are running the latest version of spectero.")
                 sys.exit(0)
 
@@ -294,6 +294,7 @@ class SpecteroInstaller:
 
             # Create the service if we're linux.
             if sys.platform in ["linux", "linux2"]:
+                self.linux_enable_ipv4_forwarding()
                 self.systemd_service()
                 self.sudoers_automation()
             elif sys.platform in ["darwin"]:
@@ -396,6 +397,24 @@ class SpecteroInstaller:
     def which(self, command):
         with open(os.devnull, 'w') as devnull:
             return (subprocess.check_output(["which", command], stderr=devnull)[:-1]).decode("utf-8")
+
+    def linux_enable_ipv4_forwarding(self):
+        # Define the propety of  what we need toc heck
+        property = "net.ipv4.ip_forward"
+        try:
+            # Try to execute
+            result = (subprocess.check_output(["sysctl", "net.ipv4.ip_forward"])[:-1]).decode("utf-8")
+
+            # Check if it is disabled
+            if result == "%s = 0":
+                # Enable ip forwarding
+                print("Enabling IPv4 Forwarding")
+                os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
+                print("Reloading System Configuration Kernel Properties...")
+                os.system("sysctl --system")
+        except:
+            print("There was a problem attempting to check for kernel flag: ipv4_forward.")
+            sys.exit(19)
 
     def sudoers_automation(self):
         # Replace the string templates.
