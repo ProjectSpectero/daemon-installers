@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 using Windows;
+using Microsoft.Win32;
 
 namespace installer
 {
@@ -128,6 +129,9 @@ namespace installer
 
             // Disable the cancel button.
             ExitButton.Enabled = false;
+            
+            // Modify registory
+            EnableFirewallFormwarding();
 
             // Mark as complete and enable the progress bar
             EasyLog("Installation is complete.");
@@ -547,6 +551,18 @@ namespace installer
             {
                 EasyLog("Spectero CLI already exists in the PATH.");
             }
+        }
+
+        /// <summary>
+        /// Enable firewall forwarding for routing, this is crucial for the daemon's network with OpenVPN
+        /// </summary>
+        public void EnableFirewallFormwarding()
+        {
+            Registry.SetValue(
+                "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters",
+                "IpEnableRouter",
+                1
+            );
         }
     }
 }
