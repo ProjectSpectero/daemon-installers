@@ -257,7 +257,6 @@ elif [ "$(uname)" == "Linux" ]; then
             bash /tmp/dotnet-install.sh \
                 --version $DOTNET_CORE_VERSION \
                 --runtime aspnetcore \
-                --runtime dotnet \
                 --install-dir /usr/local/bin/ \
                 2> /dev/null
         fi
