@@ -54,7 +54,13 @@ if [ "$(uname)" == "Darwin" ]; then
     if [[ $? != 0 ]]; then
         # Download dotnet installation script and execute it
         sudo wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
-        sudo bash /tmp/dotnet-install.sh --channel $DOTNET_CORE_VERSION --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
+        sudo bash /tmp/dotnet-install.sh \
+            --channel LTS \
+            --version latest \
+            --architecture auto \
+            --shared-runtime \
+            --install-dir /usr/local/bin/ \
+            2> /dev/null
     fi
 
     which -s openvpn;
@@ -655,13 +661,13 @@ class SpecteroInstaller:
         property = "net.ipv4.ip_forward"
         try:
             # Try to execute
-            result = (subprocess.check_output(["sysctl", "net.ipv4.ip_forward"], stderr=devnull)[:-1]).decode("utf-8")
+            result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
 
-            # Check if it is disabled
-            if result == "%s = 0":
+            # Check if it is disableds
+            if result == "%s = 0" % property:
                 # Enable ip forwarding
                 print("Enabling IPv4 Forwarding")
-                os.system("""echo "%s = 1" >> /etc/sysctl.conf""")
+                os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
                 print("Reloading System Configuration Kernel Properties...")
                 os.system("sysctl --system")
         except:

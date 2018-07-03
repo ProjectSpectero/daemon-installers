@@ -403,10 +403,10 @@ class SpecteroInstaller:
         property = "net.ipv4.ip_forward"
         try:
             # Try to execute
-            result = (subprocess.check_output(["sysctl", "net.ipv4.ip_forward"])[:-1]).decode("utf-8")
+            result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
 
-            # Check if it is disabled
-            if result == "%s = 0":
+            # Check if it is disableds
+            if result == "%s = 0" % property:
                 # Enable ip forwarding
                 print("Enabling IPv4 Forwarding")
                 os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
