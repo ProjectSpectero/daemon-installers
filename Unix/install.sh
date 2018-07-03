@@ -54,7 +54,13 @@ if [ "$(uname)" == "Darwin" ]; then
     if [[ $? != 0 ]]; then
         # Download dotnet installation script and execute it
         sudo wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
-        sudo bash /tmp/dotnet-install.sh --channel $DOTNET_CORE_VERSION --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
+        sudo bash /tmp/dotnet-install.sh \
+            --channel LTS \
+            --version latest \
+            --architecture auto \
+            --shared-runtime \
+            --install-dir /usr/local/bin/ \
+            2> /dev/null
     fi
 
     which -s openvpn;
@@ -77,25 +83,33 @@ elif [ "$(uname)" == "Linux" ]; then
         source /etc/os-release;
 
         # Find the package manager
+        DNF_CMD=$(which dnf 2> /dev/null);
         YUM_CMD=$(which yum 2> /dev/null);
         APT_GET_CMD=$(which apt-get 2> /dev/null);
 
         # Update sources if apt-get based package manager exists.
-        if [[ ! -z $APT_GET_CMD ]]; then
-            # Debian / Ubuntu
-            echo "Detected APT-GET as the operating system's package manager."
-            apt-get update;
+        if [[ ! -z $DNF_CMD ]]; then
+            echo "Detected DNF as the operating system's package manager.";
 
         elif [[ ! -z $YUM_CMD ]]; then
             # CentOS/RHEL.
             echo "Detected YUM as the operating system's package manager."
+
+        elif [[ ! -z $APT_GET_CMD ]]; then
+            # Debian / Ubuntu
+            echo "Detected APT-GET as the operating system's package manager."
+            apt-get update;
         fi
 
         # Check to see if we have the sudo tool, we will ned it later.
         if ! type "sudo" &> /dev/null; then
             echo "Dependency Check: sudo will be installed."
-            if [[ ! -z $YUM_CMD ]]; then
-                # Cent / RHEL / Fedora
+            if [[ ! -z $DNF_CMD ]]; then
+                # Fedora
+                dnf install sudo -y;
+
+            elif [[ ! -z $YUM_CMD ]]; then
+                # Cent / RHEL
                 yum install sudo -y;
 
             elif [[ ! -z $APT_GET_CMD ]]; then
@@ -115,7 +129,11 @@ elif [ "$(uname)" == "Linux" ]; then
         # Check to see if we have Python3 installed.
         if ! type "python3" &> /dev/null; then
             echo "Dependency Check: python3 will be installed."
-            if [[ ! -z $YUM_CMD ]]; then
+            if [[ ! -z $DNF_CMD ]]; then
+                # Fedora
+                dnf install python34 -y;
+
+            elif [[ ! -z $YUM_CMD ]]; then
                 # Cent / RHEL / Fedora
                 echo "Invoking package manager."
                 yum install python34 -y;
@@ -139,7 +157,11 @@ elif [ "$(uname)" == "Linux" ]; then
         # Check to see if we have openvpn installed.
         if ! type "openvpn" &> /dev/null; then
             echo "Dependency Check: OpenVPN will be installed."
-            if [[ ! -z $YUM_CMD ]]; then
+            if [[ ! -z $DNF_CMD ]]; then
+                # Fedora
+                dnf install openvpn -y;
+
+            elif [[ ! -z $YUM_CMD ]]; then
                 # Cent / RHEL / Fedora
                 yum install openvpn -y;
 
@@ -160,20 +182,18 @@ elif [ "$(uname)" == "Linux" ]; then
         # Check to see if we have dotnet core installed.
         if ! type "dotnet" &> /dev/null; then
             # Cent / RHEL
-            if [[ ! -z $YUM_CMD ]]; then
+            if [[ ! -z $DNF_CMD ]]; then
                 if [[ $ID == "fedora" ]]; then
-                    # Fedora Workstation and Server
-                    yum install libunwind-devel libcurl-devel libicu compat-openssl10 -y;
-
-                else
-                    # Generic Dependency Install
-                    echo "The installer was unable to determine the variant of linux."
-                    echo "Your package manager is yum, and we will try to install the required dependencies."
-                    echo "If the installation fails, please report the issue to"
-                    echo "https://github.com/ProjectSpectero/daemon-installers/issues"
-                    ehco "So Spectero can implement support for your operating system."
-                    yum install libunwind-devel libcurl-devel libicu -y;
+                   dnf install libunwind-devel libcurl-devel libicu compat-openssl10 -y;
                 fi
+            elif [[ ! -z $YUM_CMD ]]; then
+                # Generic Dependency Install
+                echo "The installer was unable to determine the variant of linux."
+                echo "Your package manager is yum, and we will try to install the required dependencies."
+                echo "If the installation fails, please report the issue to"
+                echo "https://github.com/ProjectSpectero/daemon-installers/issues"
+                ehco "So Spectero can implement support for your operating system."
+                yum install libunwind-devel libcurl-devel libicu -y;
 
             # Debian / Ubuntu
             elif [[ ! -z $APT_GET_CMD ]]; then
@@ -655,13 +675,13 @@ class SpecteroInstaller:
         property = "net.ipv4.ip_forward"
         try:
             # Try to execute
-            result = (subprocess.check_output(["sysctl", "net.ipv4.ip_forward"], stderr=devnull)[:-1]).decode("utf-8")
+            result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
 
-            # Check if it is disabled
-            if result == "%s = 0":
+            # Check if it is disableds
+            if result == "%s = 0" % property:
                 # Enable ip forwarding
                 print("Enabling IPv4 Forwarding")
-                os.system("""echo "%s = 1" >> /etc/sysctl.conf""")
+                os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
                 print("Reloading System Configuration Kernel Properties...")
                 os.system("sysctl --system")
         except:
