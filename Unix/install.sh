@@ -15,7 +15,7 @@
 ###############################################################################
 
 # VARIABLES
-DOTNET_CORE_VERSION="2.1";
+DOTNET_CORE_VERSION="2.1.1";
 
 
 # Check if we have dependencies
@@ -254,7 +254,11 @@ elif [ "$(uname)" == "Linux" ]; then
             wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
 
             echo "Installing dotnet core version $DOTNET_CORE_VERSION...";
-            bash /tmp/dotnet-install.sh --channel $DOTNET_CORE_VERSION --shared-runtime --install-dir /usr/local/bin/ 2> /dev/null
+            bash /tmp/dotnet-install.sh \
+                --version $DOTNET_CORE_VERSION \
+                --runtime aspnetcore \
+                --install-dir /usr/local/bin/ \
+                2> /dev/null
         fi
 
     else
