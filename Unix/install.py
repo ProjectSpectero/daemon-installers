@@ -34,7 +34,7 @@ class SpecteroInstaller:
         self.suppress_bash_tag = " >/dev/null 2>&1"
         self.systemd_service_destination = "/etc/systemd/system/spectero.service"
         self.sudoers_template = "Cmnd_Alias SPECTERO_CMDS = {systemctl} start spectero, {systemctl} stop spectero, {systemctl} status spectero, " \
-                                "{systemctl} restart spectero, {iptables}, {openvpn}"
+                                "{systemctl} restart spectero, {iptables}, {openvpn}, {which}"
         self.dotnet_framework_path = False
 
         # Determine which release channel to download from.
@@ -418,7 +418,7 @@ class SpecteroInstaller:
 
     def sudoers_automation(self):
         # Replace the string templates.
-        for command in ["systemctl", "iptables", "openvpn"]:
+        for command in ["systemctl", "iptables", "openvpn", "which"]:
             self.sudoers_template = self.sudoers_template.replace("{%s}" % command, self.which(command))
 
         # Check if sudoers exists
