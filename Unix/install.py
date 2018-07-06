@@ -222,7 +222,7 @@ class SpecteroInstaller:
 
             print("Found %s release: %s" % (self.channel, self.channel_version))
             if not execution_contains_cli_flag("--overwrite") and os.path.exists(
-                            "%s/%s" % (self.spectero_install_path, self.channel_version)):
+                    "%s/%s" % (self.spectero_install_path, self.channel_version)):
                 print("You are running the latest version of spectero.")
                 sys.exit(0)
 
