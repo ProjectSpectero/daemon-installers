@@ -402,6 +402,13 @@ function DETECT_PROGRAM_WGET() {
     fi
 }
 
+function DETECT_PROGRAM_DOTNET_CORE() {
+    which -s dotnet;
+    if [[ $? != 0 ]]; then
+        WORK_INSTALL_DOTNET_CORE
+    fi
+}
+
 function DETECT_OSX_USER_IS_ROOT() {
     if [ "$(uname)" == "Darwin" ]; then
         if [[ $EUID -ne 0 ]]; then
@@ -443,17 +450,13 @@ PRINT_TERMS_OF_SERVICE
 PRINT_PROMPT_INSTALL_LOCATION
 PRINT_PROMPT_READY_TO_INSTALL
 
-# Find the package manager.
-DETECT_PACKAGE_MANAGER
-
 # Detect packages that either the installer or daemon needs, and install them.
 DETECT_PROGRAM_BREW
 DETECT_PACKAGE_MANAGER
+DETECT_PROGRAM_WGET
 DETECT_PROGRAM_OPENVPN
 DETECT_PROGRAM_PYTHON3
-
-# Install .NET Core Runtime after dependencies are met.
-WORK_INSTALL_DOTNET_CORE
+DETECT_PROGRAM_DOTNET_CORE
 
 # Install the daemon into the system.
 WORK_INSTALL_SPECTERO
