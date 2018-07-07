@@ -25,7 +25,7 @@ INSTALL_PROMPT="true";
 ##### EXCEPTIONS
 ##### ==========================
 function EXCEPTION_USER_ABORT(){
-    PRINT_SPACER;
+    clear
     echo "The user has aborted the installation.";
     echo "Spectero did not install.";
     exit 0; # General software error.
@@ -33,7 +33,7 @@ function EXCEPTION_USER_ABORT(){
 
 function EXCEPTION_TERMS_OF_SERVICE_AGREEMENT() {
     if [ $TOS_PROMPT != "false" ]; then
-        PRINT_SPACER;
+        clear
         echo "You did not agree to the Terms of Service.";
         echo "Spectero did not install.";
         exit 1; # General software error.
@@ -41,7 +41,7 @@ function EXCEPTION_TERMS_OF_SERVICE_AGREEMENT() {
 }
 
 function EXCEPTION_SYSTEMD_NOT_FOUND() {
-    PRINT_SPACER;
+    clear
     echo "Spectero Daemon Installer has encountered a problem.";
     echo "The Operating System this script is running on doesn't appear to utilize the systemd init system.";
     echo "Spectero's daemon specifically works for systemd.";
@@ -55,28 +55,27 @@ function EXCEPTION_SYSTEMD_NOT_FOUND() {
 function EXCEPTION_OSX_USER_CANNOT_BE_ROOT() {
     echo "This installation requires brew, which cannot be ran as root.";
     echo "Please run this script as a normal user.";
-    PRINT_SPACER;
+    clear;
     exit 126; # Brew cannot execute as root - "COMMAND INVOKED CANNOT EXECUTE"
 }
 
 function EXCEPTION_LINUX_USER_NEEDS_ROOT(){
-    PRINT_SPACER;
     echo "This script must be ran as root.";
     exit 126;
 }
 
 function EXCEPTION_OSX_USER_CANNOT_BE_ROOT(){
-    PRINT_SPACER;
     echo "The installation script requires the `brew` package manager, and cannot be run as root.";
     exit 126;
 }
 
 function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
-    PRINT_SPACER;
+    clear;
     echo "The installer failed to find a compatible package manager.";
     echo "Supported Package Managers";
-    echo "    ----> apt-get, apt, dnf (Debian / Ubuntu / Fedora / End user package managers)"
-    echo "    ----> yum (CentOS / Red Hat Enterprise Linux / Server based package managers)"
+    echo "    ----> apt-get, apt, dnf (Debian / Ubuntu / Fedora / End user package managers)";
+    echo "    ----> yum (CentOS / Red Hat Enterprise Linux / Server based package managers)";
+    echo "    ----> brew (MacOS / OS X)";
     echo "";
     echo "Spectero did not install.";
     exit 127; # The command was not found
@@ -104,21 +103,18 @@ function EXCEPTION_MAN_PAGE() {
 ##### ==========================
 ##### CONSOLE
 ##### ==========================
-function PRINT_SPACER() {
-    echo "";
-    echo "=======================================================================";
-}
 
 function PRINT_GREETINGS() {
+    clear;
     echo "Welcome to the Installation Wizard Script for Spectero Daemon";
 }
 
 function PRINT_TERMS_OF_SERVICE() {
     TOS_AGREEMENT_INPUT="yes";
-
+    echo "";
     echo "Spectero's Daemon comes with a standard Terms of Service Agreement";
     echo "This document can be found at https://spectero.com/tos";
-    PRINT_SPACER;
+    echo "";
     echo "Do you agree to the Terms of Service? (no/yes)";
 
     # Read the response
@@ -131,13 +127,13 @@ function PRINT_TERMS_OF_SERVICE() {
 }
 
 function PRINT_PROMPT_INSTALL_LOCATION () {
+    clear;
+
     # Placeholder.
     USER_SPECIFIED_DIRECTORY="";
 
     if [ $INSTALL_PROMPT == "true" ]; then
-        echo "By default, Spectero installs into the following directory:";
-        echo $INSTALL_LOCATION;
-        PRINT_SPACER;
+        echo "By default, Spectero installs into the following directory: $INSTALL_LOCATION";
         echo "Please press enter to accept this path as an installation directory, or provide a directory below:";
 
         # Read the response
@@ -152,9 +148,11 @@ function PRINT_PROMPT_INSTALL_LOCATION () {
 }
 
 function PRINT_PROMPT_READY_TO_INSTALL() {
+    clear;
+
     echo "The installer has gathered enough information to start installation.";
-    PRINT_SPACER;
     echo "Would you like to start the installation? (yes/no)";
+    echo "Anything other than 'yes' will result in the installer exiting.";
 
     # Read the response
     CONTINUE="no";
@@ -184,12 +182,14 @@ function WORK_INSTALL_BREW() {
     if [ "$(uname)" == "Darwin" ]; then
         which brew &> /dev/null;
         if [[ $? != 0 ]]; then
+        echo "The brew package manager will now be installed.";
             sudo ruby -e "$(curl -FsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         fi
     fi
 }
 
 function WORK_INSTALL_SUDO() {
+    echo "The `sudo` utility will now be installed.";
     if [ "$(uname)" == "Darwin" ]; then # OS X
         brew install sudo;
     elif [ "$(uname)" == "Linux" ]; then
@@ -204,11 +204,10 @@ function WORK_INSTALL_SUDO() {
 }
 
 function WORK_INSTALL_PYTHON3() {
+    echo "The `python3` executable will now be installed.";
     if [ "$(uname)" == "Darwin" ]; then # OS X
         brew install sudo;
     elif [ "$(uname)" == "Linux" ]; then
-        echo "Dependency Check: python3 will be installed."
-
         if [[ ! -z $DNF_CMD ]]; then
             dnf install python34 -y;
         elif [[ ! -z $YUM_CMD ]]; then
@@ -220,6 +219,7 @@ function WORK_INSTALL_PYTHON3() {
 }
 
 function WORK_INSTALL_OPENVPN() {
+    echo "The `openvpn` utility will now be installed.";
     if [ "$(uname)" == "Darwin" ]; then
         brew install openvpn;
     elif [ "$(uname)" == "Linux" ]; then
@@ -234,6 +234,7 @@ function WORK_INSTALL_OPENVPN() {
 }
 
 function WORK_INSTALL_WGET() {
+    echo "The `wget` utility will now be installed.";
     if [ "$(uname)" == "Darwin" ]; then
         brew install wget;
     elif [ "$(uname)" == "Linux" ]; then
@@ -248,6 +249,7 @@ function WORK_INSTALL_WGET() {
 }
 
 function WORK_INSTALL_DOTNET_CORE() {
+    echo "The `dotnet` framework will now be installed.";
     if [[ ! -z $DNF_CMD ]]; then
         if [[ $ID == "fedora" ]]; then
            dnf install libunwind-devel libcurl-devel libicu compat-openssl10 -y;
@@ -347,6 +349,8 @@ function WORK_PARSAE_ARGUMENTS() {
 ##### DETECTORS
 ##### ==========================
 function DETECT_PACKAGE_MANAGER() {
+    clear;
+
     # Find the package manager
     DNF_CMD=$(which dnf 2> /dev/null);
     YUM_CMD=$(which yum 2> /dev/null);
@@ -365,7 +369,9 @@ function DETECT_PACKAGE_MANAGER() {
         echo "Detected APT-GET as the operating system's package manager."
 
         # apt-get specifically needs an update to the repositories.
-        apt-get update;
+        echo "Updating the package manager's sources...";
+        echo "(This can take a minute)";
+        apt-get update &> /dev/null;
     else
         EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER
     fi
@@ -383,6 +389,8 @@ function DETECT_PROGRAM_BREW() {
     which brew &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_BREW
+    else
+        echo "Dependency exists: brew - skipping installation.";
     fi
 }
 
@@ -390,6 +398,8 @@ function DETECT_PROGRAM_PYTHON3() {
     which python3 &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_PYTHON3
+    else
+        echo "Dependency exists: python3 - skipping installation.";
     fi
 }
 
@@ -397,6 +407,8 @@ function DETECT_PROGRAM_OPENVPN() {
     which openvpn &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_OPENVPN
+    else
+        echo "Dependency exists: openvpn - skipping installation.";
     fi
 }
 
@@ -404,6 +416,8 @@ function DETECT_PROGRAM_WGET() {
     which wget &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_WGET
+    else
+        echo "Dependency exists: wget - skipping installation.";
     fi
 }
 
@@ -411,6 +425,8 @@ function DETECT_PROGRAM_DOTNET_CORE() {
     which dotnet &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_DOTNET_CORE
+    else
+        echo "Dependency exists: dotnet - skipping installation.";
     fi
 }
 
