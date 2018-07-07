@@ -43,7 +43,7 @@ function EXCEPTION_SYSTEMD_NOT_FOUND() {
     PRINT_SPACER;
     echo "Spectero Daemon Installer has encountered a problem.";
     echo "The Operating System this script is running on doesn't appear to utilize the systemd init system.";
-    echo "Spectero\s daemon specifically works for systemd.";
+    echo "Spectero's daemon specifically works for systemd.";
     echo "You can find what operating systems Spectero is compatible on the website:";
     echo "https://spectero.com/downloads";
     echo "";
@@ -66,7 +66,7 @@ function EXCEPTION_LINUX_USER_NEEDS_ROOT(){
 
 function EXCEPTION_OSX_USER_CANNOT_BE_ROOT(){
     PRINT_SPACER;
-    echo "The installation script requires the \`brew\` package manager, and cannot be run as root.";
+    echo "The installation script requires the `brew` package manager, and cannot be run as root.";
     exit 126;
 }
 
@@ -90,11 +90,11 @@ function PRINT_SPACER() {
 }
 
 function PRINT_GREETINGS() {
-    echo "Welcome Installation Wizard Script for Spectero Daemon";
+    echo "Welcome to the Installation Wizard Script for Spectero Daemon";
 }
 
 function PRINT_TERMS_OF_SERVICE() {
-    echo "Spectero\'s Daemon comes with a standard Terms of Service Agreement";
+    echo "Spectero's Daemon comes with a standard Terms of Service Agreement";
     echo "This document can be found at https://spectero.com/tos";
     PRINT_SPACER;
     echo "Do you agree to the Terms of Service? (no/yes)";
@@ -390,12 +390,6 @@ DETECT_LINUX_USER_IS_ROOT
 # Make sure we are a supported distribution if we're linux.
 DETECT_SYSTEMD
 
-# Find the package manager.
-DETECT_PACKAGE_MANAGER
-
-# Determine the release branch we want to use.
-DETECT_RELEASE_BRANCH
-
 # Load environment variables if we're linux.
 LOAD_SYSTEND_DISTRIBUTION_INFORMATION
 
@@ -406,6 +400,12 @@ PRINT_TERMS_OF_SERVICE
 # Prompt the users for the two options.
 PRINT_PROMPT_INSTALL_LOCATION
 PRINT_PROMPT_READY_TO_INSTALL
+
+# Find the package manager.
+DETECT_PACKAGE_MANAGER
+
+# Determine the release branch we want to use.
+DETECT_RELEASE_BRANCH
 
 # Detect packages that either the installer or daemon needs, and install them.
 DETECT_PROGRAM_BREW
