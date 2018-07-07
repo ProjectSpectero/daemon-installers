@@ -71,17 +71,6 @@ function EXCEPTION_OSX_USER_CANNOT_BE_ROOT() {
     exit 126; # Brew cannot execute as root - "COMMAND INVOKED CANNOT EXECUTE"
 }
 
-function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
-    PRINT_SPACER
-    echo "The installer failed to find a compatible package manager.";
-    echo "Supported Package Managers";
-    echo "    ----> apt-get, apt, dnf (Debian / Ubuntu / Fedora / End user package managers)"
-    echo "    ----> yum (CentOS / Red Hat Enterprise Linux / Server based package managers)"
-    PRINT_SPACER
-    echo "Spectero did not install.";
-    exit 127; # The command was not found
-}
-
 function EXCEPTION_LINUX_USER_NEEDS_ROOT(){
     PRINT_SPACER
     echo "This script must be ran as root.";
@@ -92,6 +81,17 @@ function EXCEPTION_OSX_USER_CANNOT_BE_ROOT(){
     PRINT_SPACER
     echo "The installation script requires the \`brew\` package manager, and cannot be run as root.";
     exit 126;
+}
+
+function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
+    PRINT_SPACER
+    echo "The installer failed to find a compatible package manager.";
+    echo "Supported Package Managers";
+    echo "    ----> apt-get, apt, dnf (Debian / Ubuntu / Fedora / End user package managers)"
+    echo "    ----> yum (CentOS / Red Hat Enterprise Linux / Server based package managers)"
+    PRINT_SPACER
+    echo "Spectero did not install.";
+    exit 127; # The command was not found
 }
 
 
