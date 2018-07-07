@@ -18,7 +18,7 @@
 DOTNET_CORE_VERSION="2.1.1";
 INSTALL_LOCATION="/opt/spectero";
 BRANCH="stable";
-
+TOS_PROMPT="true";
 
 ##### ==========================
 ##### EXCEPTIONS
@@ -32,11 +32,13 @@ function EXCEPTION_USER_ABORT(){
 }
 
 function EXCEPTION_TERMS_OF_SERVICE_AGREEMENT() {
-    PRINT_SPACER;
-    echo "You did not agree to the Terms of Service.";
-    echo "";
-    echo "Spectero did not install.";
-    exit 1; # General software error.
+    if [ $TOS_PROMPT != "false" ]; then
+        PRINT_SPACER;
+        echo "You did not agree to the Terms of Service.";
+        echo "";
+        echo "Spectero did not install.";
+        exit 1; # General software error.
+    fi
 }
 
 function EXCEPTION_SYSTEMD_NOT_FOUND() {
@@ -79,6 +81,22 @@ function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
     echo "";
     echo "Spectero did not install.";
     exit 127; # The command was not found
+}
+
+function EXCEPTION_MAN_PAGE() {
+    echo "  -a=, --agree=   |   Agree to the Spectero Terms of Service";
+    echo "";
+    echo "  -b=, --branch=  |   Specify the release channel that the installer will use.";
+    echo "                  |   Potential possibilities:";
+    echo "                  |   'stable' - The mature channel that is ready for production (DEFAULT)";
+    echo "                  |   'beta'   - Get new features as they are implemented, may contain bugs.";
+    echo "                  |   'alpha'  - Get the newest things that developers implement; (Will contain bugs, not suitable for production)";
+    echo "";
+    echo "  -d=, --dir=     |   The location of where Spectero should install.";
+    ehco "";
+    echo "  -h, --help      |   Displays this page.";
+    echo "";
+    exit 0;
 }
 
 
@@ -281,6 +299,33 @@ function WORK_INSTALL_SPECTERO() {
     echo "testing";
 }
 
+function WORK_PARSAE_ARGUMENTS() {
+    for i in "$@"
+        do
+            case $i in
+                -a|--agree)
+                    TOS_PROMPT="false";
+                    shift # past argument=value
+                ;;
+                -b=*|--branch=*)
+                    BRANCH="${i#*=}";
+                    shift # past argument=value
+                ;;
+                -d=*|--install-location=*)
+                    INSTALL_LOCATION="${i#*=}"
+                    shift # past argument=value
+                ;;
+                -h|--help)
+                    EXCEPTION_MAN_PAGE;
+                    shift # past argument=value
+                ;;
+                *)
+                    echo "";
+                ;;
+            esac
+        done
+}
+
 
 ##### ==========================
 ##### DETECTORS
@@ -362,23 +407,6 @@ function DETECT_LINUX_USER_IS_ROOT() {
     fi
 }
 
-function DETECT_RELEASE_BRANCH() {
-    case "$1" in
-        --alpha)
-            BRANCH="alpha"
-            ;;
-        --beta)
-            BRANCH="beta"
-            ;;
-        --stable)
-            BRANCH="stable"
-            ;;
-        *)
-            BRANCH="stable"
-            ;;
-    esac
-}
-
 
 ##### =====================================
 ##### MAIN ROUTINE
@@ -389,6 +417,9 @@ DETECT_LINUX_USER_IS_ROOT
 
 # Make sure we are a supported distribution if we're linux.
 DETECT_SYSTEMD
+
+# Parse the passed arguments.
+WORK_PARSAE_ARGUMENTS;
 
 # Load environment variables if we're linux.
 LOAD_SYSTEND_DISTRIBUTION_INFORMATION
@@ -403,9 +434,6 @@ PRINT_PROMPT_READY_TO_INSTALL
 
 # Find the package manager.
 DETECT_PACKAGE_MANAGER
-
-# Determine the release branch we want to use.
-DETECT_RELEASE_BRANCH
 
 # Detect packages that either the installer or daemon needs, and install them.
 DETECT_PROGRAM_BREW
