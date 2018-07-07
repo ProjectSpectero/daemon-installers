@@ -18,8 +18,10 @@
 DOTNET_CORE_VERSION="2.1.1";
 INSTALL_LOCATION="/opt/spectero";
 BRANCH="stable";
+VERSION="latest"
 TOS_PROMPT="true";
 INSTALL_PROMPT="true";
+OVERWRITE="true";
 
 ##### ==========================
 ##### EXCEPTIONS
@@ -162,6 +164,13 @@ function PRINT_PROMPT_READY_TO_INSTALL() {
     if [[ $CONTINUE != "yes" ]]; then
         EXCEPTION_USER_ABORT
     fi
+}
+
+function PRINT_INSTALL_COMPLETE() {
+    clear;
+
+    echo "Installation of the Spectero Daemon has completed successfully."
+    exit 0;
 }
 
 
@@ -308,9 +317,16 @@ function WORK_INSTALL_DOTNET_CORE() {
 }
 
 function WORK_INSTALL_SPECTERO() {
-    # IMPLEMENT HEREDOC HERE.
-    # Python can do the intelegent bits that bash cannot.
-    echo "Pending implementation. If you've made it here the installer works so far."
+    # Write all data to a config
+    echo "installation_directory=$INSTALL_LOCATION" > /tmp/spectero.installconfig
+    echo "overwrite=$OVERWRITE" >> /tmp/spectero.installconfig
+    echo "branch=$BRANCH" >> /tmp/spectero.installconfig
+    echo "version=$VERSION" >> /tmp/spectero.installconfig
+
+    # Download the python side of things, python will read the above file and handle the intricate parts.
+    wget -O - https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.py &> /dev/null | sudo python3
+
+    PRINT_INSTALL_COMPLETE
 }
 
 function WORK_PARSAE_ARGUMENTS() {
