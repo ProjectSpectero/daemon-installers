@@ -303,7 +303,9 @@ function WORK_INSTALL_DOTNET_CORE() {
 }
 
 function WORK_INSTALL_SPECTERO() {
-    echo "testing";
+    # IMPLEMENT HEREDOC HERE.
+    # Python can do the intelegent bits that bash cannot.
+    echo "Pending implementation. If you've made it here the installer works so far."
 }
 
 function WORK_PARSAE_ARGUMENTS() {
