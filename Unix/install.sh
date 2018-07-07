@@ -19,6 +19,7 @@ DOTNET_CORE_VERSION="2.1.1";
 INSTALL_LOCATION="/opt/spectero";
 BRANCH="stable";
 TOS_PROMPT="true";
+INSTALL_PROMPT="true";
 
 ##### ==========================
 ##### EXCEPTIONS
@@ -84,7 +85,9 @@ function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
 }
 
 function EXCEPTION_MAN_PAGE() {
-    echo "  -a=, --agree=   |   Agree to the Spectero Terms of Service";
+    echo "  -a=, --agree=   |   Agree to the Spectero Terms of Service.";
+    echo "";
+    echo "  -ai, --install  |   Automatically install without any prompt for confirmation.";
     echo "";
     echo "  -b=, --branch=  |   Specify the release channel that the installer will use.";
     echo "                  |   Potential possibilities:";
@@ -127,18 +130,20 @@ function PRINT_TERMS_OF_SERVICE() {
 }
 
 function PRINT_PROMPT_INSTALL_LOCATION () {
-    echo "By default, spectero installs into the following directory:";
-    echo $INSTALL_LOCATION;
-    PRINT_SPACER;
-    echo "Please press enter to accept this path as an installation directory, or provide a directory below:";
+    if [ $INSTALL_PROMPT == "true" ]; then
+        echo "By default, Spectero installs into the following directory:";
+        echo $INSTALL_LOCATION;
+        PRINT_SPACER;
+        echo "Please press enter to accept this path as an installation directory, or provide a directory below:";
 
-    # Read the response
-    read USER_SPECIFIED_DIRECTORY;
+        # Read the response
+        read USER_SPECIFIED_DIRECTORY;
+    fi
 
     # Check if not yes
     if [ $USER_SPECIFIED_DIRECTORY != "" ]; then
-        INSTALL_LOCATION = $USER_SPECIFIED_DIRECTORY;
-        mkdir -p $
+        INSTALL_LOCATION=$USER_SPECIFIED_DIRECTORY;
+        mkdir -p $INSTALL_LOCATION
     fi
 }
 
@@ -305,6 +310,10 @@ function WORK_PARSAE_ARGUMENTS() {
             case $i in
                 -a|--agree)
                     TOS_PROMPT="false";
+                    shift # past argument=value
+                ;;
+                -ai|--install)
+                    INSTALL_PROMPT="false";
                     shift # past argument=value
                 ;;
                 -b=*|--branch=*)
