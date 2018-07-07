@@ -12,7 +12,7 @@
 ###############################################################################
 
 DOTNET_CORE_VERSION = "2.1.1";
-
+INSTALL_LOCATION = "/opt/spectero"
 
 ##### ==========================
 ##### CONSOLE ADDITIONS
@@ -28,24 +28,39 @@ function PRINT_GREETINGS() {
 function PRINT_TERMS_OF_SERVICE() {
     echo "Spectero\'s Daemon comes with a standard Terms of Service Agreement";
     echo "This document can be found at https://spectero.com/tos";
-    echo "";
+    PRINT_SPACER;
     echo "Do you agree to the Terms of Service? (no/yes)";
 
     # Read the response
-    read tos_agreement;
+    read TOS_AGREEMENT_INPUT;
 
     # Check if not yes
-    if [ $tos_agreement != "yes" ]; then
+    if [ $TOS_AGREEMENT_INPUT != "yes" ]; then
         EXCEPTION_TERMS_OF_SERVICE_AGREEMENT
     fi
 }
 
+function PRINT_PROMPT_INSTALL_LOCATION () {
+    echo "By default, spectero installs into the following directory:";
+    echo $INSTALL_LOCATION;
+    PRINT_SPACER;
+    echo "Please press enter to accept this path as an installation directory, or provide a directory below:";
+
+    # Read the response
+    read USER_SPECIFIED_DIRECTORY;
+
+    # Check if not yes
+    if [ $USER_SPECIFIED_DIRECTORY != "" ]; then
+        INSTALL_LOCATION = $USER_SPECIFIED_DIRECTORY;
+        mkdir -p $
+    fi
+}
 
 ##### ==========================
 ##### EXCEPTIONS
 ##### ==========================
 function EXCEPTION_TERMS_OF_SERVICE_AGREEMENT() {
-    PRINT_SPACER
+    PRINT_SPACER;
     echo "You did not agree to the Terms of Service.";
     echo "";
     echo "Spectero did not install.";
@@ -53,13 +68,13 @@ function EXCEPTION_TERMS_OF_SERVICE_AGREEMENT() {
 }
 
 function EXCEPTION_SYSTEMD_NOT_FOUND() {
-    PRINT_SPACER
+    PRINT_SPACER;
     echo "Spectero Daemon Installer has encountered a problem.";
     echo "The Operating System this script is running on doesn't appear to utilize the systemd init system.";
     echo "Spectero\s daemon specifically works for systemd.";
     echo "You can find what operating systems Spectero is compatible on the website:";
     echo "https://spectero.com/downloads";
-    PRINT_SPACER
+    PRINT_SPACER;
     echo "Spectero did not install.";
     exit 1;
 }
@@ -72,24 +87,24 @@ function EXCEPTION_OSX_USER_CANNOT_BE_ROOT() {
 }
 
 function EXCEPTION_LINUX_USER_NEEDS_ROOT(){
-    PRINT_SPACER
+    PRINT_SPACER;
     echo "This script must be ran as root.";
     exit 126;
 }
 
 function EXCEPTION_OSX_USER_CANNOT_BE_ROOT(){
-    PRINT_SPACER
+    PRINT_SPACER;
     echo "The installation script requires the \`brew\` package manager, and cannot be run as root.";
     exit 126;
 }
 
 function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
-    PRINT_SPACER
+    PRINT_SPACER;
     echo "The installer failed to find a compatible package manager.";
     echo "Supported Package Managers";
     echo "    ----> apt-get, apt, dnf (Debian / Ubuntu / Fedora / End user package managers)"
     echo "    ----> yum (CentOS / Red Hat Enterprise Linux / Server based package managers)"
-    PRINT_SPACER
+    PRINT_SPACER;
     echo "Spectero did not install.";
     exit 127; # The command was not found
 }
@@ -250,6 +265,9 @@ function WORK_INSTALL_DOTNET_CORE() {
         2> /dev/null
 }
 
+function WORK_INSTALL_SPECTERO() {
+    # TODO: IMPLEMENT LARGE PYTHON FILE OF DOOM.
+}
 
 ##### ==========================
 ##### DETECTORS
@@ -352,10 +370,8 @@ PRINT_GREETINGS
 PRINT_TERMS_OF_SERVICE
 
 # Prompt the users for the two options.
-PROMPT_INSTALL_LOCATION
-PROMPT_READY_TO_INSTALL
-
-
+PRINT_PROMPT_INSTALL_LOCATION
+PRINT_PROMPT_READY_TO_INSTALL
 
 # Detect packages that either the installer or daemon needs, and install them.
 DETECT_PROGRAM_BREW
@@ -366,6 +382,7 @@ DETECT_PROGRAM_PYTHON3
 # Install .NET Core Runtime after dependencies are met.
 WORK_INSTALL_DOTNET_CORE
 
+# Install the daemon into the system.
 WORK_INSTALL_SPECTERO
 
 # Exit gracefully.
