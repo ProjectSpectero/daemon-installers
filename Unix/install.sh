@@ -16,7 +16,8 @@
 ##### VARIABLES
 ##### ==========================
 DOTNET_CORE_VERSION = "2.1.1";
-INSTALL_LOCATION = "/opt/spectero"
+INSTALL_LOCATION = "/opt/spectero";
+BRANCH = "stable";
 
 
 ##### ==========================
@@ -258,7 +259,7 @@ function WORK_INSTALL_DOTNET_CORE() {
             echo "Your package manager is apt-get, and we will try to install the required dependencies."
             echo "If the installation fails, please report the issue to"
             echo "https://github.com/ProjectSpectero/daemon-installers/issues"
-            ehco "So Spectero can implement support for your operating system."
+            ehco "so Spectero can implement support for your operating system."
             apt-get install libunwind-dev libcurl4-openssl-dev -y;
         fi
     fi
@@ -277,7 +278,11 @@ function WORK_INSTALL_DOTNET_CORE() {
 }
 
 function WORK_INSTALL_SPECTERO() {
-    # TODO: IMPLEMENT LARGE PYTHON FILE OF DOOM.
+
+}
+
+function WORK_WRITE_SYSTEMD_SERVICE_SCRIPT() {
+
 }
 
 ##### ==========================
@@ -360,6 +365,24 @@ function DETECT_LINUX_USER_IS_ROOT() {
     fi
 }
 
+function DETECT_BRANCH() {
+    case "$1" in
+        --alpha)
+            BRANCH = "alpha"
+            ;;
+        --beta)
+            BRANCH = "beta"
+            ;;
+        --stable)
+            BRANCH = "stable"
+            ;;
+        *)
+            echo "The default branch (stable release channel) will be used.";
+            ;;
+    esac
+}
+
+
 ##### =====================================
 ##### MAIN ROUTINE
 ##### =====================================
@@ -372,6 +395,9 @@ DETECT_SYSTEMD
 
 # Find the package manager.
 DETECT_PACKAGE_MANAGER
+
+# Determine the release branch we want to use.
+DETECT_BRANCH
 
 # Load environment variables if we're linux.
 LOAD_SYSTEND_DISTRIBUTION_INFORMATION
