@@ -143,7 +143,7 @@ function PRINT_PROMPT_INSTALL_LOCATION () {
     fi
 
     # Check if not yes
-    if [ $USER_SPECIFIED_DIRECTORY != "" ]; then
+    if [[ $USER_SPECIFIED_DIRECTORY != "" ]]; then
         INSTALL_LOCATION=$USER_SPECIFIED_DIRECTORY;
         mkdir -p $INSTALL_LOCATION
     fi
@@ -152,7 +152,7 @@ function PRINT_PROMPT_INSTALL_LOCATION () {
 function PRINT_PROMPT_READY_TO_INSTALL() {
     echo "The installer has gathered enough information to start installation.";
     PRINT_SPACER;
-    echo "Would you like to start the installation? (yes/no";
+    echo "Would you like to start the installation? (yes/no)";
 
     # Read the response
     read CONTINUE;
