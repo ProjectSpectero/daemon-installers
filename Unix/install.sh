@@ -11,11 +11,78 @@
 ##
 ###############################################################################
 
+
+##### ==========================
+##### VARIABLES
+##### ==========================
 DOTNET_CORE_VERSION = "2.1.1";
 INSTALL_LOCATION = "/opt/spectero"
 
+
 ##### ==========================
-##### CONSOLE ADDITIONS
+##### EXCEPTIONS
+##### ==========================
+function EXCEPTION_USER_ABORT(){
+    PRINT_SPACER;
+    echo "You did not agree to the Terms of Service.";
+    echo "";
+    echo "Spectero did not install.";
+    exit 1; # General software error.
+}
+
+function EXCEPTION_TERMS_OF_SERVICE_AGREEMENT() {
+    PRINT_SPACER;
+    echo "You did not agree to the Terms of Service.";
+    echo "";
+    echo "Spectero did not install.";
+    exit 1; # General software error.
+}
+
+function EXCEPTION_SYSTEMD_NOT_FOUND() {
+    PRINT_SPACER;
+    echo "Spectero Daemon Installer has encountered a problem.";
+    echo "The Operating System this script is running on doesn't appear to utilize the systemd init system.";
+    echo "Spectero\s daemon specifically works for systemd.";
+    echo "You can find what operating systems Spectero is compatible on the website:";
+    echo "https://spectero.com/downloads";
+    echo "";
+    echo "Spectero did not install.";
+    exit 1;
+}
+
+function EXCEPTION_OSX_USER_CANNOT_BE_ROOT() {
+    echo "This installation requires brew, which cannot be ran as root.";
+    echo "Please run this script as a normal user.";
+    PRINT_SPACER;
+    exit 126; # Brew cannot execute as root - "COMMAND INVOKED CANNOT EXECUTE"
+}
+
+function EXCEPTION_LINUX_USER_NEEDS_ROOT(){
+    PRINT_SPACER;
+    echo "This script must be ran as root.";
+    exit 126;
+}
+
+function EXCEPTION_OSX_USER_CANNOT_BE_ROOT(){
+    PRINT_SPACER;
+    echo "The installation script requires the \`brew\` package manager, and cannot be run as root.";
+    exit 126;
+}
+
+function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
+    PRINT_SPACER;
+    echo "The installer failed to find a compatible package manager.";
+    echo "Supported Package Managers";
+    echo "    ----> apt-get, apt, dnf (Debian / Ubuntu / Fedora / End user package managers)"
+    echo "    ----> yum (CentOS / Red Hat Enterprise Linux / Server based package managers)"
+    echo "";
+    echo "Spectero did not install.";
+    exit 127; # The command was not found
+}
+
+
+##### ==========================
+##### CONSOLE
 ##### ==========================
 function PRINT_SPACER() {
     echo "===============================================================";
@@ -56,57 +123,18 @@ function PRINT_PROMPT_INSTALL_LOCATION () {
     fi
 }
 
-##### ==========================
-##### EXCEPTIONS
-##### ==========================
-function EXCEPTION_TERMS_OF_SERVICE_AGREEMENT() {
+function PRINT_PROMPT_READY_TO_INSTALL() {
+    echo "The installer has gathered enough information to start installation.";
     PRINT_SPACER;
-    echo "You did not agree to the Terms of Service.";
-    echo "";
-    echo "Spectero did not install.";
-    exit 1; # General software error.
-}
+    echo "Would you like to start the installation? (yes/no";
 
-function EXCEPTION_SYSTEMD_NOT_FOUND() {
-    PRINT_SPACER;
-    echo "Spectero Daemon Installer has encountered a problem.";
-    echo "The Operating System this script is running on doesn't appear to utilize the systemd init system.";
-    echo "Spectero\s daemon specifically works for systemd.";
-    echo "You can find what operating systems Spectero is compatible on the website:";
-    echo "https://spectero.com/downloads";
-    PRINT_SPACER;
-    echo "Spectero did not install.";
-    exit 1;
-}
+    # Read the response
+    read CONTINUE;
 
-function EXCEPTION_OSX_USER_CANNOT_BE_ROOT() {
-    echo "This installation requires brew, which cannot be ran as root.";
-    echo "Please run this script as a normal user.";
-    PRINT_SPACER;
-    exit 126; # Brew cannot execute as root - "COMMAND INVOKED CANNOT EXECUTE"
-}
-
-function EXCEPTION_LINUX_USER_NEEDS_ROOT(){
-    PRINT_SPACER;
-    echo "This script must be ran as root.";
-    exit 126;
-}
-
-function EXCEPTION_OSX_USER_CANNOT_BE_ROOT(){
-    PRINT_SPACER;
-    echo "The installation script requires the \`brew\` package manager, and cannot be run as root.";
-    exit 126;
-}
-
-function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
-    PRINT_SPACER;
-    echo "The installer failed to find a compatible package manager.";
-    echo "Supported Package Managers";
-    echo "    ----> apt-get, apt, dnf (Debian / Ubuntu / Fedora / End user package managers)"
-    echo "    ----> yum (CentOS / Red Hat Enterprise Linux / Server based package managers)"
-    PRINT_SPACER;
-    echo "Spectero did not install.";
-    exit 127; # The command was not found
+    # Check if not yes
+    if [ $CONTINUE != "yes" ]; then
+        EXCEPTION_USER_ABORT
+    fi
 }
 
 
