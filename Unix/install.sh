@@ -15,9 +15,9 @@
 ##### ==========================
 ##### VARIABLES
 ##### ==========================
-DOTNET_CORE_VERSION = "2.1.1";
-INSTALL_LOCATION = "/opt/spectero";
-BRANCH = "stable";
+DOTNET_CORE_VERSION="2.1.1";
+INSTALL_LOCATION="/opt/spectero";
+BRANCH="stable";
 
 
 ##### ==========================
@@ -278,7 +278,7 @@ function WORK_INSTALL_DOTNET_CORE() {
 }
 
 function WORK_INSTALL_SPECTERO() {
-
+    echo "testing";
 }
 
 
@@ -362,19 +362,19 @@ function DETECT_LINUX_USER_IS_ROOT() {
     fi
 }
 
-function DETECT_BRANCH() {
+function DETECT_RELEASE_BRANCH() {
     case "$1" in
         --alpha)
-            BRANCH = "alpha"
+            BRANCH="alpha"
             ;;
         --beta)
-            BRANCH = "beta"
+            BRANCH="beta"
             ;;
         --stable)
-            BRANCH = "stable"
+            BRANCH="stable"
             ;;
         *)
-            echo "The default branch (stable release channel) will be used.";
+            BRANCH="stable"
             ;;
     esac
 }
@@ -394,7 +394,7 @@ DETECT_SYSTEMD
 DETECT_PACKAGE_MANAGER
 
 # Determine the release branch we want to use.
-DETECT_BRANCH
+DETECT_RELEASE_BRANCH
 
 # Load environment variables if we're linux.
 LOAD_SYSTEND_DISTRIBUTION_INFORMATION
