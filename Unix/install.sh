@@ -138,6 +138,8 @@ function PRINT_PROMPT_INSTALL_LOCATION () {
 
         # Read the response
         read USER_SPECIFIED_DIRECTORY;
+     else
+        USER_SPECIFIED_DIRECTORY="";
     fi
 
     # Check if not yes
