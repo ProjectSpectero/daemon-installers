@@ -26,17 +26,15 @@ INSTALL_PROMPT="true";
 ##### ==========================
 function EXCEPTION_USER_ABORT(){
     PRINT_SPACER;
-    echo "You did not agree to the Terms of Service.";
-    echo "";
+    echo "The user has aborted the installation.";
     echo "Spectero did not install.";
-    exit 1; # General software error.
+    exit 0; # General software error.
 }
 
 function EXCEPTION_TERMS_OF_SERVICE_AGREEMENT() {
     if [ $TOS_PROMPT != "false" ]; then
         PRINT_SPACER;
         echo "You did not agree to the Terms of Service.";
-        echo "";
         echo "Spectero did not install.";
         exit 1; # General software error.
     fi
@@ -107,7 +105,8 @@ function EXCEPTION_MAN_PAGE() {
 ##### CONSOLE
 ##### ==========================
 function PRINT_SPACER() {
-    echo "===============================================================";
+    echo "";
+    echo "=======================================================================";
 }
 
 function PRINT_GREETINGS() {
@@ -115,6 +114,8 @@ function PRINT_GREETINGS() {
 }
 
 function PRINT_TERMS_OF_SERVICE() {
+    TOS_AGREEMENT_INPUT="yes";
+
     echo "Spectero's Daemon comes with a standard Terms of Service Agreement";
     echo "This document can be found at https://spectero.com/tos";
     PRINT_SPACER;
@@ -124,12 +125,15 @@ function PRINT_TERMS_OF_SERVICE() {
     read TOS_AGREEMENT_INPUT;
 
     # Check if not yes
-    if [ $TOS_AGREEMENT_INPUT != "yes" ]; then
+    if [[ $TOS_AGREEMENT_INPUT != "yes" ]]; then
         EXCEPTION_TERMS_OF_SERVICE_AGREEMENT
     fi
 }
 
 function PRINT_PROMPT_INSTALL_LOCATION () {
+    # Placeholder.
+    USER_SPECIFIED_DIRECTORY="";
+
     if [ $INSTALL_PROMPT == "true" ]; then
         echo "By default, Spectero installs into the following directory:";
         echo $INSTALL_LOCATION;
@@ -138,8 +142,6 @@ function PRINT_PROMPT_INSTALL_LOCATION () {
 
         # Read the response
         read USER_SPECIFIED_DIRECTORY;
-     else
-        USER_SPECIFIED_DIRECTORY="";
     fi
 
     # Check if not yes
@@ -155,10 +157,11 @@ function PRINT_PROMPT_READY_TO_INSTALL() {
     echo "Would you like to start the installation? (yes/no)";
 
     # Read the response
+    CONTINUE="no";
     read CONTINUE;
 
     # Check if not yes
-    if [ $CONTINUE != "yes" ]; then
+    if [[ $CONTINUE != "yes" ]]; then
         EXCEPTION_USER_ABORT
     fi
 }
@@ -179,7 +182,7 @@ function LOAD_SYSTEND_DISTRIBUTION_INFORMATION() {
 ##### ==========================
 function WORK_INSTALL_BREW() {
     if [ "$(uname)" == "Darwin" ]; then
-        which -s brew;
+        which brew &> /dev/null;
         if [[ $? != 0 ]]; then
             sudo ruby -e "$(curl -FsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         fi
@@ -377,35 +380,35 @@ function DETECT_SYSTEMD() {
 }
 
 function DETECT_PROGRAM_BREW() {
-    which -s brew;
+    which brew &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_BREW
     fi
 }
 
 function DETECT_PROGRAM_PYTHON3() {
-    which -s python3;
+    which python3 &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_PYTHON3
     fi
 }
 
 function DETECT_PROGRAM_OPENVPN() {
-    which -s openvpn;
+    which openvpn &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_OPENVPN
     fi
 }
 
 function DETECT_PROGRAM_WGET() {
-    which -s wget;
+    which wget &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_WGET
     fi
 }
 
 function DETECT_PROGRAM_DOTNET_CORE() {
-    which -s dotnet;
+    which dotnet &> /dev/null;
     if [[ $? != 0 ]]; then
         WORK_INSTALL_DOTNET_CORE
     fi
