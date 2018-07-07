@@ -231,46 +231,29 @@ function WORK_INSTALL_DOTNET_CORE() {
         echo "https://github.com/ProjectSpectero/daemon-installers/issues"
         ehco "So Spectero can implement support for your operating system."
         yum install libunwind-devel libcurl-devel libicu -y;
-
-    # Debian / Ubuntu
     elif [[ ! -z $APT_GET_CMD ]]; then
         # Ubuntu
         if [ $ID == "ubuntu" ]; then
-
-            # Some versions of ubuntu name the packages differently.
-            # Please add specifics for each version.
-
-            # Ubuntu 18.04
             if [ $VERSION_ID == "18.04" ]; then
                 echo "Detected Operating System: Ubuntu 18.04 LTS";
                 echo "Installing dependencies for dotnet core framework."
                 apt-get install libunwind-dev libcurl4 -y;
-
-            # Undocumented Ubuntu Version
             else
                 echo "Detected Operating System: Ubuntu (unknown version)";
                 echo "Installing dependencies for dotnet core framework."
                 apt-get install libunwind-dev libcurl4-openssl-dev -y;
             fi
-
-        # Debian
         elif [ $ID == "debian" ]; then
-
-            # Starch
             if [ $VERSION_ID == "9" ]; then
                 echo "Detected Operating System: Debian 9";
                 echo "Installing dependencies for dotnet core framework."
                 apt-get install libicu-dev libunwind-dev libcurl4-openssl-dev -y;
-
-            # Undocumented Debian Version.
             else
                 echo "Detected Operating System: Debian (unknown version)";
                 echo "Installing dependencies for dotnet core framework."
                 apt-get install libunwind-dev libcurl4-openssl-dev -y;
             fi
-
         else
-            # Generic Dependency Install
             echo "The installer was unable to determine the variant of linux."
             echo "Your package manager is apt-get, and we will try to install the required dependencies."
             echo "If the installation fails, please report the issue to"
