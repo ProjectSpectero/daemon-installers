@@ -352,8 +352,10 @@ PRINT_GREETINGS
 PRINT_TERMS_OF_SERVICE
 
 # Prompt the users for the two options.
-# PROMPT_INSTALL_LOCATION
-# PROMPT_READY_TO_INSTALL
+PROMPT_INSTALL_LOCATION
+PROMPT_READY_TO_INSTALL
+
+
 
 # Detect packages that either the installer or daemon needs, and install them.
 DETECT_PROGRAM_BREW
@@ -361,6 +363,10 @@ DETECT_PACKAGE_MANAGER
 DETECT_PROGRAM_OPENVPN
 DETECT_PROGRAM_PYTHON3
 
+# Install .NET Core Runtime after dependencies are met.
+WORK_INSTALL_DOTNET_CORE
+
+WORK_INSTALL_SPECTERO
 
 # Exit gracefully.
 exit 0;
