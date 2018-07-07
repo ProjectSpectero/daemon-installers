@@ -281,9 +281,6 @@ function WORK_INSTALL_SPECTERO() {
 
 }
 
-function WORK_WRITE_SYSTEMD_SERVICE_SCRIPT() {
-
-}
 
 ##### ==========================
 ##### DETECTORS
@@ -309,7 +306,7 @@ function DETECT_PACKAGE_MANAGER() {
         # apt-get specifically needs an update to the repositories.
         apt-get update;
     else
-        EXCEPTION_INCOMPATABLE_PACKAGE_MANAGER
+        EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER
     fi
 }
 
