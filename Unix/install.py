@@ -1,3 +1,23 @@
+#!/usr/bin/env python3
+
+###############################################################################
+##
+##  Spectero, Inc
+##  Copyright (c) 2018 - All rights reserved
+##  https://spectero.com
+##
+##  This python script is a special case, and should not be used without
+##  the proper `install.sh`.
+##
+##  The bash script produces a configuration that this script is designed
+##  to read. Although you can write your own configuration if you
+##  study this script, it is not advised.
+##
+##  This script is also subject to Spectero's Terms of Service.
+##  You may find this document at https://spectero.com/tos
+##
+###############################################################################
+
 import os
 import json
 import sys
@@ -62,6 +82,14 @@ def read_config():
     print("Installation config successfully loaded.")
 
 
+def get_install_directory_from_config():
+    new = config["directory"]
+    if not new.endswith('/'):
+        new = new + "/"
+
+    return new
+
+
 def get_download_channel_information():
     global releases
     request = urllib.request.Request('https://c.spectero.com/releases.json')
@@ -70,22 +98,85 @@ def get_download_channel_information():
 
 
 def validate_user_requests_against_releases():
+    global releases, config
+
     # Check to make sure we are a valid branch.
+    print("Validating that %s is a valid release channel..." % config["branch"])
     if config["branch"] not in releases["channels"]:
         exception_channel_not_found()
 
     # Convert latest to the latest branch string
     if config["version"] == "latest":
+        print("Resolving 'latest' version...")
         config["version"] = releases["channels"][config["branch"]]
+        print("The latest version for branch '%s' is %s", config["branch"], config["version"])
 
     # Check if we can download this version.
+    print("Making sure that %s is a valid release..." % config["version"])
     if config["version"] not in releases["versions"]:
         exception_version_not_available_for_download()
 
+    # Check to make sure there's a download link
+    print("Getting download links for %s..." % config["version"])
     if releases["versions"][config["version"]] is None:
         exception_no_download_link()
+    else:
+        print("Link found: %s" % releases["versions"][config["version"]])
 
 
-read_config()
-get_download_channel_information()
-validate_user_requests_against_releases()
+def download_and_extract():
+    global releases, config
+
+    # Get the URL for the version.
+    url = releases["versions"][config["version"]]
+
+    # Build a easy to access path.
+    path = ("%s/%s.zip" % (get_install_directory_from_config(), config["version"]))
+
+    # Download
+    print("Invoking wget to download files...")
+    os.system("wget %s -O %s" % (url, path))
+
+    # Extract
+    print("Invoking tar to extract files...")
+    os.system("tar -xvf %s -C %s" % (path, get_install_directory_from_config()))
+
+    # Cleanup
+    os.system("rm %s" % path)
+    print("Extract and download procedure complete.")
+
+
+def create_latest_symlink():
+    if config["symlink"] == "true":
+        path = ("%s/%s" % (get_install_directory_from_config(), config["version"]))
+        symlink_path = get_install_directory_from_config() + "latest"
+
+        if os.path.islink(symlink_path):
+            print("Old symlink exists, removing...")
+            os.system("unlink %s" % symlink_path)
+
+        print("Creating symlink %s to %s" % (symlink_path, path))
+        os.system("ln -s %s %s" % (path, symlink_path))
+    else:
+        print("User has specified that they do not want a symlink - skipping this step.")
+
+
+def create_systemd_service():
+    if config["service"] == "true":
+        print("Work in progress.")
+    else:
+        print("User has specified that they do not want a service for the Spectero Daemon - skipping this step.")
+
+
+def create_shell_script():
+    print("work in progress.")
+
+
+if __name__ == "__main__":
+    read_config()
+    get_download_channel_information()
+    validate_user_requests_against_releases()
+    download_and_extract()
+    create_latest_symlink()
+    create_systemd_service()
+    create_shell_script()
