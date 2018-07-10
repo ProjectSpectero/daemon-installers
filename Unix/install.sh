@@ -41,7 +41,7 @@ function EXCEPTION_USER_ABORT(){
 }
 
 function EXCEPTION_TERMS_OF_SERVICE_AGREEMENT() {
-    if [ $TOS_PROMPT != "false" ]; then
+    if [[ $TOS_PROMPT != "false" ]]; then
         clear
         echo "You did not agree to the Terms of Service.";
         echo "Spectero did not install.";
@@ -133,19 +133,23 @@ function PRINT_MAN_PAGE() {
 }
 
 function PRINT_TERMS_OF_SERVICE() {
-    TOS_AGREEMENT_INPUT="yes";
     echo "";
     echo "Spectero's Daemon comes with a standard Terms of Service Agreement";
     echo "This document can be found at https://spectero.com/tos";
     echo "";
     echo "Do you agree to the Terms of Service? (no/yes)";
 
-    # Read the response
-    read TOS_AGREEMENT_INPUT;
+    # check if the argument exists
+    if [[ $TOS_PROMPT == "yes" ]]; then
+        TOS_AGREEMENT_INPUT="no";
 
-    # Check if not yes
-    if [[ $TOS_AGREEMENT_INPUT != "yes" ]]; then
-        EXCEPTION_TERMS_OF_SERVICE_AGREEMENT
+        # Read the response
+        read TOS_AGREEMENT_INPUT;
+
+        # Check if not yes
+        if [[ $TOS_AGREEMENT_INPUT != "yes" ]]; then
+            EXCEPTION_TERMS_OF_SERVICE_AGREEMENT
+        fi
     fi
 }
 
