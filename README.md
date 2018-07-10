@@ -8,7 +8,7 @@ Windows:
 
 Linux, MacOS:
 ```bash
-wget -O - https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.sh &> /dev/null | sudo bash
+wget -O - https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.sh | sudo bash
 ```
 
 ## License
