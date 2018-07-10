@@ -26,6 +26,11 @@ OVERWRITE="true";
 ##### ==========================
 ##### EXCEPTIONS
 ##### ==========================
+function EXCEPTION_MAN_PAGE() {
+    PRINT_MAN_PAGE
+    exit 0;
+}
+
 function EXCEPTION_USER_ABORT(){
     clear
     echo "The user has aborted the installation.";
@@ -66,11 +71,6 @@ function EXCEPTION_LINUX_USER_NEEDS_ROOT(){
     exit 126;
 }
 
-function EXCEPTION_OSX_USER_CANNOT_BE_ROOT(){
-    echo "The installation script requires the `brew` package manager, and cannot be run as root.";
-    exit 126;
-}
-
 function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
     clear;
     echo "The installer failed to find a compatible package manager.";
@@ -83,32 +83,47 @@ function EXCEPTION_INCOMPATIBLE_PACKAGE_MANAGER() {
     exit 127; # The command was not found
 }
 
-function EXCEPTION_MAN_PAGE() {
-    echo "  -a=, --agree=   |   Agree to the Spectero Terms of Service.";
-    echo "";
-    echo "  -ai, --install  |   Automatically install without any prompt for confirmation.";
-    echo "";
-    echo "  -b=, --branch=  |   Specify the release channel that the installer will use.";
-    echo "                  |   Potential possibilities:";
-    echo "                  |   'stable' - The mature channel that is ready for production (DEFAULT)";
-    echo "                  |   'beta'   - Get new features as they are implemented, may contain bugs.";
-    echo "                  |   'alpha'  - Get the newest things that developers implement; (Will contain bugs, not suitable for production)";
-    echo "";
-    echo "  -d=, --dir=     |   The location of where Spectero should install.";
-    ehco "";
-    echo "  -h, --help      |   Displays this page.";
-    echo "";
-    exit 0;
-}
-
 
 ##### ==========================
 ##### CONSOLE
 ##### ==========================
-
 function PRINT_GREETINGS() {
     clear;
     echo "Welcome to the Installation Wizard Script for Spectero Daemon";
+}
+
+function PRINT_MAN_PAGE() {
+    echo "Spectero Daemon Installer Manual";
+    echo "  -a, --agree     |   Agree to the Spectero Terms of Service.";
+    echo "";
+
+    echo "  -ai, --install  |   Automatically install without any prompt for confirmation.";
+    echo "";
+
+    echo "  -b, --branch    |   Specify the release channel that the installer will use.";
+    echo "                  |   Potential possibilities:";
+    echo "                  |   'stable' - The mature channel that is ready for production";
+    echo "                                 (This option is enabled by default)";
+    echo "                  |   'beta'   - Get new features as they are implemented";
+    echo "                                 (Software may contain bugs at the user's own risk)";
+    echo "                  |   'alpha'  - Get the newest things that developers implement";
+    echo "                                 (Bleeding edge, will contain bugs, designed for testing)";
+    echo "";
+
+    echo "  -c, --channel   |   This argument does the same things as --branch";
+    echo "";
+
+    echo "  -d, --dir       |   The location of where Spectero should install.";
+    echo "";
+
+    echo "  -h, --help      |   Displays this page.";
+    echo "";
+
+    echo "  -nsl, --no-sl   |   Disables symlinking for the 'latest' folder.";
+    echo "";
+
+    echo "  -v, --version   |   Allows the user to specify a specific version of the release channel to install.";
+    echo "";
 }
 
 function PRINT_TERMS_OF_SERVICE() {
@@ -329,37 +344,6 @@ function WORK_INSTALL_SPECTERO() {
     PRINT_INSTALL_COMPLETE
 }
 
-function WORK_PARSAE_ARGUMENTS() {
-    for i in "$@"
-        do
-            case $i in
-                -a|--agree)
-                    TOS_PROMPT="false";
-                    shift # past argument=value
-                ;;
-                -ai|--install)
-                    INSTALL_PROMPT="false";
-                    shift # past argument=value
-                ;;
-                -b=*|--branch=*)
-                    BRANCH="${i#*=}";
-                    shift # past argument=value
-                ;;
-                -d=*|--install-location=*)
-                    INSTALL_LOCATION="${i#*=}"
-                    shift # past argument=value
-                ;;
-                -h|--help)
-                    EXCEPTION_MAN_PAGE;
-                    shift # past argument=value
-                ;;
-                *)
-                    echo "";
-                ;;
-            esac
-        done
-}
-
 
 ##### ==========================
 ##### DETECTORS
@@ -449,7 +433,7 @@ function DETECT_PROGRAM_DOTNET_CORE() {
 function DETECT_OSX_USER_IS_ROOT() {
     if [ "$(uname)" == "Darwin" ]; then
         if [[ $EUID -ne 0 ]]; then
-            EXCEPTION_LINUX_USER_NEEDS_ROOT
+            EXCEPTION_OSX_USER_CANNOT_BE_ROOT
         fi
     fi
 }
@@ -474,7 +458,40 @@ DETECT_LINUX_USER_IS_ROOT
 DETECT_SYSTEMD
 
 # Parse the passed arguments.
-WORK_PARSAE_ARGUMENTS;
+while [ $# -ne 0 ]
+do
+    name="$1"
+    case "$name" in
+        -a|--agree|-[Aa]gree)
+            shift
+            TOS_PROMPT="false";
+            ;;
+        -ai|--install|-[Ii]nstall)
+            shift
+            INSTALL_PROMPT="false";
+            ;;
+        -rc|--branch|-[Bb]ranch)
+            shift
+            BRANCH="$1";
+            ;;
+        -c|--channel|-[Cc]hannel)
+            shift
+            BRANCH="$1";
+            ;;
+        -loc|--location|-[Ll]ocation)
+            shift
+            INSTALL_LOCATION="$1"
+            ;;
+        -?|--?|-h|--help|-[Hh]elp)
+            EXCEPTION_MAN_PAGE
+            ;;
+        *)
+            say_err "Unknown argument \`$name\`"
+            exit 1
+            ;;
+    esac
+    shift
+done
 
 # Load environment variables if we're linux.
 LOAD_SYSTEND_DISTRIBUTION_INFORMATION
