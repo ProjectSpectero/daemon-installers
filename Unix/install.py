@@ -212,12 +212,14 @@ def create_systemd_service():
     else:
         print("User has specified that they do not want a service for the Spectero Daemon - skipping this step.")
 
+
 def create_user():
     # Create User, Group and assign.
     if sys.platform in ["linux", "linux2"]:
         os.system("useradd spectero")
         os.system("groupadd spectero")
         os.system("usermod -a -G spectero spectero")
+
 
 def update_sudoers():
     template = "Cmnd_Alias SPECTERO_CMDS = {systemctl} start spectero, {systemctl} stop spectero, {systemctl} status spectero, {systemctl} restart spectero, {iptables}, {openvpn}, {which}"
@@ -234,7 +236,28 @@ def update_sudoers():
 
 
 def create_shell_script():
-    print("work in progress.")
+    try:
+        cli_script = get_install_directory_from_config() + config["version"] + "/cli/Tooling/spectero"
+
+        # String replacement.
+        with open(cli_script, 'r') as file:
+            filedata = file.read()
+        print("Replacing variables in console management interface template...")
+        filedata = filedata.replace("{dotnet path}", which("dotnet"))
+        filedata = filedata.replace("{spectero working directory}", get_install_directory_from_config())
+        filedata = filedata.replace("{version}", config["version"])
+
+        with open(cli_script, 'w') as file:
+            file.write(filedata)
+
+        print("Copying console management interface shell script to /usr/local/bin/spectero")
+        shutil.copyfile(cli_script, "/usr/local/bin/spectero")
+        os.system("chmod +x /usr/local/bin/spectero")
+    except Exception as e:
+        traceback.print_exc()
+        print("The installer encountered a problem while copying the CLI script.")
+        print("Please report this problem.")
+        sys.exit(12)
 
 
 if __name__ == "__main__":
