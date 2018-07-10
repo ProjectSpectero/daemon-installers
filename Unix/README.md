@@ -26,13 +26,6 @@ It is designed for easy deployment and automation.
 
 <sub><sup>At this time we only currently support operating systems that have `systemd` and either the `yum`, `apt-get` or `brew` package managers.</sup></sub>
 
-
-## Quick Install
-Copy this command into your terminal to install spectero:
-```sh
-$ sudo bash <(curl -s https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.sh)
-```
-
 ## Command Line Arguments
 Please view the [Unix Command Line Arguments](https://github.com/ProjectSpectero/daemon-installers/wiki/Unix-Command-Line-Arguments) Wiki Page.
 
