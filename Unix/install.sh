@@ -480,15 +480,11 @@ do
             shift
             BRANCH="$1";
             ;;
-        -d|--dir|--directory|-[Dd]irectory)
-            shift
-            INSTALL_LOCATION="$1";
-            ;;
         -v|--version|--[Vv]ersion)
             shift
             VERSION="$1";
             ;;
-        -loc|--location|-[Ll]ocation)
+        -loc|--location|-[Ll]ocation|-d|--dir|--directory|-[Dd]irectory)
             shift
             INSTALL_LOCATION="$1"
             ;;
