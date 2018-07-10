@@ -225,6 +225,25 @@ function WORK_INSTALL_BREW() {
     fi
 }
 
+function WORK_UNINSTALL() {
+    clear;
+    echo "Uninstalling Spectero Daemon...";
+
+    if [[ -e "/usr/local/bin/spectero" ]]; then
+        sudo rm -f "/usr/local/bin/spectero";
+    fi
+
+    if [[ -e "/etc/systemd/system/spectero.service" ]]; then
+        systemctl disable spectero.service
+        systemctl stop spectero.service
+        sudo rm -f "/etc/systemd/system/spectero.service";
+    fi
+
+    echo "Spectero was successfully removed from your computer.";
+    echo "The files still exist in the installation directory in case you wish to reinstall, but can be manually deleted if you wish.";
+    exit 0;
+{
+
 function WORK_INSTALL_SUDO() {
     echo "The `sudo` utility will now be installed.";
     if [ "$(uname)" == "Darwin" ]; then # OS X
@@ -346,10 +365,12 @@ function WORK_INSTALL_DOTNET_CORE() {
 
 function WORK_INSTALL_SPECTERO() {
     # Write all data to a config
-    echo "installation_directory=$INSTALL_LOCATION" > /tmp/spectero.installconfig
+    echo "directory=$INSTALL_LOCATION" > /tmp/spectero.installconfig
     echo "overwrite=$OVERWRITE" >> /tmp/spectero.installconfig
     echo "branch=$BRANCH" >> /tmp/spectero.installconfig
     echo "version=$VERSION" >> /tmp/spectero.installconfig
+    echo "service=$SERVICE" >> /tmp/spectero.installconfig
+    echo "symlink=$SYMLINK" >> /tmp/spectero.installconfig
 
     # Download the python side of things, python will read the above file and handle the intricate parts.
     wget -O - https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.py &> /dev/null | sudo python3
@@ -499,8 +520,11 @@ do
         -nsds|--no-systemd|-[Nn]o[Ss]ystemd)
             SERVICE="false";
             ;;
+        -u|--uninstall|-[Uu]ninstall)
+            WORK_UNINSTALL;
+            ;;
         -?|--?|-h|--help|-[Hh]elp)
-            EXCEPTION_MAN_PAGE
+            EXCEPTION_MAN_PAGE;
             ;;
         *)
             echo "Unknown argument \`$name\`"
