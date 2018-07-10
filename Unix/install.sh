@@ -181,13 +181,16 @@ function PRINT_PROMPT_READY_TO_INSTALL() {
     echo "Would you like to start the installation? (yes/no)";
     echo "Anything other than 'yes' will result in the installer exiting.";
 
-    # Read the response
-    CONTINUE="no";
-    read CONTINUE;
+    # check if the argument exists
+    if [[ $INSTALL_PROMPT == "true" ]]; then
+        # Read the response
+        CONTINUE="no";
+        read CONTINUE;
 
-    # Check if not yes
-    if [[ $CONTINUE != "yes" ]]; then
-        EXCEPTION_USER_ABORT
+        # Check if not yes
+        if [[ $CONTINUE != "yes" ]]; then
+            EXCEPTION_USER_ABORT
+        fi
     fi
 }
 
