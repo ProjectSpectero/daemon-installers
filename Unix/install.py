@@ -23,8 +23,8 @@ import os
 import shutil
 import subprocess
 import sys
-import urllib.request
 import traceback
+import urllib.request
 
 config = {}
 releases = {}
@@ -234,6 +234,7 @@ def update_sudoers():
             with open('/etc/sudoers', "a") as sudoers:
                 sudoers.write(template + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
 
+
 def linux_enable_ipv4_forwarding():
     # Define the propety of  what we need toc heck
     property = "net.ipv4.ip_forward"
@@ -241,7 +242,7 @@ def linux_enable_ipv4_forwarding():
         # Try to execute
         result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
 
-        # Check if it is disableds
+        # Check if it is disabled
         if result == "%s = 0" % property:
             # Enable ip forwarding
             print("Enabling IPv4 Forwarding")
