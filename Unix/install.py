@@ -69,7 +69,7 @@ def get_download_channel_information():
 
 
 def validate_user_requests_against_releases():
-    #
+    # Check to make sure we are a valid branch.
     if config["branch"] not in releases["channels"]:
         exception_channel_not_found()
 
