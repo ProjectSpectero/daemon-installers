@@ -128,6 +128,9 @@ function PRINT_MAN_PAGE() {
     echo "  -nsl, --no-sl           |   Disables symlinking for the 'latest' folder.";
     echo "                          |";
 
+    echo "  -u, --uninstall         |   Uninstalls the Spectero CLI and Service.";
+    echo "                          |";
+
     echo "  -v, --version           |   Install a specific version.";
     echo "                          |";
 }
