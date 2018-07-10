@@ -63,6 +63,7 @@ def read_config():
 
 
 def get_download_channel_information():
+    global releases
     request = urllib.request.Request('https://c.spectero.com/releases.json')
     result = urllib.request.urlopen(request)
     releases = json.loads(result.read())
