@@ -212,6 +212,26 @@ def create_systemd_service():
     else:
         print("User has specified that they do not want a service for the Spectero Daemon - skipping this step.")
 
+def create_user():
+    # Create User, Group and assign.
+    if sys.platform in ["linux", "linux2"]:
+        os.system("useradd spectero")
+        os.system("groupadd spectero")
+        os.system("usermod -a -G spectero spectero")
+
+def update_sudoers():
+    template = "Cmnd_Alias SPECTERO_CMDS = {systemctl} start spectero, {systemctl} stop spectero, {systemctl} status spectero, {systemctl} restart spectero, {iptables}, {openvpn}, {which}"
+
+    # Replace the string templates.
+    for command in ["systemctl", "iptables", "openvpn", "which"]:
+        template = template.replace("{%s}" % command, which(command))
+
+    # Check if sudoers exists
+    if os.path.exists('/etc/sudoers'):
+        if template not in open('/etc/sudoers').read():
+            with open('/etc/sudoers', "a") as sudoers:
+                sudoers.write(template + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
+
 
 def create_shell_script():
     print("work in progress.")
@@ -222,6 +242,8 @@ if __name__ == "__main__":
     get_download_channel_information()
     validate_user_requests_against_releases()
     download_and_extract()
+    create_user()
+    update_sudoers()
     create_latest_symlink()
     create_systemd_service()
     create_shell_script()

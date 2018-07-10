@@ -293,16 +293,14 @@ function WORK_INSTALL_OPENVPN() {
 }
 
 function WORK_INSTALL_WGET() {
-    echo "The `wget` utility will now be installed.";
-    if [ "$(uname)" == "Darwin" ]; then
-        brew install wget;
-    elif [ "$(uname)" == "Linux" ]; then
+    echo "The `sudo` utility will now be installed.";
+    if [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
-            dnf install wget -y;
+            dnf install sudo -y;
         elif [[ ! -z $YUM_CMD ]]; then
-            yum install wget -y;
+            yum install sudo -y;
         elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install wget -y;
+            apt-get install sudo -y;
         fi
     fi
 }
@@ -377,8 +375,10 @@ function WORK_INSTALL_SPECTERO() {
 
     # Download the python side of things, python will read the above file and handle the intricate parts.
     wget -O - https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.py &> /dev/null | sudo python3
+}
 
-    PRINT_INSTALL_COMPLETE
+function WORK_KERNEL_CHANGE_FORWARDING() {
+
 }
 
 
@@ -419,6 +419,15 @@ function DETECT_SYSTEMD() {
         if [ ! -e /etc/os-release ]; then
             EXCEPTION_SYSTEMD_NOT_FOUND
         fi
+    fi
+}
+
+function DETECT_PROGRAM_SUDO() {
+    which sudo &> /dev/null;
+    if [[ $? != 0 ]]; then
+        WORK_INSTALL_SUDO
+    else
+        echo "Dependency exists: sudo - skipping installation.";
     fi
 }
 
@@ -538,26 +547,33 @@ do
 done
 
 # Load environment variables if we're linux.
-LOAD_SYSTEND_DISTRIBUTION_INFORMATION
+LOAD_SYSTEND_DISTRIBUTION_INFORMATION;
 
 # Print the welcome message and the agreement of the terms of service.
-PRINT_GREETINGS
-PRINT_TERMS_OF_SERVICE
+PRINT_GREETINGS;
+PRINT_TERMS_OF_SERVICE;
 
 # Prompt the users for the two options.
-PRINT_PROMPT_INSTALL_LOCATION
-PRINT_PROMPT_READY_TO_INSTALL
+PRINT_PROMPT_INSTALL_LOCATION;
+PRINT_PROMPT_READY_TO_INSTALL;
+
+# Change kernel settings
+WORK_KERNEL_CHANGE_FORWARDING
 
 # Detect packages that either the installer or daemon needs, and install them.
-DETECT_PROGRAM_BREW
-DETECT_PACKAGE_MANAGER
-DETECT_PROGRAM_WGET
-DETECT_PROGRAM_OPENVPN
-DETECT_PROGRAM_PYTHON3
-DETECT_PROGRAM_DOTNET_CORE
+DETECT_PROGRAM_SUDO;
+DETECT_PROGRAM_BREW;
+DETECT_PACKAGE_MANAGER;
+DETECT_PROGRAM_WGET;
+DETECT_PROGRAM_OPENVPN;
+DETECT_PROGRAM_PYTHON3;
+DETECT_PROGRAM_DOTNET_CORE;
 
 # Install the daemon into the system.
-WORK_INSTALL_SPECTERO
+WORK_INSTALL_SPECTERO;
+
+# Let the user know the install is complete.
+PRINT_INSTALL_COMPLETE;
 
 # Exit gracefully.
 exit 0;
