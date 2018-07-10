@@ -160,7 +160,7 @@ function PRINT_PROMPT_INSTALL_LOCATION () {
     USER_SPECIFIED_DIRECTORY="";
 
     if [ $INSTALL_PROMPT == "true" ]; then
-        echo "By default, Spectero installs into the following directory: $INSTALL_LOCATION";
+        echo "By default if you press enter, Spectero will install into the following directory: $INSTALL_LOCATION";
         echo "Please press enter to accept this path as an installation directory, or provide a directory below:";
 
         # Read the response
@@ -473,11 +473,9 @@ do
     name="$1"
     case "$name" in
         -a|--agree|-[Aa]gree)
-            shift
             TOS_PROMPT="false";
             ;;
         -ai|--install|-[Ii]nstall)
-            shift
             INSTALL_PROMPT="false";
             ;;
         -b|--branch|--[Br]ranch|-c|--channel|-[Cc]hannel)
@@ -493,18 +491,16 @@ do
             INSTALL_LOCATION="$1"
             ;;
         -nsl|--no-sl|-[Nn]o[Ss]ymlink)
-            shift
             SYMLINK="false";
             ;;
         -nsds|--no-systemd|-[Nn]o[Ss]ystemd)
-            shift
             SERVICE="false";
             ;;
         -?|--?|-h|--help|-[Hh]elp)
             EXCEPTION_MAN_PAGE
             ;;
         *)
-            say_err "Unknown argument \`$name\`"
+            echo "Unknown argument \`$name\`"
             exit 1
             ;;
     esac
