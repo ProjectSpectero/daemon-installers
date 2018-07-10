@@ -22,6 +22,8 @@ VERSION="latest"
 TOS_PROMPT="true";
 INSTALL_PROMPT="true";
 OVERWRITE="true";
+SYMLINK="true"
+SERVICE="true";
 
 ##### ==========================
 ##### EXCEPTIONS
@@ -94,36 +96,40 @@ function PRINT_GREETINGS() {
 
 function PRINT_MAN_PAGE() {
     echo "Spectero Daemon Installer Manual";
-    echo "  -a, --agree     |   Agree to the Spectero Terms of Service.";
-    echo "";
+    echo "===========================";
+    echo "  -a, --agree             |   Agree to the Spectero Terms of Service.";
+    echo "                          |";
 
-    echo "  -ai, --install  |   Automatically install without any prompt for confirmation.";
-    echo "";
+    echo "  -ai, --install          |   Automatically install without any prompt for confirmation.";
+    echo "                          |";
 
-    echo "  -b, --branch    |   Specify the release channel that the installer will use.";
-    echo "                  |   Potential possibilities:";
-    echo "                  |   'stable' - The mature channel that is ready for production";
-    echo "                                 (This option is enabled by default)";
-    echo "                  |   'beta'   - Get new features as they are implemented";
-    echo "                                 (Software may contain bugs at the user's own risk)";
-    echo "                  |   'alpha'  - Get the newest things that developers implement";
-    echo "                                 (Bleeding edge, will contain bugs, designed for testing)";
-    echo "";
+    echo "  -b, --branch            |   Specify the release channel that the installer will use.";
+    echo "                          |   Potential possibilities:";
+    echo "                          |   'stable' - The mature channel that is ready for production";
+    echo "                          |      (This option is enabled by default)";
+    echo "                          |   'beta'   - Get new features as they are implemented";
+    echo "                          |       (Software may contain bugs at the user's own risk)";
+    echo "                          |   'alpha'  - Get the newest things that developers implement";
+    echo "                          |       (Bleeding edge, will contain bugs, designed for testing)";
+    echo "                          |";
 
-    echo "  -c, --channel   |   This argument does the same things as --branch";
-    echo "";
+    echo "  -c, --channel           |   This argument does the same things as --branch";
+    echo "                          |";
 
-    echo "  -d, --dir       |   The location of where Spectero should install.";
-    echo "";
+    echo "  -d, --dir               |   The location of where Spectero should install.";
+    echo "                          |";
 
-    echo "  -h, --help      |   Displays this page.";
-    echo "";
+    echo "  -h, --help              |   Displays this page.";
+    echo "                          |";
 
-    echo "  -nsl, --no-sl   |   Disables symlinking for the 'latest' folder.";
-    echo "";
+    echo "  -nsds, --no-systemd     |   Disables symlinking for the 'latest' folder.";
+    echo "                          |";
 
-    echo "  -v, --version   |   Allows the user to specify a specific version of the release channel to install.";
-    echo "";
+    echo "  -nsl, --no-sl           |   Disables symlinking for the 'latest' folder.";
+    echo "                          |";
+
+    echo "  -v, --version           |   Install a specific version.";
+    echo "                          |";
 }
 
 function PRINT_TERMS_OF_SERVICE() {
@@ -470,17 +476,29 @@ do
             shift
             INSTALL_PROMPT="false";
             ;;
-        -rc|--branch|-[Bb]ranch)
+        -b|--branch|--[Br]ranch|-c|--channel|-[Cc]hannel)
             shift
             BRANCH="$1";
             ;;
-        -c|--channel|-[Cc]hannel)
+        -d|--dir|--directory|-[Dd]irectory)
             shift
-            BRANCH="$1";
+            INSTALL_LOCATION="$1";
+            ;;
+        -v|--version|--[Vv]ersion)
+            shift
+            VERSION="$1";
             ;;
         -loc|--location|-[Ll]ocation)
             shift
             INSTALL_LOCATION="$1"
+            ;;
+        -nsl|--no-sl|-[Nn]o[Ss]ymlink)
+            shift
+            SYMLINK="false";
+            ;;
+        -nsds|--no-systemd|-[Nn]o[Ss]ystemd)
+            shift
+            SERVICE="false";
             ;;
         -?|--?|-h|--help|-[Hh]elp)
             EXCEPTION_MAN_PAGE
