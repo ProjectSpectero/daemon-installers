@@ -377,11 +377,6 @@ function WORK_INSTALL_SPECTERO() {
     wget -O - https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.py &> /dev/null | sudo python3
 }
 
-function WORK_KERNEL_CHANGE_FORWARDING() {
-
-}
-
-
 ##### ==========================
 ##### DETECTORS
 ##### ==========================
@@ -556,9 +551,6 @@ PRINT_TERMS_OF_SERVICE;
 # Prompt the users for the two options.
 PRINT_PROMPT_INSTALL_LOCATION;
 PRINT_PROMPT_READY_TO_INSTALL;
-
-# Change kernel settings
-WORK_KERNEL_CHANGE_FORWARDING
 
 # Detect packages that either the installer or daemon needs, and install them.
 DETECT_PROGRAM_SUDO;

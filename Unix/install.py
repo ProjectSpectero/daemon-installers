@@ -234,6 +234,24 @@ def update_sudoers():
             with open('/etc/sudoers', "a") as sudoers:
                 sudoers.write(template + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
 
+def linux_enable_ipv4_forwarding():
+    # Define the propety of  what we need toc heck
+    property = "net.ipv4.ip_forward"
+    try:
+        # Try to execute
+        result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
+
+        # Check if it is disableds
+        if result == "%s = 0" % property:
+            # Enable ip forwarding
+            print("Enabling IPv4 Forwarding")
+            os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
+            print("Reloading System Configuration Kernel Properties...")
+            os.system("sysctl --system")
+    except:
+        print("There was a problem attempting to check for kernel flag: ipv4_forward.")
+        sys.exit(1)
+
 
 def create_shell_script():
     try:
@@ -268,5 +286,6 @@ if __name__ == "__main__":
     create_user()
     update_sudoers()
     create_latest_symlink()
+    linux_enable_ipv4_forwarding()
     create_systemd_service()
     create_shell_script()
