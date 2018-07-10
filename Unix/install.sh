@@ -242,7 +242,7 @@ function WORK_UNINSTALL() {
     echo "Spectero was successfully removed from your computer.";
     echo "The files still exist in the installation directory in case you wish to reinstall, but can be manually deleted if you wish.";
     exit 0;
-{
+}
 
 function WORK_INSTALL_SUDO() {
     echo "The `sudo` utility will now be installed.";
