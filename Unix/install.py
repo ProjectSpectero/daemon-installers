@@ -18,10 +18,13 @@
 ##
 ###############################################################################
 
-import os
 import json
+import os
+import shutil
+import subprocess
 import sys
 import urllib.request
+import traceback
 
 config = {}
 releases = {}
@@ -161,9 +164,51 @@ def create_latest_symlink():
         print("User has specified that they do not want a symlink - skipping this step.")
 
 
+def which(command):
+    with open(os.devnull, 'w') as devnull:
+        return (subprocess.check_output(["which", command], stderr=devnull)[:-1]).decode("utf-8")
+
+
+def get_dotnet_core_path():
+    return which("dotnet")
+
+
 def create_systemd_service():
     if config["service"] == "true":
-        print("Work in progress.")
+        try:
+            systemd_script_location = "%s%s/daemon/Tooling/Linux/spectero.service" % (get_install_directory_from_config(), config["version"])
+            systemd_script_template = "%s%s/daemon/Tooling/Linux/spectero.service" % (get_install_directory_from_config(), config["version"])
+
+            # Open a reader to the template
+            with open(systemd_script_template, 'r') as file:
+                filedata = file.read()
+
+            # Replace template data here
+            filedata = filedata.replace("ExecStart=/usr/bin/dotnet", "ExecStart=" + which("dotnet"))
+
+            # Open a writer to the template location.
+            with open(systemd_script_template, 'w') as file:
+                file.write(filedata)
+
+            # Copy to system directory
+            shutil.copyfile(systemd_script_template, systemd_script_location)
+
+            # Reload the systemd daemon
+            os.system("systemctl daemon-reload")
+
+            # Enable the process
+            os.system("systemctl enable spectero")
+
+            # Attempt to start the process
+            print("Using systemctl to start spectero service.")
+            os.system("systemctl start spectero")
+
+            # Print the status
+            os.system("systemctl status spectero")
+        except Exception as e:
+            traceback.print_exc()
+            print("The installer encountered a problem while configuring the systemd service.")
+            print("Please report this problem.")
     else:
         print("User has specified that they do not want a service for the Spectero Daemon - skipping this step.")
 
