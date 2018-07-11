@@ -61,7 +61,7 @@ def exception_no_download_link():
 
 def read_config():
     # Check if install instructions exist
-    if not os.path.isfile("/temp/spectero.installconfig"):
+    if not os.path.isfile("/tmp/spectero.installconfig"):
         exception_config_missing()
 
     # Read the install instructions
