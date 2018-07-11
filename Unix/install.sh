@@ -543,8 +543,8 @@ def download_and_extract():
     os.system("wget %s -O %s" % (url, path))
 
     # Extract
-    print("Invoking tar to extract files...")
-    os.system("unzip %s -d %s" % (path, get_install_directory_from_config()))
+    print("Invoking unzip to extract files...")
+    os.system("unzip %s -d -u %s" % (path, get_install_directory_from_config()))
 
     # Cleanup
     os.system("rm %s" % path)
@@ -610,9 +610,6 @@ def create_systemd_service():
             # Attempt to start the process
             print("Using systemctl to start spectero service.")
             os.system("systemctl start spectero")
-
-            # Print the status
-            os.system("systemctl status spectero")
         except Exception as e:
             traceback.print_exc()
             print("The installer encountered a problem while configuring the systemd service.")
