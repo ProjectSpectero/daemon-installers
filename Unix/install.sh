@@ -143,7 +143,7 @@ function PRINT_TERMS_OF_SERVICE() {
     echo "Do you agree to the Terms of Service? (no/yes)";
 
     # check if the argument exists
-    if [[ $TOS_PROMPT == "yes" ]]; then
+    if [[ $TOS_PROMPT == "true" ]]; then
         TOS_AGREEMENT_INPUT="no";
 
         # Read the response
