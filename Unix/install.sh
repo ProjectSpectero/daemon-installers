@@ -106,7 +106,7 @@ function PRINT_MAN_PAGE() {
     echo "  -b, --branch            |   Specify the release channel that the installer will use.";
     echo "                          |   Potential possibilities:";
     echo "                          |   'stable' - The mature channel that is ready for production";
-    echo "                          |      (This option is enabled by default)";
+    echo "                          |       (This option is enabled by default)";
     echo "                          |   'beta'   - Get new features as they are implemented";
     echo "                          |       (Software may contain bugs at the user's own risk)";
     echo "                          |   'alpha'  - Get the newest things that developers implement";
@@ -248,7 +248,7 @@ function WORK_UNINSTALL() {
 }
 
 function WORK_INSTALL_SUDO() {
-    echo "The `sudo` utility will now be installed.";
+    echo "The 'sudo' utility will now be installed.";
     if [ "$(uname)" == "Darwin" ]; then # OS X
         brew install sudo;
     elif [ "$(uname)" == "Linux" ]; then
@@ -263,7 +263,7 @@ function WORK_INSTALL_SUDO() {
 }
 
 function WORK_INSTALL_PYTHON3() {
-    echo "The `python3` executable will now be installed.";
+    echo "The 'python3' executable will now be installed.";
     if [ "$(uname)" == "Darwin" ]; then # OS X
         brew install sudo;
     elif [ "$(uname)" == "Linux" ]; then
@@ -278,7 +278,7 @@ function WORK_INSTALL_PYTHON3() {
 }
 
 function WORK_INSTALL_OPENVPN() {
-    echo "The `openvpn` utility will now be installed.";
+    echo "The 'openvpn' utility will now be installed.";
     if [ "$(uname)" == "Darwin" ]; then
         brew install openvpn;
     elif [ "$(uname)" == "Linux" ]; then
@@ -293,7 +293,7 @@ function WORK_INSTALL_OPENVPN() {
 }
 
 function WORK_INSTALL_WGET() {
-    echo "The `sudo` utility will now be installed.";
+    echo "The 'wget' utility will now be installed.";
     if [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
             dnf install sudo -y;
@@ -305,8 +305,21 @@ function WORK_INSTALL_WGET() {
     fi
 }
 
+function WORK_INSTALL_UNZIP() {
+    echo "The 'unziz' utility will now be installed.";
+    if [ "$(uname)" == "Linux" ]; then
+        if [[ ! -z $DNF_CMD ]]; then
+            dnf install unzip -y;
+        elif [[ ! -z $YUM_CMD ]]; then
+            yum install unzip -y;
+        elif [[ ! -z $APT_GET_CMD ]]; then
+            apt-get install unzip -y;
+        fi
+    fi
+}
+
 function WORK_INSTALL_DOTNET_CORE() {
-    echo "The `dotnet` framework will now be installed.";
+    echo "The 'dotnet' framework will now be installed.";
     if [[ ! -z $DNF_CMD ]]; then
         if [[ $ID == "fedora" ]]; then
            dnf install libunwind-devel libcurl-devel libicu compat-openssl10 -y;
@@ -436,6 +449,8 @@ def exception_no_download_link():
 
 
 def read_config():
+    global config
+
     # Check if install instructions exist
     if not os.path.isfile("/tmp/spectero.installconfig"):
         exception_config_missing()
@@ -455,7 +470,7 @@ def read_config():
                 value = splitline[1]
 
             # Update the dictionary
-            print("Writing key '%s' with value '%s' into memory.", key, value)
+            print("Writing key '%s' with value '%s' into memory." % (key, value))
             config[key] = value
 
     print("Installation config successfully loaded.")
@@ -488,7 +503,7 @@ def validate_user_requests_against_releases():
     if config["version"] == "latest":
         print("Resolving 'latest' version...")
         config["version"] = releases["channels"][config["branch"]]
-        print("The latest version for branch '%s' is %s", config["branch"], config["version"])
+        print("The latest version for branch '%s' is %s" % (config["branch"], config["version"]))
 
     # Check if we can download this version.
     print("Making sure that %s is a valid release..." % config["version"])
@@ -500,17 +515,17 @@ def validate_user_requests_against_releases():
     if releases["versions"][config["version"]] is None:
         exception_no_download_link()
     else:
-        print("Link found: %s" % releases["versions"][config["version"]])
+        print("Link found: %s" % releases["versions"][config["version"]]["download"])
 
 
 def download_and_extract():
     global releases, config
 
     # Get the URL for the version.
-    url = releases["versions"][config["version"]]
+    url = releases["versions"][config["version"]]["download"]
 
     # Build a easy to access path.
-    path = ("%s/%s.zip" % (get_install_directory_from_config(), config["version"]))
+    path = ("%s%s.zip" % (get_install_directory_from_config(), config["version"]))
 
     # Download
     print("Invoking wget to download files...")
@@ -518,7 +533,7 @@ def download_and_extract():
 
     # Extract
     print("Invoking tar to extract files...")
-    os.system("tar -xvf %s -C %s" % (path, get_install_directory_from_config()))
+    os.system("unzip %s -d %s" % (path, get_install_directory_from_config()))
 
     # Cleanup
     os.system("rm %s" % path)
@@ -527,7 +542,7 @@ def download_and_extract():
 
 def create_latest_symlink():
     if config["symlink"] == "true":
-        path = ("%s/%s" % (get_install_directory_from_config(), config["version"]))
+        path = ("%s%s" % (get_install_directory_from_config(), config["version"]))
         symlink_path = get_install_directory_from_config() + "latest"
 
         if os.path.islink(symlink_path):
@@ -552,7 +567,7 @@ def get_dotnet_core_path():
 def create_systemd_service():
     if config["service"] == "true":
         try:
-            systemd_script_location = "%s%s/daemon/Tooling/Linux/spectero.service" % (get_install_directory_from_config(), config["version"])
+            systemd_script_location = "/etc/systemd/system/spectero.service"
             systemd_script_template = "%s%s/daemon/Tooling/Linux/spectero.service" % (get_install_directory_from_config(), config["version"])
 
             # Open a reader to the template
@@ -667,7 +682,6 @@ if __name__ == "__main__":
     create_systemd_service()
     create_shell_script()
 
-
 EOF
 python3 /tmp/spectero-installer.py
 }
@@ -754,6 +768,15 @@ function DETECT_PROGRAM_WGET() {
         WORK_INSTALL_WGET
     else
         echo "Dependency exists: wget - skipping installation.";
+    fi
+}
+
+function DETECT_PROGRAM_UNZIP() {
+    which unzip &> /dev/null;
+    if [[ $? != 0 ]]; then
+        WORK_INSTALL_UNZIP
+    else
+        echo "Dependency exists: unzip - skipping installation.";
     fi
 }
 
@@ -852,6 +875,7 @@ DETECT_PROGRAM_SUDO;
 DETECT_PROGRAM_BREW;
 DETECT_PACKAGE_MANAGER;
 DETECT_PROGRAM_WGET;
+DETECT_PROGRAM_UNZIP
 DETECT_PROGRAM_OPENVPN;
 DETECT_PROGRAM_PYTHON3;
 DETECT_PROGRAM_DOTNET_CORE;

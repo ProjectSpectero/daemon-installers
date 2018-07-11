@@ -60,6 +60,8 @@ def exception_no_download_link():
 
 
 def read_config():
+    global config
+
     # Check if install instructions exist
     if not os.path.isfile("/tmp/spectero.installconfig"):
         exception_config_missing()
@@ -79,7 +81,7 @@ def read_config():
                 value = splitline[1]
 
             # Update the dictionary
-            print("Writing key '%s' with value '%s' into memory.", key, value)
+            print("Writing key '%s' with value '%s' into memory." % (key, value))
             config[key] = value
 
     print("Installation config successfully loaded.")
@@ -112,7 +114,7 @@ def validate_user_requests_against_releases():
     if config["version"] == "latest":
         print("Resolving 'latest' version...")
         config["version"] = releases["channels"][config["branch"]]
-        print("The latest version for branch '%s' is %s", config["branch"], config["version"])
+        print("The latest version for branch '%s' is %s" % (config["branch"], config["version"]))
 
     # Check if we can download this version.
     print("Making sure that %s is a valid release..." % config["version"])
@@ -124,17 +126,17 @@ def validate_user_requests_against_releases():
     if releases["versions"][config["version"]] is None:
         exception_no_download_link()
     else:
-        print("Link found: %s" % releases["versions"][config["version"]])
+        print("Link found: %s" % releases["versions"][config["version"]]["download"])
 
 
 def download_and_extract():
     global releases, config
 
     # Get the URL for the version.
-    url = releases["versions"][config["version"]]
+    url = releases["versions"][config["version"]]["download"]
 
     # Build a easy to access path.
-    path = ("%s/%s.zip" % (get_install_directory_from_config(), config["version"]))
+    path = ("%s%s.zip" % (get_install_directory_from_config(), config["version"]))
 
     # Download
     print("Invoking wget to download files...")
@@ -142,7 +144,7 @@ def download_and_extract():
 
     # Extract
     print("Invoking tar to extract files...")
-    os.system("tar -xvf %s -C %s" % (path, get_install_directory_from_config()))
+    os.system("unzip %s -d %s" % (path, get_install_directory_from_config()))
 
     # Cleanup
     os.system("rm %s" % path)
@@ -151,7 +153,7 @@ def download_and_extract():
 
 def create_latest_symlink():
     if config["symlink"] == "true":
-        path = ("%s/%s" % (get_install_directory_from_config(), config["version"]))
+        path = ("%s%s" % (get_install_directory_from_config(), config["version"]))
         symlink_path = get_install_directory_from_config() + "latest"
 
         if os.path.islink(symlink_path):
@@ -176,7 +178,7 @@ def get_dotnet_core_path():
 def create_systemd_service():
     if config["service"] == "true":
         try:
-            systemd_script_location = "%s%s/daemon/Tooling/Linux/spectero.service" % (get_install_directory_from_config(), config["version"])
+            systemd_script_location = "/etc/systemd/system/spectero.service"
             systemd_script_template = "%s%s/daemon/Tooling/Linux/spectero.service" % (get_install_directory_from_config(), config["version"])
 
             # Open a reader to the template
