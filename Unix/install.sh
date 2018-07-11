@@ -373,7 +373,7 @@ function WORK_INSTALL_SPECTERO() {
     echo "service=$SERVICE" >> /tmp/spectero.installconfig
     echo "symlink=$SYMLINK" >> /tmp/spectero.installconfig
 
-cat << EOF > /tmp/spectero-install.py
+cat << EOF > "/tmp/spectero-installer.py"
 #!/usr/bin/env python3
 
 ###############################################################################
@@ -667,9 +667,9 @@ if __name__ == "__main__":
     create_systemd_service()
     create_shell_script()
 
-EOF
 
-    python3 /tmp/spectero-install.py
+EOF
+python3 /tmp/spectero-installer.py
 }
 
 ##### ==========================
