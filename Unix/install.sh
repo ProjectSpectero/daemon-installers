@@ -180,7 +180,7 @@ function PRINT_PROMPT_INSTALL_LOCATION () {
     fi
 
     # Create the directory if it doesn't exist
-    if [[ -d $INSTALL_LOCATION ]]; then
+    if [[ ! -d $INSTALL_LOCATION ]]; then
         echo "Created directory: $INSTALL_LOCATION";
         mkdir -p $INSTALL_LOCATION
     fi
