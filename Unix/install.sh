@@ -18,7 +18,7 @@
 DOTNET_CORE_VERSION="2.1.1";
 INSTALL_LOCATION="/opt/spectero";
 BRANCH="stable";
-VERSION="latest"
+BRANCH_VERSION="latest"
 TOS_PROMPT="true";
 INSTALL_PROMPT="true";
 OVERWRITE="true";
@@ -369,7 +369,7 @@ function WORK_INSTALL_SPECTERO() {
     echo "directory=$INSTALL_LOCATION" > /tmp/spectero.installconfig
     echo "overwrite=$OVERWRITE" >> /tmp/spectero.installconfig
     echo "branch=$BRANCH" >> /tmp/spectero.installconfig
-    echo "version=$VERSION" >> /tmp/spectero.installconfig
+    echo "version=$BRANCH_VERSION" >> /tmp/spectero.installconfig
     echo "service=$SERVICE" >> /tmp/spectero.installconfig
     echo "symlink=$SYMLINK" >> /tmp/spectero.installconfig
 
@@ -810,7 +810,7 @@ do
             ;;
         -v|--version|--[Vv]ersion)
             shift
-            VERSION="$1";
+            BRANCH_VERSION="$1";
             ;;
         -loc|--location|-[Ll]ocation|-d|--dir|--directory|-[Dd]irectory)
             shift
