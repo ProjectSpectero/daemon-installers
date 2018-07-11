@@ -571,6 +571,12 @@ def which(command):
         return (subprocess.check_output(["which", command], stderr=devnull)[:-1]).decode("utf-8")
 
 
+def fix_permissions():
+    print("Fixing directory ownership...")
+    os.system("chown -R spectero:spectero %s" % get_install_directory_from_config())
+    os.system("chmod -R 744 %s" % get_install_directory_from_config())
+
+
 def get_dotnet_core_path():
     return which("dotnet")
 
@@ -687,6 +693,7 @@ if __name__ == "__main__":
     validate_user_requests_against_releases()
     download_and_extract()
     create_user()
+    fix_permissions()
     update_sudoers()
     create_latest_symlink()
     linux_enable_ipv4_forwarding()
