@@ -294,13 +294,15 @@ function WORK_INSTALL_OPENVPN() {
 
 function WORK_INSTALL_WGET() {
     echo "The 'wget' utility will now be installed.";
-    if [ "$(uname)" == "Linux" ]; then
+    if [ "$(uname)" == "darwin" ]; then
+        brew install wget;
+    elif [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
-            dnf install sudo -y;
+            dnf install wget -y;
         elif [[ ! -z $YUM_CMD ]]; then
-            yum install sudo -y;
+            yum install wget -y;
         elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install sudo -y;
+            apt-get install wget -y;
         fi
     fi
 }
