@@ -165,20 +165,18 @@ function PRINT_TERMS_OF_SERVICE() {
 function PRINT_PROMPT_INSTALL_LOCATION () {
     clear;
 
-    # Placeholder.
-    USER_SPECIFIED_DIRECTORY="";
-
+    #
     if [ $INSTALL_PROMPT == "true" ]; then
         echo "By default if you press enter, Spectero will install into the following directory: $INSTALL_LOCATION";
         echo "Please press enter to accept this path as an installation directory, or provide a directory below:";
 
-        # Read the response
-        read USER_SPECIFIED_DIRECTORY;
+        # Prompt the user
+        read INSTALL_LOCATION;
     fi
 
-    # Check if not yes
-    if [[ $USER_SPECIFIED_DIRECTORY != "" ]]; then
-        INSTALL_LOCATION=$USER_SPECIFIED_DIRECTORY;
+    # Create the directory if it doesn't exist
+    if [[ -d $INSTALL_LOCATION ]]; then
+        echo "Created directory: $INSTALL_LOCATION";
         mkdir -p $INSTALL_LOCATION
     fi
 }
@@ -496,7 +494,7 @@ def get_download_channel_information():
     global releases
     request = urllib.request.Request('https://c.spectero.com/releases.json')
     result = urllib.request.urlopen(request)
-    releases = json.loads(result.read().decode('utf8'))
+    releases = json.loads(result.read().decode('utf-8'))
 
 
 def validate_user_requests_against_releases():
