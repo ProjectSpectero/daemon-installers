@@ -7,7 +7,7 @@
 ##  https://spectero.com
 ##
 ##  This python script is a special case, and should not be used without
-##  the proper `install.sh`.
+##  the proper 'install.sh'.
 ##
 ##  The bash script produces a configuration that this script is designed
 ##  to read. Although you can write your own configuration if you
@@ -99,7 +99,7 @@ def get_download_channel_information():
     global releases
     request = urllib.request.Request('https://c.spectero.com/releases.json')
     result = urllib.request.urlopen(request)
-    releases = json.loads(result.read())
+    releases = json.loads(result.read().decode('utf-8'))
 
 
 def validate_user_requests_against_releases():
