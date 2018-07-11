@@ -165,13 +165,18 @@ function PRINT_TERMS_OF_SERVICE() {
 function PRINT_PROMPT_INSTALL_LOCATION () {
     clear;
 
-    #
+    # Check if the user should be propmpted.
     if [ $INSTALL_PROMPT == "true" ]; then
         echo "By default if you press enter, Spectero will install into the following directory: $INSTALL_LOCATION";
         echo "Please press enter to accept this path as an installation directory, or provide a directory below:";
 
         # Prompt the user
-        read INSTALL_LOCATION;
+        read INSTALL_LOCATION_ENTERED;
+
+        # Reassign the installation location.
+        if [[ $INSTALL_LOCATION_ENTERED != "" ]]; then
+            INSTALL_LOCATION=$INSTALL_LOCATION_ENTERED;
+        fi
     fi
 
     # Create the directory if it doesn't exist
