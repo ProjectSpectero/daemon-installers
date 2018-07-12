@@ -544,7 +544,7 @@ def download_and_extract():
 
     # Extract
     print("Invoking unzip to extract files...")
-    os.system("unzip %s -d -u %s" % (path, get_install_directory_from_config()))
+    os.system("unzip -qq -u %s -d %s" % (path, get_install_directory_from_config()))
 
     # Cleanup
     os.system("rm %s" % path)

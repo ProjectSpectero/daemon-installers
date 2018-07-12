@@ -13,3 +13,18 @@ C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\obj\Debug\Spectero
 C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\obj\Debug\Spectero Installer.exe
 C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\obj\Debug\Spectero Installer.pdb
 C:\Users\elyci\source\repos\daemon-installers\Windows\Windows\obj\Debug\SpecteroWindowsInstaller.csprojResolveAssemblyReference.cache
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\bin\Debug\Spectero Installer.exe.config
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\bin\Debug\Spectero Installer.exe
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\bin\Debug\Spectero Installer.pdb
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\SpecteroWindowsInstaller.csprojAssemblyReference.cache
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\installer.FinishForm.resources
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\installer.InstallForm.resources
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\installer.InstallLocationForm.resources
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\installer.SelectChannelForm.resources
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\Windows.TermsOfServiceForm.resources
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\Windows.WelcomeForm.resources
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\installer.Properties.Resources.resources
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\SpecteroWindowsInstaller.csproj.GenerateResource.cache
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\SpecteroWindowsInstaller.csproj.CoreCompileInputs.cache
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\Spectero Installer.exe
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\Spectero Installer.pdb

@@ -130,7 +130,7 @@ namespace installer
             // Disable the cancel button.
             ExitButton.Enabled = false;
             
-            // Modify registory
+            // Modify registry
             EnableFirewallFormwarding();
 
             // Mark as complete and enable the progress bar
