@@ -15,7 +15,7 @@
 ##### ==========================
 ##### VARIABLES
 ##### ==========================
-DOTNET_CORE_VERSION="2.1.1";
+DOTNET_CORE_VERSION="2.1.2";
 INSTALL_LOCATION="/opt/spectero";
 BRANCH="stable";
 BRANCH_VERSION="latest"
