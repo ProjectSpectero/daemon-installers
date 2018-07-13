@@ -317,7 +317,20 @@ function WORK_INSTALL_WGET() {
 }
 
 function WORK_INSTALL_UNZIP() {
-    echo "The 'unziz' utility will now be installed.";
+    echo "The 'unzip' utility will now be installed.";
+    if [ "$(uname)" == "Linux" ]; then
+        if [[ ! -z $DNF_CMD ]]; then
+            dnf install unzip -y;
+        elif [[ ! -z $YUM_CMD ]]; then
+            yum install unzip -y;
+        elif [[ ! -z $APT_GET_CMD ]]; then
+            apt-get install unzip -y;
+        fi
+    fi
+}
+
+function WORK_INSTALL_IPTABLES() {
+    echo "The 'iptables' utility will now be installed.";
     if [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
             dnf install unzip -y;
@@ -799,6 +812,15 @@ function DETECT_PROGRAM_UNZIP() {
     fi
 }
 
+function DETECT_PROGRAM_IPTABLES() {
+    which iptables &> /dev/null;
+    if [[ $? != 0 ]]; then
+        WORK_INSTALL_IPTABLES
+    else
+        echo "Dependency exists: iptables - skipping installation.";
+    fi
+}
+
 function DETECT_PROGRAM_DOTNET_CORE() {
     which dotnet &> /dev/null;
     if [[ $? != 0 ]]; then
@@ -898,6 +920,7 @@ DETECT_PROGRAM_UNZIP
 DETECT_PROGRAM_OPENVPN;
 DETECT_PROGRAM_PYTHON3;
 DETECT_PROGRAM_DOTNET_CORE;
+DETECT_PROGRAM_IPTABLES
 
 # Install the daemon into the system.
 WORK_INSTALL_SPECTERO;
