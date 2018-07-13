@@ -207,9 +207,10 @@ function PRINT_PROMPT_READY_TO_INSTALL() {
 }
 
 function PRINT_INSTALL_COMPLETE() {
-    clear;
-
-    echo "Installation of the Spectero Daemon has completed successfully."
+    echo "";
+    echo "Installation of the Spectero Daemon has completed successfully.";
+    echo "You may now add this node to your Spectero account by running:";
+    echo "\$ spectero cli connect <node key>";
     exit 0;
 }
 
@@ -262,11 +263,11 @@ function WORK_INSTALL_SUDO() {
         brew install sudo;
     elif [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
-            dnf install sudo -y;
+            dnf install sudo -y &> /dev/null;
         elif [[ ! -z $YUM_CMD ]]; then
-            yum install sudo -y;
+            yum install sudo -y &> /dev/null;
         elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install sudo -y;
+            apt-get install sudo -y &> /dev/null;
         fi
     fi
 }
@@ -292,11 +293,11 @@ function WORK_INSTALL_OPENVPN() {
         brew install openvpn;
     elif [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
-            dnf install openvpn -y;
+            dnf install openvpn -y &> /dev/null;
         elif [[ ! -z $YUM_CMD ]]; then
-            yum install openvpn -y;
+            yum install openvpn -y &> /dev/null;
         elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install openvpn -y;
+            apt-get install openvpn -y &> /dev/null;
         fi
     fi
 }
@@ -307,11 +308,11 @@ function WORK_INSTALL_WGET() {
         brew install wget;
     elif [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
-            dnf install wget -y;
+            dnf install wget -y &> /dev/null;
         elif [[ ! -z $YUM_CMD ]]; then
-            yum install wget -y;
+            yum install wget -y &> /dev/null;
         elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install wget -y;
+            apt-get install wget -y &> /dev/null;
         fi
     fi
 }
@@ -320,11 +321,11 @@ function WORK_INSTALL_UNZIP() {
     echo "The 'unzip' utility will now be installed.";
     if [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
-            dnf install unzip -y;
+            dnf install unzip -y &> /dev/null;
         elif [[ ! -z $YUM_CMD ]]; then
-            yum install unzip -y;
+            yum install unzip -y &> /dev/null;
         elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install unzip -y;
+            apt-get install unzip -y &> /dev/null;
         fi
     fi
 }
@@ -333,11 +334,11 @@ function WORK_INSTALL_IPTABLES() {
     echo "The 'iptables' utility will now be installed.";
     if [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
-            dnf install unzip -y;
+            dnf install unzip -y &> /dev/null;
         elif [[ ! -z $YUM_CMD ]]; then
-            yum install unzip -y;
+            yum install unzip -y &> /dev/null;
         elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install unzip -y;
+            apt-get install unzip -y &> /dev/null;
         fi
     fi
 }
@@ -346,7 +347,7 @@ function WORK_INSTALL_DOTNET_CORE() {
     echo "The 'dotnet' framework will now be installed.";
     if [[ ! -z $DNF_CMD ]]; then
         if [[ $ID == "fedora" ]]; then
-           dnf install libunwind-devel libcurl-devel libicu compat-openssl10 -y;
+           dnf install libunwind-devel libcurl-devel libicu compat-openssl10 -y &> /dev/null;
         fi
     elif [[ ! -z $YUM_CMD ]]; then
         # Generic Dependency Install
@@ -355,28 +356,28 @@ function WORK_INSTALL_DOTNET_CORE() {
         echo "If the installation fails, please report the issue to"
         echo "https://github.com/ProjectSpectero/daemon-installers/issues"
         ehco "So Spectero can implement support for your operating system."
-        yum install libunwind-devel libcurl-devel libicu -y;
+        yum install libunwind-devel libcurl-devel libicu -y &> /dev/null;
     elif [[ ! -z $APT_GET_CMD ]]; then
         # Ubuntu
         if [ $ID == "ubuntu" ]; then
             if [ $VERSION_ID == "18.04" ]; then
                 echo "Detected Operating System: Ubuntu 18.04 LTS";
                 echo "Installing dependencies for dotnet core framework."
-                apt-get install libunwind-dev libcurl4 -y;
+                apt-get install libunwind-dev libcurl4 -y &> /dev/null;
             else
                 echo "Detected Operating System: Ubuntu (unknown version)";
                 echo "Installing dependencies for dotnet core framework."
-                apt-get install libunwind-dev libcurl4-openssl-dev -y;
+                apt-get install libunwind-dev libcurl4-openssl-dev -y &> /dev/null;
             fi
         elif [ $ID == "debian" ]; then
             if [ $VERSION_ID == "9" ]; then
                 echo "Detected Operating System: Debian 9";
                 echo "Installing dependencies for dotnet core framework."
-                apt-get install libicu-dev libunwind-dev libcurl4-openssl-dev -y;
+                apt-get install libicu-dev libunwind-dev libcurl4-openssl-dev -y &> /dev/null;
             else
                 echo "Detected Operating System: Debian (unknown version)";
                 echo "Installing dependencies for dotnet core framework."
-                apt-get install libunwind-dev libcurl4-openssl-dev -y;
+                apt-get install libunwind-dev libcurl4-openssl-dev -y &> /dev/null;
             fi
         else
             echo "The installer was unable to determine the variant of linux."
@@ -384,13 +385,13 @@ function WORK_INSTALL_DOTNET_CORE() {
             echo "If the installation fails, please report the issue to"
             echo "https://github.com/ProjectSpectero/daemon-installers/issues"
             ehco "so Spectero can implement support for your operating system."
-            apt-get install libunwind-dev libcurl4-openssl-dev -y;
+            apt-get install libunwind-dev libcurl4-openssl-dev -y &> /dev/null;
         fi
     fi
 
     # Download .NET Core Installation script
     echo "Downloading dotnet core installation script."
-    wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh > /dev/null
+    wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh &> /dev/null
 
     # Install
     echo "Installing Microsoft .NET Core Framework...";
@@ -398,7 +399,7 @@ function WORK_INSTALL_DOTNET_CORE() {
         --version $DOTNET_CORE_VERSION \
         --runtime aspnetcore \
         --install-dir /usr/local/bin/ \
-        2> /dev/null
+        &> /dev/null
 }
 
 function WORK_INSTALL_SPECTERO() {
@@ -494,7 +495,6 @@ def read_config():
                 value = splitline[1]
 
             # Update the dictionary
-            print("Writing key '%s' with value '%s' into memory." % (key, value))
             config[key] = value
 
     print("Installation config successfully loaded.")
@@ -553,7 +553,7 @@ def download_and_extract():
 
     # Download
     print("Invoking wget to download files...")
-    os.system("wget %s -O %s" % (url, path))
+    os.system("wget %s -O %s -q --show-progress" % (url, path))
 
     # Extract
     print("Invoking unzip to extract files...")

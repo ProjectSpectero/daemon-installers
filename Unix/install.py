@@ -81,7 +81,6 @@ def read_config():
                 value = splitline[1]
 
             # Update the dictionary
-            print("Writing key '%s' with value '%s' into memory." % (key, value))
             config[key] = value
 
     print("Installation config successfully loaded.")
@@ -140,7 +139,7 @@ def download_and_extract():
 
     # Download
     print("Invoking wget to download files...")
-    os.system("wget %s -O %s" % (url, path))
+    os.system("wget %s -O %s -q --show-progress" % (url, path))
 
     # Extract
     print("Invoking unzip to extract files...")
