@@ -350,13 +350,17 @@ function WORK_INSTALL_DOTNET_CORE() {
            dnf install libunwind-devel libcurl-devel libicu compat-openssl10 -y &> /dev/null;
         fi
     elif [[ ! -z $YUM_CMD ]]; then
-        # Generic Dependency Install
-        echo "The installer was unable to determine the variant of linux."
-        echo "Your package manager is yum, and we will try to install the required dependencies."
-        echo "If the installation fails, please report the issue to"
-        echo "https://github.com/ProjectSpectero/daemon-installers/issues"
-        ehco "So Spectero can implement support for your operating system."
-        yum install libunwind-devel libcurl-devel libicu -y &> /dev/null;
+        if [[ $ID == "centos" ]]; then
+           yum install libunwind-devel libcurl-devel libicu -y &> /dev/null;
+        else
+            # Generic Dependency Install
+            echo "The installer was unable to determine the variant of linux."
+            echo "Your package manager is yum, and we will try to install the required dependencies."
+            echo "If the installation fails, please report the issue to"
+            echo "https://github.com/ProjectSpectero/daemon-installers/issues"
+            echo "So Spectero can implement support for your operating system."
+            yum install libunwind-devel libcurl-devel libicu -y &> /dev/null;
+        fi
     elif [[ ! -z $APT_GET_CMD ]]; then
         # Ubuntu
         if [ $ID == "ubuntu" ]; then
@@ -384,7 +388,7 @@ function WORK_INSTALL_DOTNET_CORE() {
             echo "Your package manager is apt-get, and we will try to install the required dependencies."
             echo "If the installation fails, please report the issue to"
             echo "https://github.com/ProjectSpectero/daemon-installers/issues"
-            ehco "so Spectero can implement support for your operating system."
+            echo "so Spectero can implement support for your operating system."
             apt-get install libunwind-dev libcurl4-openssl-dev -y &> /dev/null;
         fi
     fi
@@ -400,6 +404,16 @@ function WORK_INSTALL_DOTNET_CORE() {
         --runtime aspnetcore \
         --install-dir /usr/local/bin/ \
         &> /dev/null
+}
+
+function WORK_INSTALL_EPEL_REPO() {
+    if [[ $ID == "centos" ]]; then
+        if [[ $VERSION_ID == "7" ]]; then
+            yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y;
+        elif [[ $VERSION_ID == "6" ]]; then
+            yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm -y;
+        fi
+    fi
 }
 
 function WORK_INSTALL_SPECTERO() {
@@ -553,7 +567,7 @@ def download_and_extract():
 
     # Download
     print("Invoking wget to download files...")
-    os.system("wget %s -O %s -q --show-progress" % (url, path))
+    os.system("wget %s -O %s -q" % (url, path))
 
     # Extract
     print("Invoking unzip to extract files...")
@@ -803,6 +817,15 @@ function DETECT_PROGRAM_WGET() {
     fi
 }
 
+function DETECT_EPEL_REPO() {
+    if [[ $ID == "centos" ]]; then
+        rpm -qa | grep epel-release &> /dev/null;
+        if [[ $? == "1" ]]; then
+            WORK_INSTALL_EPEL_REPO;
+        fi
+    fi
+}
+
 function DETECT_PROGRAM_UNZIP() {
     which unzip &> /dev/null;
     if [[ $? != 0 ]]; then
@@ -912,6 +935,7 @@ PRINT_PROMPT_INSTALL_LOCATION;
 PRINT_PROMPT_READY_TO_INSTALL;
 
 # Detect packages that either the installer or daemon needs, and install them.
+DETECT_EPEL_REPO;
 DETECT_PROGRAM_SUDO;
 DETECT_PROGRAM_BREW;
 DETECT_PACKAGE_MANAGER;

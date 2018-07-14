@@ -139,7 +139,7 @@ def download_and_extract():
 
     # Download
     print("Invoking wget to download files...")
-    os.system("wget %s -O %s -q --show-progress" % (url, path))
+    os.system("wget %s -O %s -q" % (url, path))
 
     # Extract
     print("Invoking unzip to extract files...")
