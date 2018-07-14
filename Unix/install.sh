@@ -666,7 +666,7 @@ def linux_enable_ipv4_forwarding():
             print("Enabling IPv4 Forwarding")
             os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
             print("Reloading System Configuration Kernel Properties...")
-            os.system("sysctl --system")
+            os.system("sysctl --system &> /dev/null")
     except:
         print("There was a problem attempting to check for kernel flag: ipv4_forward.")
         sys.exit(1)
