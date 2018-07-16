@@ -173,7 +173,7 @@ def fix_permissions():
     print("Fixing directory ownership...")
     os.system("chown -R spectero:spectero %s" % get_install_directory_from_config())
     os.system("chmod -R 744 %s" % get_install_directory_from_config())
-    os.system("usermod -m -d %s" % get_install_directory_from_config()[:-1])
+    os.system("usermod -m -d %s spectero" % get_install_directory_from_config()[:-1])
 
 
 def get_dotnet_core_path():
