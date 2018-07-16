@@ -209,8 +209,6 @@ function PRINT_PROMPT_READY_TO_INSTALL() {
 function PRINT_INSTALL_COMPLETE() {
     echo "";
     echo "Installation of the Spectero Daemon has completed successfully.";
-    echo "You may now add this node to your Spectero account by running:";
-    echo "\$ spectero cli connect <node key>";
     exit 0;
 }
 
@@ -448,7 +446,6 @@ cat << EOF > "/tmp/spectero-installer.py"
 
 import json
 import os
-import shutil
 import subprocess
 import sys
 import traceback
@@ -611,7 +608,7 @@ def get_dotnet_core_path():
 def create_systemd_service():
     if config["service"] == "true":
         try:
-            systemd_script_location = "/etc/systemd/system/spectero.service"
+            systemd_script_destination = "/etc/systemd/system/spectero.service"
             systemd_script_template = "%s%s/daemon/Tooling/Linux/spectero.service" % (get_install_directory_from_config(), config["version"])
 
             # Open a reader to the template
@@ -626,17 +623,19 @@ def create_systemd_service():
                 file.write(filedata)
 
             # Copy to system directory
-            shutil.copyfile(systemd_script_template, systemd_script_location)
+            os.system("cp %s %s" % (systemd_script_template, systemd_script_destination))
 
             # Reload the systemd daemon
-            os.system("systemctl daemon-reload")
+            os.system("systemctl daemon-reload &> /dev/null")
 
             # Enable the process
-            os.system("systemctl enable spectero")
+            os.system("systemctl enable spectero > /dev/null 2>&1")
 
             # Attempt to start the process
             print("Using systemctl to start spectero service.")
             os.system("systemctl start spectero")
+            print("Getting service status... (You may have to press CTRL+C)")
+            os.system("systemctl status spectero")
         except Exception as e:
             traceback.print_exc()
             print("The installer encountered a problem while configuring the systemd service.")
@@ -650,6 +649,8 @@ def create_user():
     if sys.platform in ["linux", "linux2"]:
         os.system("useradd spectero")
         os.system("groupadd spectero")
+        os.system("mkdir -p /home/spectero")
+        os.system("chown -R spectero:spectero /home/spectero")
         os.system("usermod -a -G spectero spectero")
 
 
@@ -680,7 +681,7 @@ def linux_enable_ipv4_forwarding():
             print("Enabling IPv4 Forwarding")
             os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
             print("Reloading System Configuration Kernel Properties...")
-            os.system("sysctl --system &> /dev/null")
+            os.system("sysctl --system > /dev/null 2>&1")  # Needs more aggressive suppression.
     except:
         print("There was a problem attempting to check for kernel flag: ipv4_forward.")
         sys.exit(1)
@@ -689,6 +690,7 @@ def linux_enable_ipv4_forwarding():
 def create_shell_script():
     try:
         cli_script = get_install_directory_from_config() + config["version"] + "/cli/Tooling/spectero"
+        cli_script_destination = "/usr/local/bin/spectero"
 
         # String replacement.
         with open(cli_script, 'r') as file:
@@ -702,8 +704,8 @@ def create_shell_script():
             file.write(filedata)
 
         print("Copying console management interface shell script to /usr/local/bin/spectero")
-        shutil.copyfile(cli_script, "/usr/local/bin/spectero")
-        os.system("chmod +x /usr/local/bin/spectero")
+        os.system("cp %s %s" % (cli_script, cli_script_destination))
+        os.system("chmod +x %s" % cli_script_destination)
     except Exception as e:
         traceback.print_exc()
         print("The installer encountered a problem while copying the CLI script.")
