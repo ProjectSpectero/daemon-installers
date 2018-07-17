@@ -94,7 +94,7 @@ def get_install_directory_from_config():
 
 
 def get_dotnet_destination():
-    return get_install_directory_from_config() + config["version"] + "/dotnet"
+    return get_install_directory_from_config() + "latest/dotnet"
 
 
 def get_dotnet_core_path():
