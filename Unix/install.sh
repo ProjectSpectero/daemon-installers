@@ -391,17 +391,8 @@ function WORK_INSTALL_DOTNET_CORE() {
         fi
     fi
 
-    # Download .NET Core Installation script
-    echo "Downloading dotnet core installation script."
-    wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh &> /dev/null
-
-    # Install
-    echo "Installing Microsoft .NET Core Framework...";
-    bash /tmp/dotnet-install.sh \
-        --version $DOTNET_CORE_VERSION \
-        --runtime aspnetcore \
-        --install-dir /usr/local/bin/ \
-        &> /dev/null
+    echo "Dependencies for dotnet core have been installed.";
+    echo "The second stage of the installer will create a local installation of dotnet.";
 }
 
 function WORK_INSTALL_EPEL_REPO() {
@@ -414,15 +405,17 @@ function WORK_INSTALL_EPEL_REPO() {
     fi
 }
 
-function WORK_INSTALL_SPECTERO() {
+function WORK_WRITE_CONFIG() {
     # Write all data to a config
-    echo "directory=$INSTALL_LOCATION" > /tmp/spectero.installconfig
-    echo "overwrite=$OVERWRITE" >> /tmp/spectero.installconfig
-    echo "branch=$BRANCH" >> /tmp/spectero.installconfig
-    echo "version=$BRANCH_VERSION" >> /tmp/spectero.installconfig
-    echo "service=$SERVICE" >> /tmp/spectero.installconfig
-    echo "symlink=$SYMLINK" >> /tmp/spectero.installconfig
+    echo "directory=$INSTALL_LOCATION" > /tmp/spectero.installconfig;
+    echo "overwrite=$OVERWRITE" >> /tmp/spectero.installconfig;
+    echo "branch=$BRANCH" >> /tmp/spectero.installconfig;
+    echo "version=$BRANCH_VERSION" >> /tmp/spectero.installconfig;
+    echo "service=$SERVICE" >> /tmp/spectero.installconfig;
+    echo "symlink=$SYMLINK" >> /tmp/spectero.installconfig;
+}
 
+function WORK_INSTALL_SPECTERO() {
 cat << EOF > "/tmp/spectero-installer.py"
 #!/usr/bin/env python3
 
@@ -453,6 +446,7 @@ import urllib.request
 
 config = {}
 releases = {}
+sources = {}
 
 
 def exception_config_missing():
@@ -515,8 +509,28 @@ def get_install_directory_from_config():
     new = config["directory"]
     if not new.endswith('/'):
         new = new + "/"
-
     return new
+
+
+def get_dotnet_destination():
+    return get_install_directory_from_config() + "latest/dotnet"
+
+
+def get_dotnet_core_path():
+    try:
+        return which("dotnet")
+    except:
+        if not os.path.isdir(get_dotnet_destination()):
+            tmp_path = "/tmp/spectero-dotnet-install.tar.gz"
+            link = get_dotnet_runtime_link()
+
+            # download, create the directory, extract.
+            os.system("wget %s -O %s -q" % (link, tmp_path))
+            os.system("mkdir -p %s" % get_dotnet_destination())
+            os.system("tar -xf %s -C %s" % (tmp_path, get_dotnet_destination()))
+
+        # Get the downloaded dotnet executable path.
+        return get_dotnet_destination() + "/dotnet"
 
 
 def get_download_channel_information():
@@ -602,10 +616,6 @@ def fix_permissions():
     os.system("usermod -m -d %s spectero" % get_install_directory_from_config()[:-1])
 
 
-def get_dotnet_core_path():
-    return which("dotnet")
-
-
 def create_systemd_service():
     if config["service"] == "true":
         try:
@@ -617,7 +627,7 @@ def create_systemd_service():
                 filedata = file.read()
 
             # Replace template data here
-            filedata = filedata.replace("ExecStart=/usr/bin/dotnet", "ExecStart=" + which("dotnet"))
+            filedata = filedata.replace("ExecStart=/usr/bin/dotnet", "ExecStart=" + get_dotnet_core_path())
 
             # Open a writer to the template location.
             with open(systemd_script_template, 'w') as file:
@@ -695,7 +705,7 @@ def create_shell_script():
         with open(cli_script, 'r') as file:
             filedata = file.read()
         print("Replacing variables in console management interface template...")
-        filedata = filedata.replace("{dotnet path}", which("dotnet"))
+        filedata = filedata.replace("{dotnet path}", get_dotnet_core_path())
         filedata = filedata.replace("{spectero working directory}", get_install_directory_from_config())
         filedata = filedata.replace("{version}", config["version"])
 
@@ -712,9 +722,27 @@ def create_shell_script():
         sys.exit(12)
 
 
+def get_sources_information():
+    global sources
+    try:
+        request = urllib.request.Request('https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/SOURCES.json')
+        result = urllib.request.urlopen(request)
+        sources = json.loads(result.read().decode('utf-8'))
+    except:
+        request = urllib.request.Request('https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/development/SOURCES.json')
+        result = urllib.request.urlopen(request)
+        sources = json.loads(result.read().decode('utf-8'))
+
+
+def get_dotnet_runtime_link():
+    global sources
+    return sources["linux"]["dotnet"]["x64"]
+
+
 if __name__ == "__main__":
     read_config()
     get_download_channel_information()
+    get_sources_information()
     validate_user_requests_against_releases()
     download_and_extract()
     create_user()
@@ -934,6 +962,9 @@ PRINT_TERMS_OF_SERVICE;
 # Prompt the users for the two options.
 PRINT_PROMPT_INSTALL_LOCATION;
 PRINT_PROMPT_READY_TO_INSTALL;
+
+# Write the configuration to the disk.
+WORK_WRITE_CONFIG
 
 # Detect packages that either the installer or daemon needs, and install them.
 DETECT_EPEL_REPO;

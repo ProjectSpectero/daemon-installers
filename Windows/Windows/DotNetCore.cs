@@ -38,7 +38,7 @@ namespace installer
         /// <returns></returns>
         public static string GetDownloadLinkFromArch() =>
             (Program.Is64BitOperatingSystem)
-                ? Program.SourcesInformation["dotnet"]["x64"].ToString()
-                : Program.SourcesInformation["dotnet"]["x86"].ToString();
+                ? Program.SourcesInformation["windows"]["dotnet"]["x64"].ToString()
+                : Program.SourcesInformation["windows"]["dotnet"]["x86"].ToString();
     }
 }
