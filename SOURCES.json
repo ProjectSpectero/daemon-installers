@@ -2,8 +2,8 @@
   "terms-of-service": "https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/LICENSE.md",
   "windows": {
     "dotnet": {
-      "x64": "https://download.microsoft.com/download/1/f/7/1f7755c5-934d-4638-b89f-1f4ffa5afe89/dotnet-runtime-2.1.2-win-x64.exe",
-      "x86": "https://download.microsoft.com/download/1/f/7/1f7755c5-934d-4638-b89f-1f4ffa5afe89/dotnet-runtime-2.1.2-win-x86.exe"
+      "x64": "https://download.microsoft.com/download/1/f/7/1f7755c5-934d-4638-b89f-1f4ffa5afe89/dotnet-runtime-2.1.2-win-x64.zip",
+      "x86": "https://download.microsoft.com/download/1/f/7/1f7755c5-934d-4638-b89f-1f4ffa5afe89/dotnet-runtime-2.1.2-win-x86.zip"
     },
     "nssm": "http://nssm.cc/release/nssm-2.24.zip"
   },
