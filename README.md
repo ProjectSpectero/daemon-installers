@@ -2,6 +2,15 @@
 This repository is a collection of installers designed to install the [Spectero Daemon](https://).  
 Each directory in this repository is for a designated operating system.
 
+## Quick Install
+Windows:  
+[Click here to download executable](https://github.com/ProjectSpectero/daemon-installers/blob/master/Windows/Windows/bin/Debug/Spectero%20Installer.exe?raw=true)
+
+Linux, MacOS:
+```bash
+wget -O - https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.sh | sudo bash
+```
+
 ## License
 ```
 Spectero, Inc
