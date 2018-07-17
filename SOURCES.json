@@ -9,7 +9,7 @@
   },
   "linux": {
     "dotnet": {
-      "x64": "https://www.microsoft.com/net/download/thank-you/dotnet-runtime-2.1.2-linux-x64-asp.net-core-runtime-binaries"
+      "x64": "https://download.microsoft.com/download/1/f/7/1f7755c5-934d-4638-b89f-1f4ffa5afe89/aspnetcore-runtime-2.1.2-linux-x64.tar.gz"
     }
   }
 }
