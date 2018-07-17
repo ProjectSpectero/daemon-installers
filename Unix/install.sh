@@ -414,15 +414,17 @@ function WORK_INSTALL_EPEL_REPO() {
     fi
 }
 
-function WORK_INSTALL_SPECTERO() {
+function WORK_WRITE_CONFIG() {
     # Write all data to a config
-    echo "directory=$INSTALL_LOCATION" > /tmp/spectero.installconfig
-    echo "overwrite=$OVERWRITE" >> /tmp/spectero.installconfig
-    echo "branch=$BRANCH" >> /tmp/spectero.installconfig
-    echo "version=$BRANCH_VERSION" >> /tmp/spectero.installconfig
-    echo "service=$SERVICE" >> /tmp/spectero.installconfig
-    echo "symlink=$SYMLINK" >> /tmp/spectero.installconfig
+    echo "directory=$INSTALL_LOCATION" > /tmp/spectero.installconfig;
+    echo "overwrite=$OVERWRITE" >> /tmp/spectero.installconfig;
+    echo "branch=$BRANCH" >> /tmp/spectero.installconfig;
+    echo "version=$BRANCH_VERSION" >> /tmp/spectero.installconfig;
+    echo "service=$SERVICE" >> /tmp/spectero.installconfig;
+    echo "symlink=$SYMLINK" >> /tmp/spectero.installconfig;
+}
 
+function WORK_INSTALL_SPECTERO() {
 cat << EOF > "/tmp/spectero-installer.py"
 #!/usr/bin/env python3
 
@@ -934,6 +936,9 @@ PRINT_TERMS_OF_SERVICE;
 # Prompt the users for the two options.
 PRINT_PROMPT_INSTALL_LOCATION;
 PRINT_PROMPT_READY_TO_INSTALL;
+
+# Write the configuration to the disk.
+WORK_WRITE_CONFIG
 
 # Detect packages that either the installer or daemon needs, and install them.
 DETECT_EPEL_REPO;
