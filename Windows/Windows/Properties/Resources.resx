@@ -156,7 +156,7 @@
     <value>Failed to download release data. Are you connected to the internet?</value>
   </data>
   <data name="sources_url" xml:space="preserve">
-    <value>https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Windows/SOURCES.json</value>
+    <value>https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/SOURCES.json</value>
     <comment>URL for getting data dynamically</comment>
   </data>
   <data name="removal_success" xml:space="preserve">
