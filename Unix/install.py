@@ -97,21 +97,31 @@ def get_dotnet_destination():
     return get_install_directory_from_config() + "latest/dotnet"
 
 
+def local_dotnet_core_installer():
+    # Local dotnet core was not installed.
+    if not os.path.isdir(get_dotnet_destination()):
+        tmp_path = "/tmp/spectero-dotnet-install.tar.gz"
+        link = get_dotnet_runtime_link()
+
+        # download, create the directory, extract.
+        os.system("wget %s -O %s -q" % (link, tmp_path))
+        os.system("mkdir -p %s" % get_dotnet_destination())
+        os.system("tar -xf %s -C %s" % (tmp_path, get_dotnet_destination()))
+
+    # Get the downloaded dotnet executable path.
+    return get_dotnet_destination() + "/dotnet"
+
+
 def get_dotnet_core_path():
     try:
-        return which("dotnet")
+        result = which("dotnet")
+        return result
+
+        # Find the version
+
     except:
-        if not os.path.isdir(get_dotnet_destination()):
-            tmp_path = "/tmp/spectero-dotnet-install.tar.gz"
-            link = get_dotnet_runtime_link()
-
-            # download, create the directory, extract.
-            os.system("wget %s -O %s -q" % (link, tmp_path))
-            os.system("mkdir -p %s" % get_dotnet_destination())
-            os.system("tar -xf %s -C %s" % (tmp_path, get_dotnet_destination()))
-
-        # Get the downloaded dotnet executable path.
-        return get_dotnet_destination() + "/dotnet"
+        # Perform a local install
+        return local_dotnet_core_installer()
 
 
 def get_download_channel_information():
