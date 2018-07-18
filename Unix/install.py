@@ -59,6 +59,12 @@ def exception_no_download_link():
     sys.exit(1)
 
 
+def exception_cannnot_read_popen(popen):
+    print("Failed to read dotnet output")
+    print(popen)
+    sys.exit(1)
+
+
 def read_config():
     global config
 
@@ -112,13 +118,49 @@ def local_dotnet_core_installer():
     return get_dotnet_destination() + "/dotnet"
 
 
+def get_repository_dotnet_version():
+    return
+
+
+def is_dotnet_version_compatable(installed_version):
+    requirement = get_repository_dotnet_version()
+    split_requirement = requirement.split('.')
+    installed_version_split = installed_version.split('.')
+
+    # Iterate through each.
+    for i in range(0, 2):
+        # Check to see if the requirement is higher.
+        if int(split_requirement) > int(installed_version_split):
+            # We need a local install.
+            return False
+
+    # We can use the currently installed version of dotnet core.
+    return True
+
+
 def get_dotnet_core_path():
     try:
+        # Attempt to get the system install, will determine if it exists.
         result = which("dotnet")
-        return result
 
         # Find the version
+        info_output = subprocess.check_output([result, "--info"]).split('\n')
 
+        # Check if the version is compatible.
+        for line in info_output:
+            if "Version: " in line:
+                current_line = line.decode('utf-8')
+                current_line = current_line.trim()
+                version_numbers = current_line.split("Version:")[1].trim()
+                if is_dotnet_version_compatable(version_numbers):
+                    # The version is compatable.
+                    return result
+                else:
+                    # The version wasn't compatible.
+                    return local_dotnet_core_installer()
+
+        # Throw exception and print lines for debugging.
+        exception_cannnot_read_popen(info_output)
     except:
         # Perform a local install
         return local_dotnet_core_installer()
