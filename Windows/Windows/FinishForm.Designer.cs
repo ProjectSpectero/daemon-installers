@@ -125,7 +125,7 @@
             this.MinimizeBox = false;
             this.Name = "FinishForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "FinishForm";
+            this.Text = "Spectero Install Complete";
             this.Load += new System.EventHandler(this.FinishForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel2.ResumeLayout(false);
