@@ -44,7 +44,11 @@ namespace installer
             {
                 StableRadio.Select();
             }
+
+            ChannelVersion.SelectedIndex = 0;
         }
+
+
 
         /// <summary>
         /// Sets the channel to stable.

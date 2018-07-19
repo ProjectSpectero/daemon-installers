@@ -130,7 +130,7 @@ def get_repository_dotnet_version():
     return parttwo
 
 
-def is_dotnet_version_compatible(installed_version):
+def is_dotnet_version_compatable(installed_version):
     requirement = get_repository_dotnet_version()
     split_requirement = requirement.split('.')
     installed_version_split = installed_version.split('.')

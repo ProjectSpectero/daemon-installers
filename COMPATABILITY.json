@@ -49,10 +49,10 @@
         },
         "CentOS":{
             "Distributions":{
-                "7":{
-                    "tested":true
+                "6":{
+                    "tested":false
                 },
-                "8":{
+                "7":{
                     "tested":true
                 }
             },
