@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.ServiceProcess;
 using System.Text;
 using System.Windows.Forms;
 using Windows;
@@ -26,26 +27,7 @@ namespace installer
 
         public bool Exists()
         {
-            var proc = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "sc",
-                    Arguments = "interrogate spectero",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true
-                }
-            };
-
-            proc.Start();
-            while (!proc.StandardOutput.EndOfStream)
-            {
-                string line = proc.StandardOutput.ReadLine();
-                if (line.Contains("The specified service does not exist as an installed service")) return false;
-            }
-
-            return true;
+            return ServiceController.GetServices().Any(serviceController => serviceController.ServiceName.Equals("spectero.daemon"));
         }
 
         public void Create()
