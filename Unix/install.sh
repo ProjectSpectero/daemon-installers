@@ -7,7 +7,7 @@
 ##  https://spectero.com
 ##
 ##  For command line arguments, please refer to our confluence documentation
-##  <LINK TO CONFLUENCE>
+##  https://spectero.atlassian.net/wiki/spaces/docs/pages/3244075/Linux+macOS+Installer+Arguments
 ##
 ###############################################################################
 
