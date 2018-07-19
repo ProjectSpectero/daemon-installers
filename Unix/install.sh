@@ -276,11 +276,11 @@ function WORK_INSTALL_PYTHON3() {
         brew install sudo;
     elif [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
-            dnf install python34 -y;
+            dnf install python34 -y &> /dev/null;
         elif [[ ! -z $YUM_CMD ]]; then
-            yum install python34 -y;
+            yum install python34 -y &> /dev/null;
         elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install python3 -y;
+            apt-get install python3 -y &> /dev/null;
         fi
     fi
 }
