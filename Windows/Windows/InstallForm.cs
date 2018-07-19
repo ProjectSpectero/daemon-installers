@@ -135,7 +135,8 @@ namespace installer
 
             // Mark as complete and enable the progress bar
             EasyLog("Installation is complete.");
-            NextButton.Enabled = true;
+            new FinishForm().Show();
+            this.Close();
         }
 
         /// <summary>
