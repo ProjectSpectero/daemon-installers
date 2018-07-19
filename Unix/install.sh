@@ -571,15 +571,15 @@ def get_dotnet_core_path():
         result = which("dotnet")
 
         # Find the version
-        info_output = subprocess.check_output([result, "--info"]).split('\n')
+        info_output = subprocess.check_output([result, "--info"]).decode('utf-8').split('\n')
 
         # Check if the version is compatible.
         for line in info_output:
             if "Version: " in line:
-                current_line = line.decode('utf-8')
-                current_line = current_line.trim()
-                version_numbers = current_line.split("Version:")[1].trim()
-                if is_dotnet_version_compatable(version_numbers):
+                current_line = lines
+                current_line = current_line.strip()
+                version_numbers = current_line.split("Version:")[1].strip()
+                if is_dotnet_version_compatible(version_numbers):
                     # The version is compatable.
                     return result
                 else:
