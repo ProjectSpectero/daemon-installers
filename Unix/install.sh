@@ -576,7 +576,7 @@ def get_dotnet_core_path():
         # Check if the version is compatible.
         for line in info_output:
             if "Version: " in line:
-                current_line = lines
+                current_line = line
                 current_line = current_line.strip()
                 version_numbers = current_line.split("Version:")[1].strip()
                 if is_dotnet_version_compatible(version_numbers):
