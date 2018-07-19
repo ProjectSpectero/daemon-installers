@@ -7,7 +7,7 @@
 ##  https://spectero.com
 ##
 ##  For command line arguments, please refer to our confluence documentation
-##  <LINK TO CONFLUENCE>
+##  https://spectero.atlassian.net/wiki/spaces/docs/pages/3244075/Linux+macOS+Installer+Arguments
 ##
 ###############################################################################
 
@@ -276,11 +276,11 @@ function WORK_INSTALL_PYTHON3() {
         brew install sudo;
     elif [ "$(uname)" == "Linux" ]; then
         if [[ ! -z $DNF_CMD ]]; then
-            dnf install python34 -y;
+            dnf install python34 -y &> /dev/null;
         elif [[ ! -z $YUM_CMD ]]; then
-            yum install python34 -y;
+            yum install python34 -y &> /dev/null;
         elif [[ ! -z $APT_GET_CMD ]]; then
-            apt-get install python3 -y;
+            apt-get install python3 -y &> /dev/null;
         fi
     fi
 }
@@ -478,6 +478,12 @@ def exception_no_download_link():
     sys.exit(1)
 
 
+def exception_cannnot_read_popen(popen):
+    print("Failed to read dotnet output")
+    print(popen)
+    sys.exit(1)
+
+
 def read_config():
     global config
 
@@ -516,21 +522,75 @@ def get_dotnet_destination():
     return get_install_directory_from_config() + "latest/dotnet"
 
 
+def local_dotnet_core_installer():
+    # Local dotnet core was not installed.
+    if not os.path.isdir(get_dotnet_destination()):
+        tmp_path = "/tmp/spectero-dotnet-install.tar.gz"
+        link = get_dotnet_runtime_link()
+
+        # download, create the directory, extract.
+        os.system("wget %s -O %s -q" % (link, tmp_path))
+        os.system("mkdir -p %s" % get_dotnet_destination())
+        os.system("tar -xf %s -C %s" % (tmp_path, get_dotnet_destination()))
+
+    # Get the downloaded dotnet executable path.
+    return get_dotnet_destination() + "/dotnet"
+
+
+def get_repository_dotnet_version():
+    # Get the URL
+    url = sources["linux"]["dotnet"]["x64"]
+
+    # Split the string by a constant.
+    partone = url.split("aspnetcore-runtime-")[1]
+    parttwo = partone.split("-linux-")[0]
+
+    # Part two should be the version due to safe string splitting.
+    return parttwo
+
+
+def is_dotnet_version_compatible(installed_version):
+    requirement = get_repository_dotnet_version()
+    split_requirement = requirement.split('.')
+    installed_version_split = installed_version.split('.')
+
+    # Iterate through each.
+    for i in range(0, len(split_requirement)):
+        # Check to see if the requirement is higher.
+        if int(split_requirement[i]) > int(installed_version_split[i]):
+            # We need a local install.
+            return False
+
+    # We can use the currently installed version of dotnet core.
+    return True
+
+
 def get_dotnet_core_path():
     try:
-        return which("dotnet")
+        # Attempt to get the system install, will determine if it exists.
+        result = which("dotnet")
+
+        # Find the version
+        info_output = subprocess.check_output([result, "--info"]).decode('utf-8').split('\n')
+
+        # Check if the version is compatible.
+        for line in info_output:
+            if "Version: " in line:
+                current_line = line
+                current_line = current_line.strip()
+                version_numbers = current_line.split("Version:")[1].strip()
+                if is_dotnet_version_compatible(version_numbers):
+                    # The version is compatable.
+                    return result
+                else:
+                    # The version wasn't compatible.
+                    return local_dotnet_core_installer()
+
+        # Throw exception and print lines for debugging.
+        exception_cannnot_read_popen(info_output)
     except:
-        if not os.path.isdir(get_dotnet_destination()):
-            tmp_path = "/tmp/spectero-dotnet-install.tar.gz"
-            link = get_dotnet_runtime_link()
-
-            # download, create the directory, extract.
-            os.system("wget %s -O %s -q" % (link, tmp_path))
-            os.system("mkdir -p %s" % get_dotnet_destination())
-            os.system("tar -xf %s -C %s" % (tmp_path, get_dotnet_destination()))
-
-        # Get the downloaded dotnet executable path.
-        return get_dotnet_destination() + "/dotnet"
+        # Perform a local install
+        return local_dotnet_core_installer()
 
 
 def get_download_channel_information():
