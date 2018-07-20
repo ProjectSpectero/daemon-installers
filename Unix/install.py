@@ -119,15 +119,7 @@ def local_dotnet_core_installer():
 
 
 def get_repository_dotnet_version():
-    # Get the URL
-    url = sources["linux"]["dotnet"]["x64"]
-
-    # Split the string by a constant.
-    partone = url.split("aspnetcore-runtime-")[1]
-    parttwo = partone.split("-linux-")[0]
-
-    # Part two should be the version due to safe string splitting.
-    return parttwo
+    return releases["versions"][config["version"]]["requiredDotnetVersion"]
 
 
 def is_dotnet_version_compatible(installed_version):
