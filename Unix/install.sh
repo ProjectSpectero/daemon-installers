@@ -538,7 +538,7 @@ def local_dotnet_core_installer():
 
 
 def get_repository_dotnet_version():
-    return releases["versions"][config["version"]]["requiredDotnetVersion"]
+    return releases["versions"][config["version"]]["requiredDotnetCoreVersion"]
 
 
 def is_dotnet_version_compatible(installed_version):
