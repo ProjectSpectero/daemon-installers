@@ -44,8 +44,6 @@ namespace installer
             {
                 StableRadio.Select();
             }
-
-            ChannelVersion.SelectedIndex = 0;
         }
 
 
@@ -88,18 +86,21 @@ namespace installer
             // Delete all objects since we're a new choice.
             ChannelVersion.Items.Clear();
 
+            // Remember the selected channel.
+            Program.Channel = channel;
+
             // Iterate over each version to provide choice for this channel.
             foreach (var jToken in Program.ReleaseInformation["versions"])
             {
                 var currentVersion = (JProperty)jToken;
-                ChannelVersion.Items.Add(currentVersion.Name);
+                if (currentVersion.Name.Contains(Program.Channel)) ChannelVersion.Items.Add(currentVersion.Name);
             }
 
             // Select the combobox to the latest value.
             ChannelVersion.SelectedText = Program.ReleaseInformation["channels"][channel].ToString();
 
-            // Remember the selected channel.
-            Program.Channel = channel;
+            // Update the selected index.
+            ChannelVersion.SelectedIndex = 0;
         }
 
         /// <summary>

@@ -82,16 +82,11 @@ namespace installer
                         // Update the service
                         sm.Delete();
                         EasyLog("The old spectero.daemon service has been deleted.");
-                        sm.Create();
-                        EasyLog("Created newer spectero.daemon service successfully.");
                     }
-                    else
-                    {
-                        // Create the service.
-                        sm.Create();
-                        EasyLog("Created widnows service: spectero.daemon.");
-                        sm.Start();
-                    }
+                    // Create the service.
+                    sm.Create();
+                    EasyLog("Created widnows service: spectero.daemon.");
+                    sm.Start();
                 }
             }
             catch (Exception exception)
@@ -135,7 +130,8 @@ namespace installer
 
             // Mark as complete and enable the progress bar
             EasyLog("Installation is complete.");
-            NextButton.Enabled = true;
+            new FinishForm().Show();
+            this.Close();
         }
 
         /// <summary>
@@ -538,7 +534,7 @@ namespace installer
             const string name = "PATH";
 
             // Get the previous value for the PATH.
-            string currentEnvironmentVariableValue = System.Environment.GetEnvironmentVariable(name);
+            string currentEnvironmentVariableValue = Environment.GetEnvironmentVariable(name);
 
             // If it doesn't already exist, add.
             if (!currentEnvironmentVariableValue.Contains(pathToAdd))

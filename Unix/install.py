@@ -119,15 +119,7 @@ def local_dotnet_core_installer():
 
 
 def get_repository_dotnet_version():
-    # Get the URL
-    url = sources["linux"]["dotnet"]["x64"]
-
-    # Split the string by a constant.
-    partone = url.split("aspnetcore-runtime-")[1]
-    parttwo = partone.split("-linux-")[0]
-
-    # Part two should be the version due to safe string splitting.
-    return parttwo
+    return releases["versions"][config["version"]]["requiredDotnetCoreVersion"]
 
 
 def is_dotnet_version_compatible(installed_version):
@@ -211,6 +203,9 @@ def validate_user_requests_against_releases():
 def download_and_extract():
     global releases, config
 
+    # Create the working directory.
+    os.system("mkdir -p %s%s" % (get_install_directory_from_config(), config["version"]))
+
     # Get the URL for the version.
     url = releases["versions"][config["version"]]["download"]
 
@@ -223,7 +218,7 @@ def download_and_extract():
 
     # Extract
     print("Invoking unzip to extract files...")
-    os.system("unzip -qq -u %s -d %s" % (path, get_install_directory_from_config()))
+    os.system("unzip -qq -u %s -d %s%s" % (path, get_install_directory_from_config(), config["version"]))
 
     # Cleanup
     os.system("rm %s" % path)

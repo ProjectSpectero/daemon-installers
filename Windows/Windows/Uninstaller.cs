@@ -75,12 +75,14 @@ namespace installer
             // Return the single path
             foreach (var currentPath in envSplit)
                 if (currentPath.Contains("Spectero"))
-                    return
-                        Directory.GetParent(
-                            Directory.GetParent(
-                                currentPath
-                            ).FullName
-                        ).FullName;
+                {
+                    string newpath = currentPath;
+                    while (!newpath.EndsWith("Spectero"))
+                    {
+                        newpath = Directory.GetParent(newpath).FullName;
+                    }
+                }
+                    
 
             SpecteroPathNotFoundException();
             return "";
