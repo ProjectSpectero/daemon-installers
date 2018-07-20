@@ -130,8 +130,7 @@ namespace installer
 
             // Mark as complete and enable the progress bar
             EasyLog("Installation is complete.");
-            new FinishForm().Show();
-            this.Close();
+            NextButton.Enabled = true;
         }
 
         /// <summary>

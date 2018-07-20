@@ -36,7 +36,7 @@ namespace installer
         /// <returns></returns>
         public static bool InstallationExists()
         {
-            return Environment.GetEnvironmentVariable("PATH").Contains("Spectero");
+            return Environment.GetEnvironmentVariable("PATH").Contains("Spectero") && Directory.Exists(GetSpecteroInstallationLocation());
         }
 
         /// <summary>
