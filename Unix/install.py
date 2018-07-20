@@ -211,6 +211,9 @@ def validate_user_requests_against_releases():
 def download_and_extract():
     global releases, config
 
+    # Create the working directory.
+    os.system("mkdir -p %s%s" % (get_install_directory_from_config(), config["version"]))
+
     # Get the URL for the version.
     url = releases["versions"][config["version"]]["download"]
 
@@ -223,7 +226,7 @@ def download_and_extract():
 
     # Extract
     print("Invoking unzip to extract files...")
-    os.system("unzip -qq -u %s -d %s" % (path, get_install_directory_from_config()))
+    os.system("unzip -qq -u %s -d %s%s" % (path, get_install_directory_from_config(), config["version"]))
 
     # Cleanup
     os.system("rm %s" % path)
