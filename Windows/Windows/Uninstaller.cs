@@ -81,6 +81,7 @@ namespace installer
                     {
                         newpath = Directory.GetParent(newpath).FullName;
                     }
+                    return newpath;
                 }
                     
 
