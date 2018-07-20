@@ -203,8 +203,11 @@ namespace installer
             const string zipName = "dotnet-binary.zip";
             var dotnetInstallationPath = Path.Combine(Program.InstallLocation, "dotnet");
             var dotnetZipPath = Path.Combine(Program.InstallLocation, zipName);
+            bool forceInstall = false;
+            
+            dotnet_force:
 
-            if (!DotNetCore.Exists())
+            if (!DotNetCore.Exists() || forceInstall)
             {
                 // Make the directory if it doesn't exist.
                 if (!Directory.Exists(dotnetInstallationPath))
@@ -313,7 +316,14 @@ namespace installer
             }
             else
             {
-                Program.DotnetPath = DotNetCore.GetDotnetPath();
+                if (DotNetCore.IsVersionCompatable())
+                {
+                    Program.DotnetPath = DotNetCore.GetDotnetPath();
+                } else
+                {
+                    forceInstall = true;
+                    goto dotnet_force;
+                }
             }
         }
 
@@ -476,6 +486,9 @@ namespace installer
                 OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
                 OverallProgress.Value = 0;
 
+                string workingDirecotry = Path.Combine(Program.InstallLocation, Program.Version);
+                if (!Directory.Exists(workingDirecotry)) Directory.CreateDirectory(workingDirecotry);
+
                 // Iterate through each object in the archive
                 foreach (ZipEntry zipEntry in versionZipFile)
                 {
@@ -484,7 +497,7 @@ namespace installer
                         Thread.Sleep(10);
 
                     // Get the current absolute path
-                    string currentPath = Path.Combine(Program.InstallLocation, zipEntry.Name);
+                    string currentPath = Path.Combine(workingDirecotry, zipEntry.Name);
 
                     // Create the directory if needed.
                     if (zipEntry.IsDirectory)

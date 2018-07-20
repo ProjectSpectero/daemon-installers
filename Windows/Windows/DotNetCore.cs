@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using Windows;
 
 namespace installer
@@ -40,5 +42,51 @@ namespace installer
             (Program.Is64BitOperatingSystem)
                 ? Program.SourcesInformation["windows"]["dotnet"]["x64"].ToString()
                 : Program.SourcesInformation["windows"]["dotnet"]["x86"].ToString();
+
+        public static bool IsVersionCompatable()
+        {
+            // Consult the local installation.
+            var proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = GetDotnetPath(),
+                    Arguments = "--list-runtimes",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                }
+            };
+            
+            // Execute and determine the version.
+            proc.Start();
+            while (!proc.StandardOutput.EndOfStream)
+            {
+                string line = proc.StandardOutput.ReadLine();
+
+                // Get the line that contains a version.
+                if (line.Contains("Microsoft.AspNetCore.All"))
+                {
+                    // Single out the data from the installed version.
+                    line = line.Remove(0, 25); // Remove the "Microsoft.AspNetCore.All"
+                    line = line.Substring(0, 5); // Single out the version                
+
+                    // Split 
+                    string[] installed = line.Split('.');
+                    string[] requirement = Program.ReleaseInformation["versions"][Program.Version]["requiredDotnetCoreVersion"].ToString().Split('.');
+
+                    // Compare.
+                    for (var i = 0; i != installed.Length; i++)
+                        if (int.Parse(installed[i]) < int.Parse(requirement[i]))
+                            // The installed version cannot run the required version.
+                            return false;
+                    // The installed version can run the required version
+                    return true;
+                }
+            }
+
+            // Generic failure.
+            return false;
+        }
     }
 }
