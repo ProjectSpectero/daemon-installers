@@ -65,6 +65,9 @@ namespace installer
             // Download .NET core if it doesn't exist.
             DotNetCoreDownloaderSubworker();
 
+            // Download Visual C++ if it doesn't exist.
+            if (!Program.VisualCRuntimeExists()) VisualCInstallSubroutine();
+
             // Download the files.
             SpecteroDownloaderSubworker();
 
