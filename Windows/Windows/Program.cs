@@ -1,5 +1,6 @@
 ﻿using installer;
 using installer.Properties;
+using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
@@ -304,6 +305,17 @@ namespace Windows
             IntPtr hModule = GetModuleHandle(moduleName);
             if (hModule != IntPtr.Zero)
                 return GetProcAddress(hModule, methodName) != IntPtr.Zero;
+            return false;
+        }
+
+        public static bool VisualCRuntimeExists()
+        {
+            // Define the paths.
+            var x86 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\Installer\Dependencies{e2803110-78b3-4664-a479-3611a381656a}");
+            var x86_64 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\Installer\Dependencies{d992c12e-cab2-426f-bde3-fb8c53950b0d}");
+
+            // Check if either exists.
+            if (x86 != null || x86_64 != null) return true;
             return false;
         }
     }
