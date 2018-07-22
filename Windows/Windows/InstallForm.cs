@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Windows;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace installer
 {
@@ -533,6 +534,68 @@ namespace installer
 
             // Download the file asyncronously.
             webClient.DownloadFileAsync(new Uri(_downloadLink), _absoluteZipPath);
+
+            while (webClient.IsBusy || !complete)
+            {
+                Thread.Sleep(1);
+            }
+        }
+
+        public void VisualCInstallSubroutine()
+        {
+            // Thread signal.
+            bool complete = false;
+
+            // Webclient
+            WebClient webClient = new WebClient();
+
+            // Remember the directory
+            string visualCDownloadLink = Program.Is64BitOperatingSystem
+                ? "https://download.microsoft.com/download/6/A/A/6AA4EDFF-645B-48C5-81CC-ED5963AEAD48/vc_redist.x64.exe"
+                : "https://download.microsoft.com/download/6/A/A/6AA4EDFF-645B-48C5-81CC-ED5963AEAD48/vc_redist.x86.exe";
+            string[] brokenUrlStrings = visualCDownloadLink.Split('/');
+            string filename = brokenUrlStrings[brokenUrlStrings.Length - 1];
+            var visualCInstallerDownloadPath = Path.Combine(Program.InstallLocation, filename);
+
+            // Tell the user what's going to happen
+            EasyLog(string.Format("Downloading {0} from {1}",
+                filename,
+                visualCDownloadLink
+            ));
+
+            // Start the stopwatch.
+            _timeStarted = DateTime.Now;
+
+            // Download Percent Changed Event - Update the progress bar
+            webClient.DownloadProgressChanged += (senderChild, eChild) =>
+            {
+                OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
+                OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
+                ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
+                    Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
+                    Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
+                    Math.Round(eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
+                    )
+                );
+            };
+
+            // Download Complete Event
+            webClient.DownloadFileCompleted += (senderChild, eChild) =>
+            {
+                // Tell the user where the file was saved.
+                EasyLog(string.Format("{0} was saved to {1}", filename, visualCInstallerDownloadPath));
+
+                // TODO: INSTALL SILENTLY
+                EasyLog(string.Format("Installing Microsoft Visual C++ 2015 {0} Redistributable...", Program.Is64BitOperatingSystem ? "x64" : "x86"));
+                var microsoftVisualCInstaller = Process.Start(visualCInstallerDownloadPath, "/install /passive /norestart");
+                microsoftVisualCInstaller.WaitForExit();
+
+                // Change the thread signal.
+                complete = true;
+            };
+
+            // Download the file asyncronously.
+            webClient.DownloadFileAsync(new Uri(visualCDownloadLink), visualCInstallerDownloadPath);
 
             while (webClient.IsBusy || !complete)
             {
