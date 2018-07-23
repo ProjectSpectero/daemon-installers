@@ -35,7 +35,7 @@ namespace installer
             Process.Start(
                 GetExecutablePath(),
                 string.Format("install \"spectero.daemon\" \"{0}\" \"{1}\"",
-                    Program.DotnetPath,
+                    DotNetCore.GetDotnetPath(),
                     GetBinaryExpectedPath()
                 )
             );
