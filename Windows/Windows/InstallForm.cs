@@ -62,13 +62,10 @@ namespace installer
             _zipFilename = Program.Version + ".zip";
             _absoluteZipPath = Path.Combine(Program.InstallLocation, _zipFilename);
 
-            // Download .NET core if it doesn't exist.
-            DotNetCoreDownloaderSubworker();
+            // Download DNCRTs if it doesn't exist.
+            if (!DotNetCore.Exists()) DotNetCoreInstallSubroutine();
 
-            // Download Visual C++ if it doesn't exist.
-            if (!Program.VisualCRuntimeExists()) VisualCInstallSubroutine();
-
-            // Download the files.
+            // Download the project files.
             SpecteroDownloaderSubworker();
 
             // Check service things.
@@ -193,142 +190,6 @@ namespace installer
 
             // scroll it automatically
             Logger.ScrollToCaret();
-        }
-
-        public void DotNetCoreDownloaderSubworker()
-        {
-            // Thread signal.
-            bool complete = false;
-
-            // Webclient
-            WebClient webClient = new WebClient();
-
-            // Remember the directory
-            const string zipName = "dotnet-binary.zip";
-            var dotnetInstallationPath = Path.Combine(Program.InstallLocation, "dotnet");
-            var dotnetZipPath = Path.Combine(Program.InstallLocation, zipName);
-            bool forceInstall = false;
-            
-            dotnet_force:
-
-            if (!DotNetCore.Exists() || forceInstall)
-            {
-                // Make the directory if it doesn't exist.
-                if (!Directory.Exists(dotnetInstallationPath))
-                    Directory.CreateDirectory(dotnetInstallationPath);
-
-                // Tell the user what's going to happen
-                EasyLog(string.Format("Downloading {0} from {1}",
-                    zipName,
-                    DotNetCore.GetDownloadLinkFromArch()
-                ));
-
-                // Start the download stopwatch.
-                _timeStarted = DateTime.Now;
-
-                // Update the progress bar.
-                webClient.DownloadProgressChanged += (senderChild, eChild) =>
-                {
-                    OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
-                    OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
-                    ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
-                        Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
-                        Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
-                        Math.Round(
-                            eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
-                        )
-                    );
-                };
-
-                // Define a rule to the webclient to change a boolean when the download is done.
-                webClient.DownloadFileCompleted += (senderChild, eChild) =>
-                {
-                    // Tell the user where the file was saved.
-                    EasyLog(string.Format("{1} runtime was saved to {0}", dotnetZipPath, zipName));
-
-                    // Extract the archive
-                    ZipFile versionZipFile = new ZipFile(File.OpenRead(dotnetZipPath));
-
-                    // Reset the progress bar.
-                    OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
-                    OverallProgress.Value = 0;
-
-                    // Iterate through each object in the archive
-                    foreach (ZipEntry zipEntry in versionZipFile)
-                    {
-                        // Check if we should pause
-                        while (_pauseActions)
-                            Thread.Sleep(10);
-
-                        // Get the current absolute path
-                        string currentPath = Path.Combine(dotnetInstallationPath, zipEntry.Name);
-
-                        // Create the directory if needed.
-                        if (zipEntry.IsDirectory)
-
-                        {
-                            Directory.CreateDirectory(currentPath);
-                            EasyLog("Created Directory: " + currentPath);
-                        }
-                        // Copy the file to the directory.
-                        else
-                        {
-                            // Redundant path checking
-                            string basepath = new FileInfo(currentPath).Directory.FullName;
-                            if (!Directory.Exists(basepath))
-                            {
-                                Directory.CreateDirectory(basepath);
-                            }
-
-                            // Use a buffer, 4096 bytes seems to be pretty optimal.
-                            byte[] buffer = new byte[4096];
-                            Stream zipStream = versionZipFile.GetInputStream(zipEntry);
-
-                            // Copy to and from the buffer, and then to the disk.
-                            using (FileStream streamWriter = File.Create(currentPath))
-                            {
-                                EasyLog("Copying file: " + currentPath);
-                                StreamUtils.Copy(zipStream, streamWriter, buffer);
-                            }
-                        }
-
-                        // Update the progress bar.
-                        OverallProgress.Value += 1;
-
-                        // Update the progress text.
-                        ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
-                            OverallProgress.Maximum);
-                    }
-
-                    // Assign where dotnet is.
-                    Program.DotnetPath = Path.Combine(dotnetInstallationPath, "dotnet.exe");
-
-                    // ADd the installation path to the PATH varaible.
-                    AddToPath(dotnetInstallationPath);
-
-                    // Mark the process as complete.
-                    complete = true;
-                };
-
-                // Download the file asyncronously.
-                webClient.DownloadFileAsync(new Uri(DotNetCore.GetDownloadLinkFromArch()), dotnetZipPath);
-
-                while (webClient.IsBusy || !complete)
-                {
-                    Thread.Sleep(1);
-                }
-            }
-            else
-            {
-                if (DotNetCore.IsVersionCompatable())
-                {
-                    Program.DotnetPath = DotNetCore.GetDotnetPath();
-                } else
-                {
-                    forceInstall = true;
-                    goto dotnet_force;
-                }
-            }
         }
 
         public void NonSuckingServiceManagerSubworker()
@@ -544,7 +405,7 @@ namespace installer
             }
         }
 
-        public void VisualCInstallSubroutine()
+        public void DotNetCoreInstallSubroutine()
         {
             // Thread signal.
             bool complete = false;
@@ -553,17 +414,15 @@ namespace installer
             WebClient webClient = new WebClient();
 
             // Remember the directory
-            string visualCDownloadLink = Program.Is64BitOperatingSystem
-                ? "https://download.microsoft.com/download/6/A/A/6AA4EDFF-645B-48C5-81CC-ED5963AEAD48/vc_redist.x64.exe"
-                : "https://download.microsoft.com/download/6/A/A/6AA4EDFF-645B-48C5-81CC-ED5963AEAD48/vc_redist.x86.exe";
-            string[] brokenUrlStrings = visualCDownloadLink.Split('/');
-            string filename = brokenUrlStrings[brokenUrlStrings.Length - 1];
-            var visualCInstallerDownloadPath = Path.Combine(Program.InstallLocation, filename);
+            string dotNetInstallerDownloadLink = Program.SourcesInformation["windows"]["dotnet"].ToString();
+            string[] brokenUrlStrings = dotNetInstallerDownloadLink.Split('/');
+            string dotNetInstallerFilename = brokenUrlStrings[brokenUrlStrings.Length - 1];
+            var dotNetInstallerDownloadPath = Path.Combine(Program.InstallLocation, dotNetInstallerFilename);
 
             // Tell the user what's going to happen
             EasyLog(string.Format("Downloading {0} from {1}",
-                filename,
-                visualCDownloadLink
+                dotNetInstallerFilename,
+                dotNetInstallerDownloadLink
             ));
 
             // Start the stopwatch.
@@ -586,11 +445,11 @@ namespace installer
             webClient.DownloadFileCompleted += (senderChild, eChild) =>
             {
                 // Tell the user where the file was saved.
-                EasyLog(string.Format("{0} was saved to {1}", filename, visualCInstallerDownloadPath));
+                EasyLog(string.Format("{0} was saved to {1}", dotNetInstallerFilename, dotNetInstallerDownloadPath));
 
                 // TODO: INSTALL SILENTLY
-                EasyLog(string.Format("Installing Microsoft Visual C++ 2015 {0} Redistributable...", Program.Is64BitOperatingSystem ? "x64" : "x86"));
-                var microsoftVisualCInstaller = Process.Start(visualCInstallerDownloadPath, "/install /passive /norestart");
+                EasyLog("Installing Microsoft Dotnet Core Dependency...");
+                var microsoftVisualCInstaller = Process.Start(dotNetInstallerDownloadPath, "/install /passive /norestart /q");
                 microsoftVisualCInstaller.WaitForExit();
 
                 // Change the thread signal.
@@ -598,7 +457,7 @@ namespace installer
             };
 
             // Download the file asyncronously.
-            webClient.DownloadFileAsync(new Uri(visualCDownloadLink), visualCInstallerDownloadPath);
+            webClient.DownloadFileAsync(new Uri(dotNetInstallerDownloadLink), dotNetInstallerDownloadPath);
 
             while (webClient.IsBusy || !complete)
             {
