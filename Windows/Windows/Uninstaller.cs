@@ -26,7 +26,7 @@ namespace installer
             Directory.Delete(specteroInstallPath, true);
 
             // Let the user know
-            MessageBox.Show(Resources.removal_success, Resources.messagebox_title);
+            MessageBox.Show(Resources.removal_success, Resources.messagebox_title, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>

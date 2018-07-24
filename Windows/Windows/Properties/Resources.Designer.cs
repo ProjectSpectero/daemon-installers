@@ -156,7 +156,7 @@ namespace installer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Spectero has successfully been deleted and removed from your system..
+        ///   Looks up a localized string similar to The Spectero Daemon was successfully uninstalled from this computer..
         /// </summary>
         internal static string removal_success {
             get {
@@ -188,16 +188,6 @@ namespace installer.Properties {
         internal static string spectero_releases_url {
             get {
                 return ResourceManager.GetString("spectero_releases_url", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An active installation of Spectero has been found in your computer.
-        ///Would you like to uninstall Spectero?.
-        /// </summary>
-        internal static string uninstall_prompt {
-            get {
-                return ResourceManager.GetString("uninstall_prompt", resourceCulture);
             }
         }
         

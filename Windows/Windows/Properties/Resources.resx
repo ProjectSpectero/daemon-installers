@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="removal_success" xml:space="preserve">
-    <value>Spectero has successfully been deleted and removed from your system.</value>
+    <value>The Spectero Daemon was successfully uninstalled from this computer.</value>
   </data>
   <data name="agree" xml:space="preserve">
     <value>I Agree</value>
@@ -155,10 +155,6 @@
   </data>
   <data name="messagebox_title" xml:space="preserve">
     <value>Spectero Installer</value>
-  </data>
-  <data name="uninstall_prompt" xml:space="preserve">
-    <value>An active installation of Spectero has been found in your computer.
-Would you like to uninstall Spectero?</value>
   </data>
   <data name="outline_delete_forever_black_18dp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\outline_delete_forever_black_18dp.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
