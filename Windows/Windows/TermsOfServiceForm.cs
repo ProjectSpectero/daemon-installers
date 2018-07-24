@@ -24,6 +24,9 @@ namespace Windows
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Fix the icon
+            this.Icon = Resources.DefaultIcon;
+            
             // Disalble the next button by default.
             NextButton.Enabled = false;
 

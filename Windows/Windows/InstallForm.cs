@@ -39,7 +39,10 @@ namespace installer
         /// <param name="e"></param>
         private void InstallForm_Load(object sender, EventArgs e)
         {
-            // allow illegal thread access to the UI, doesn't mater here
+            // Fix the icon
+            this.Icon = Resources.DefaultIcon;
+            
+            // Allow illegal thread access to the UI, doesn't mater here
             CheckForIllegalCrossThreadCalls = false;
 
             // Show the form and get to work.

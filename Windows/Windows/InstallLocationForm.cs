@@ -1,4 +1,5 @@
-﻿using System;
+﻿using installer.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -22,6 +23,9 @@ namespace installer
 
         private void InstallLocationForm_Load(object sender, EventArgs e)
         {
+            // Fix the icon.
+            this.Icon = Resources.DefaultIcon;
+            
             // Set a default path to install
             if (Program.InstallLocation == null)
                 Program.InstallLocation = Program.GetInstallationPath();

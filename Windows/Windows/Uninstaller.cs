@@ -27,7 +27,6 @@ namespace installer
 
             // Let the user know
             MessageBox.Show(Resources.removal_success, Resources.messagebox_title);
-            Environment.Exit(0);
         }
 
         /// <summary>

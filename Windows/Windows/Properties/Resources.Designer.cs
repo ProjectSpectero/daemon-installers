@@ -79,11 +79,31 @@ namespace installer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon DefaultIcon {
+            get {
+                object obj = ResourceManager.GetObject("DefaultIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to exit the installation wizard?.
         /// </summary>
         internal static string exit_message {
             get {
                 return ResourceManager.GetString("exit_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap google_32_132 {
+            get {
+                object obj = ResourceManager.GetObject("google-32-132", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -103,6 +123,26 @@ namespace installer.Properties {
         internal static string messagebox_title {
             get {
                 return ResourceManager.GetString("messagebox_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_delete_forever_black_18dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_delete_forever_black_18dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_get_app_black_18dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_get_app_black_18dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using installer.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -24,7 +25,8 @@ namespace installer
 
         private void FinishForm_Load(object sender, EventArgs e)
         {
-
+            // Fix the icon for the form in the taskbar.
+            this.Icon = Resources.DefaultIcon;
         }
     }
 }
