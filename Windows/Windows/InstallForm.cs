@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Windows;
 using Microsoft.Win32;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace installer
 {
@@ -131,6 +132,9 @@ namespace installer
             
             // Modify registry
             EnableFirewallFormwarding();
+
+            // Add the path to the installer to add/remove page in control panel.
+            CreateInstallerEntry();
 
             // Mark as complete and enable the progress bar
             EasyLog("Installation is complete.");
@@ -499,6 +503,56 @@ namespace installer
                 "IpEnableRouter",
                 1
             );
+        }
+
+        public void CreateInstallerEntry()
+        {
+            string uninstallRegKeyPAth = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(uninstallRegKeyPAth, true))
+            {
+                if (parent == null)
+                    throw new Exception("Uninstall registry key not found.");
+
+                try
+                {
+                    RegistryKey key = null;
+                    try
+                    {
+                        string guidText = Guid.NewGuid().ToString("B");
+                        key = parent.OpenSubKey(guidText, true) ??
+                              parent.CreateSubKey(guidText);
+
+                        if (key == null)
+                            throw new Exception(String.Format("Unable to create uninstaller '{0}\\{1}'", uninstallRegKeyPAth, guidText));
+                      
+
+                        // Get information about the assembly and build a path.
+                        Assembly asm = GetType().Assembly;
+                        Version version = asm.GetName().Version;
+                        string exe = "\"" + asm.CodeBase.Substring(8).Replace("/", "\\\\") + "\"";
+
+                        // Set values
+                        key.SetValue("DisplayName", "Spectero Daemon for Windows");
+                        key.SetValue("ApplicationVersion", version.ToString());
+                        key.SetValue("Publisher", "Spectero, Inc");
+                        key.SetValue("DisplayIcon", exe);
+                        key.SetValue("DisplayVersion", version.ToString(2));
+                        key.SetValue("URLInfoAbout", "https://spectero.com");
+                        key.SetValue("Contact", "support@spectero.com");
+                        key.SetValue("InstallDate", DateTime.Now.ToString("yyyyMMdd"));
+                        key.SetValue("UninstallString", exe);
+                    }
+                    finally
+                    {
+                        if (key != null)
+                            key.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("An error occurred writing uninstall information to the registry.  The service is fully installed but can only be uninstalled manually through the command line.", ex);
+                }
+            }
         }
     }
 }
