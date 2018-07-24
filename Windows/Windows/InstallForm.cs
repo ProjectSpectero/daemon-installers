@@ -62,6 +62,9 @@ namespace installer
             // Store the download link in an easy to access variable
             _downloadLink = Program.ReleaseInformation["versions"][Program.Version]["download"].ToString();
 
+            // Create the base path
+            if (!Directory.Exists(Program.InstallLocation)) Directory.CreateDirectory(Program.InstallLocation);
+
             // Create shorthand variables to use rather than redundant functions.
             _zipFilename = Program.Version + ".zip";
             _absoluteZipPath = Path.Combine(Program.InstallLocation, _zipFilename);
@@ -134,7 +137,11 @@ namespace installer
             EnableFirewallFormwarding();
 
             // Add the path to the installer to add/remove page in control panel.
-            CreateInstallerEntry();
+            var winins = new WindowsInstaller();
+            if (winins.Exists()) winins.CreateEntry();
+
+            // Set markers in registry
+            CreateRegistryEntry();
 
             // Mark as complete and enable the progress bar
             EasyLog("Installation is complete.");
@@ -505,10 +512,10 @@ namespace installer
             );
         }
 
-        public void CreateInstallerEntry()
+        public void CreateRegistryEntry()
         {
-            string uninstallRegKeyPAth = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-            using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(uninstallRegKeyPAth, true))
+            string root = @"SOFTWARE\";
+            using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(root, true))
             {
                 if (parent == null)
                     throw new Exception("Uninstall registry key not found.");
@@ -518,39 +525,28 @@ namespace installer
                     RegistryKey key = null;
                     try
                     {
-                        string guidText = Guid.NewGuid().ToString("B");
-                        key = parent.OpenSubKey(guidText, true) ??
-                              parent.CreateSubKey(guidText);
+                        // Get the key from the registry.
+                        key = parent.OpenSubKey("Spectero", true) ?? parent.CreateSubKey("Spectero");
 
+                        // If the key doesn't exist, throw a problem.
                         if (key == null)
-                            throw new Exception(String.Format("Unable to create uninstaller '{0}\\{1}'", uninstallRegKeyPAth, guidText));
-                      
-
-                        // Get information about the assembly and build a path.
-                        Assembly asm = GetType().Assembly;
-                        Version version = asm.GetName().Version;
-                        string exe = "\"" + asm.CodeBase.Substring(8).Replace("/", "\\\\") + "\"";
+                            throw new Exception(String.Format("Unable to create registry entry '{0}\\{1}'", root, "Spectero"));
 
                         // Set values
-                        key.SetValue("DisplayName", "Spectero Daemon for Windows");
-                        key.SetValue("ApplicationVersion", version.ToString());
-                        key.SetValue("Publisher", "Spectero, Inc");
-                        key.SetValue("DisplayIcon", exe);
-                        key.SetValue("DisplayVersion", version.ToString(2));
-                        key.SetValue("URLInfoAbout", "https://spectero.com");
-                        key.SetValue("Contact", "support@spectero.com");
-                        key.SetValue("InstallDate", DateTime.Now.ToString("yyyyMMdd"));
-                        key.SetValue("UninstallString", exe);
+                        key.SetValue("InstallationDirectory", Program.InstallLocation);
+                        key.SetValue("InstalledVersion", Program.Version);
+                        key.SetValue("InstalledChannel", Program.Channel);
                     }
                     finally
                     {
+                        // If data is written, close the stream.
                         if (key != null)
                             key.Close();
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("An error occurred writing uninstall information to the registry.  The service is fully installed but can only be uninstalled manually through the command line.", ex);
+                    throw new Exception("An error occurred writing information to the registry.", ex);
                 }
             }
         }

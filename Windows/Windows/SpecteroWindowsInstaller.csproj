@@ -114,6 +114,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WindowsInstaller.cs" />
     <EmbeddedResource Include="FinishForm.resx">
       <DependentUpon>FinishForm.cs</DependentUpon>
     </EmbeddedResource>

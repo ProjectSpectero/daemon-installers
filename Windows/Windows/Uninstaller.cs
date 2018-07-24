@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using installer.Properties;
+using Microsoft.Win32;
 
 namespace installer
 {
@@ -13,9 +14,6 @@ namespace installer
     {
         public Uninstaller()
         {
-            // Store the installation path.
-            string specteroInstallPath = GetSpecteroInstallationLocation();
-
             // Delete the service
             UninstallNssm();
 
@@ -23,7 +21,13 @@ namespace installer
             RemoveSpecteroFromPath();
 
             // Delete Spectero
-            Directory.Delete(specteroInstallPath, true);
+            Directory.Delete(GetInstallationDirectory(), true);
+
+            // Delete the windows installer entry.
+            new WindowsInstaller().DeleteEntry();
+
+            // Remove from the registry.
+            DeleteRegistryEntry();
 
             // Let the user know
             MessageBox.Show(Resources.removal_success, Resources.messagebox_title, MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -35,7 +39,13 @@ namespace installer
         /// <returns></returns>
         public static bool InstallationExists()
         {
-            return Environment.GetEnvironmentVariable("PATH").Contains("Spectero") && Directory.Exists(GetSpecteroInstallationLocation());
+            try
+            {
+                return Directory.Exists(GetInstallationDirectory());
+            } catch (Exception e)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -59,35 +69,6 @@ namespace installer
             Environment.SetEnvironmentVariable("PATH", recompiledEnv, EnvironmentVariableTarget.User);
         }
 
-        /// <summary>
-        /// Try to determine the installation location from the path.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetSpecteroInstallationLocation()
-        {
-            // Get the current environment state
-            string env = Environment.GetEnvironmentVariable("PATH");
-
-            // Explode the string to get the objects in an iterable format.
-            string[] envSplit = env.Split(';');
-
-            // Return the single path
-            foreach (var currentPath in envSplit)
-                if (currentPath.Contains("Spectero"))
-                {
-                    string newpath = currentPath;
-                    while (!newpath.EndsWith("Spectero"))
-                    {
-                        newpath = Directory.GetParent(newpath).FullName;
-                    }
-                    return newpath;
-                }
-                    
-
-            SpecteroPathNotFoundException();
-            return "";
-        }
-
         public static Exception SpecteroPathNotFoundException()
         {
             return new Exception("The installation path of spectero could not be found.");
@@ -99,9 +80,9 @@ namespace installer
             string nssmDir = null;
 
             // Iterate through each subfolder and find the one for NSSM.
-            foreach (var currentPath in Directory.GetDirectories(GetSpecteroInstallationLocation()))
+            foreach (var currentPath in Directory.GetDirectories(GetInstallationDirectory()))
                 if (currentPath.Contains("nssm"))
-                    nssmDir = Path.Combine(GetSpecteroInstallationLocation(), currentPath);
+                    nssmDir = Path.Combine(GetInstallationDirectory(), currentPath);
 
 
             // Check to see if NSSM has been found.
@@ -116,6 +97,28 @@ namespace installer
 
                 // Delete the NSSM directory.
                 Directory.Delete(nssmDir, true);
+            }
+        }
+
+        public static string GetInstallationDirectory()
+        {
+            string uninstallRegKeyPath = @"SOFTWARE\";
+            using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(uninstallRegKeyPath, true))
+            {
+                // Get the key from the registry.
+                RegistryKey key = parent.OpenSubKey("Spectero", true);
+
+                // Get the value we need
+                return key.GetValue("InstallationDirectory").ToString();
+            }
+        }
+
+        public static void DeleteRegistryEntry()
+        {
+            string uninstallRegKeyPath = @"SOFTWARE\";
+            using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(uninstallRegKeyPath, true))
+            {
+                parent.DeleteSubKey("Spectero");
             }
         }
     }

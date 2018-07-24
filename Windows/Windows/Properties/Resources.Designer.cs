@@ -108,6 +108,15 @@ namespace installer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {d4e179aa-5ba5-4ef4-99e7-df12f5492e66}.
+        /// </summary>
+        internal static string guid {
+            get {
+                return ResourceManager.GetString("guid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap installshield {

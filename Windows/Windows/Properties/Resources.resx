@@ -174,4 +174,8 @@
   <data name="DefaultIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DefaultIcon.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="guid" xml:space="preserve">
+    <value>{d4e179aa-5ba5-4ef4-99e7-df12f5492e66}</value>
+    <comment>Unique Identification string that the installer will label itself as</comment>
+  </data>
 </root>
