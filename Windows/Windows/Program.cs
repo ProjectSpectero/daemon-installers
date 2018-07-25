@@ -170,6 +170,14 @@ namespace Windows
 
         private static void HandleArguments()
         {
+            if (CommandLineArgumentExists("--uninstall"))
+            {
+                DialogResult dialogResult = MessageBox.Show("Do you want to unisntall the Spectero Daemon?", "Spectero Installer", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes) new Uninstaller();
+                Environment.Exit(0);
+            }
+
+
             // Check if we should install silently.
             if (CommandLineArgumentExists("--silent"))
                 InstallSliently = true;
