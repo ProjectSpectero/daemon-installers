@@ -119,6 +119,7 @@
             this.InstallArea.Controls.Add(this.label4);
             this.InstallArea.Controls.Add(this.label3);
             this.InstallArea.Controls.Add(this.pictureBox2);
+            this.InstallArea.Cursor = System.Windows.Forms.Cursors.Hand;
             this.InstallArea.Location = new System.Drawing.Point(115, 127);
             this.InstallArea.Name = "InstallArea";
             this.InstallArea.Size = new System.Drawing.Size(414, 71);
@@ -166,6 +167,7 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBox1.TabIndex = 28;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.UninstallArea_Click);
             // 
             // UninstallArea
             // 
@@ -174,6 +176,7 @@
             this.UninstallArea.Controls.Add(this.label5);
             this.UninstallArea.Controls.Add(this.pictureBox1);
             this.UninstallArea.Controls.Add(this.label6);
+            this.UninstallArea.Cursor = System.Windows.Forms.Cursors.Hand;
             this.UninstallArea.Enabled = false;
             this.UninstallArea.Location = new System.Drawing.Point(115, 204);
             this.UninstallArea.Name = "UninstallArea";
@@ -189,6 +192,7 @@
             this.label5.Size = new System.Drawing.Size(246, 13);
             this.label5.TabIndex = 33;
             this.label5.Text = "Remove the Spectero Daemon from this computer.";
+            this.label5.Click += new System.EventHandler(this.UninstallArea_Click);
             // 
             // label6
             // 
@@ -199,6 +203,7 @@
             this.label6.Size = new System.Drawing.Size(56, 13);
             this.label6.TabIndex = 32;
             this.label6.Text = "Uninstall";
+            this.label6.Click += new System.EventHandler(this.UninstallArea_Click);
             // 
             // InstallerOptionForm
             // 
