@@ -119,6 +119,7 @@
             this.InstallArea.Controls.Add(this.label4);
             this.InstallArea.Controls.Add(this.label3);
             this.InstallArea.Controls.Add(this.pictureBox2);
+            this.InstallArea.Cursor = System.Windows.Forms.Cursors.Hand;
             this.InstallArea.Location = new System.Drawing.Point(115, 127);
             this.InstallArea.Name = "InstallArea";
             this.InstallArea.Size = new System.Drawing.Size(414, 71);
@@ -174,6 +175,7 @@
             this.UninstallArea.Controls.Add(this.label5);
             this.UninstallArea.Controls.Add(this.pictureBox1);
             this.UninstallArea.Controls.Add(this.label6);
+            this.UninstallArea.Cursor = System.Windows.Forms.Cursors.Hand;
             this.UninstallArea.Enabled = false;
             this.UninstallArea.Location = new System.Drawing.Point(115, 204);
             this.UninstallArea.Name = "UninstallArea";
