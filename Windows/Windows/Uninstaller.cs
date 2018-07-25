@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,8 @@ namespace installer
     {
         public Uninstaller()
         {
+            foreach (string procName in new[] { "nssm", "dotnet" }) foreach (Process proc in Process.GetProcessesByName(procName)) proc.Kill();
+
             // Delete the service
             UninstallNssm();
 
@@ -115,11 +118,17 @@ namespace installer
 
         public static void DeleteRegistryEntry()
         {
-            string uninstallRegKeyPath = @"SOFTWARE\";
-            using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(uninstallRegKeyPath, true))
+            try
             {
-                parent.DeleteSubKey("Spectero");
-            }
+                string uninstallRegKeyPath = @"SOFTWARE\";
+                using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(uninstallRegKeyPath, true))
+                {
+                    parent.DeleteSubKey("Spectero");
+                }
+            } catch (Exception e)
+            {
+
+            } 
         }
     }
 }

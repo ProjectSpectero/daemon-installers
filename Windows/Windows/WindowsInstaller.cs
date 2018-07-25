@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
 
 namespace installer
 {
@@ -36,23 +37,13 @@ namespace installer
         /// </summary>
         public void DeleteEntry()
         {
-            try
-            {
-                string uninstallRegKeyPath = @"SOFTWARE\";
-                using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(uninstallRegKeyPath, true))
-                {
-                    parent.DeleteSubKey("Spectero");
-                }
-            } catch (Exception e)
-            {
-
-            }
+            Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\" + Resources.guid);
         }
 
         /// <summary>
         /// Create the entry in the add/remove programs page.
         /// </summary>
-        public void CreateEntry()
+        public void CreateEntry(string installer)
         {
             string uninstallRegKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
             using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(uninstallRegKeyPath, true))
@@ -75,7 +66,7 @@ namespace installer
                         // Get information about the assembly and build a path.
                         Assembly asm = GetType().Assembly;
                         Version version = asm.GetName().Version;
-                        string exe = "\"" + asm.CodeBase.Substring(8).Replace("/", "\\\\") + "\"";
+                        string exe = "\"" + installer.Replace("/", "\\\\") + "\"";
 
                         // Set values
                         key.SetValue("DisplayName", "Spectero Daemon for Windows");
@@ -86,7 +77,7 @@ namespace installer
                         key.SetValue("URLInfoAbout", "https://spectero.com");
                         key.SetValue("Contact", "support@spectero.com");
                         key.SetValue("InstallDate", DateTime.Now.ToString("yyyyMMdd"));
-                        key.SetValue("UninstallString", exe);
+                        key.SetValue("UninstallString", exe + " --uninstall");
                     }
                     finally
                     {

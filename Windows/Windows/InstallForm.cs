@@ -17,7 +17,8 @@ namespace installer
     {
         // Palceholder variables
         private string _zipFilename;
-
+        private string _installerPath;
+        private string _absoluteInstallationPath;
         private string _absoluteZipPath;
         private string _downloadLink;
         private DateTime _timeStarted;
@@ -59,11 +60,20 @@ namespace installer
         /// </summary>
         public void Worker()
         {
+
             // Store the download link in an easy to access variable
             _downloadLink = Program.ReleaseInformation["versions"][Program.Version]["download"].ToString();
 
-            // Create the base path
+            // Genereate an absolute installation path specifically so we can store the daemon here.
+            _absoluteInstallationPath = Path.Combine(Program.InstallLocation, "Daemon");
+            _installerPath = Path.Combine(Program.InstallLocation, "Installer.exe");
+
+            // Create the base path and absolute path.
             if (!Directory.Exists(Program.InstallLocation)) Directory.CreateDirectory(Program.InstallLocation);
+            if (!Directory.Exists(_absoluteInstallationPath)) Directory.CreateDirectory(_absoluteInstallationPath);
+
+            // Check if we're the SxS installer - if not, then copy.
+            if (Assembly.GetExecutingAssembly().Location != _installerPath) File.Copy(Assembly.GetExecutingAssembly().Location, _installerPath, true);
 
             // Create shorthand variables to use rather than redundant functions.
             _zipFilename = Program.Version + ".zip";
@@ -111,7 +121,7 @@ namespace installer
                 // Check to see if we should add to the path of the system.
                 if (Program.AddToPath)
                 {
-                    AddToPath(Path.Combine(Program.InstallLocation, "latest\\cli\\Tooling"));
+                    AddToPath(Path.Combine(_absoluteInstallationPath, "latest\\cli\\Tooling"));
                 }
             }
             catch (Exception exception)
@@ -123,8 +133,8 @@ namespace installer
             try
             {
                 Program.CreateSymbolicLink(
-                    Path.Combine(Program.InstallLocation, "latest"),
-                    Path.Combine(Program.InstallLocation, Program.Version),
+                    Path.Combine(_absoluteInstallationPath, "latest"),
+                    Path.Combine(_absoluteInstallationPath, Program.Version),
                     Program.SymbolicLink.Directory
                 );
             }
@@ -141,7 +151,7 @@ namespace installer
 
             // Add the path to the installer to add/remove page in control panel.
             var winins = new WindowsInstaller();
-            if (winins.Exists()) winins.CreateEntry();
+            if (winins.Exists()) winins.CreateEntry(_installerPath);
 
             // Set markers in registry
             CreateRegistryEntry();
@@ -253,7 +263,7 @@ namespace installer
                 EasyLog(string.Format("{0} was saved to {1}", zipName, nssmZipPath));
 
                 // Create the installation directory if it doesn't exist.
-                if (!Directory.Exists(Program.InstallLocation))
+                if (!Directory.Exists(nssmInstallPath))
                 {
                     Directory.CreateDirectory(nssmInstallPath);
                     EasyLog("Created Directory: " + nssmInstallPath);
@@ -322,13 +332,6 @@ namespace installer
             // Thread signal.
             bool complete = false;
 
-            // Create the installation directory if it doesn't exist.
-            if (!Directory.Exists(Program.InstallLocation))
-            {
-                Directory.CreateDirectory(Program.InstallLocation);
-                EasyLog("Created Directory: " + Program.InstallLocation);
-            }
-
             // Tell the user what's going to happen
             EasyLog(string.Format("Downloading version {0} ({1} release) from {2}",
                 Program.Version,
@@ -368,8 +371,8 @@ namespace installer
                 OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
                 OverallProgress.Value = 0;
 
-                string workingDirecotry = Path.Combine(Program.InstallLocation, Program.Version);
-                if (!Directory.Exists(workingDirecotry)) Directory.CreateDirectory(workingDirecotry);
+                string workingDirectory = Path.Combine(_absoluteInstallationPath, Program.Version);
+                if (!Directory.Exists(workingDirectory)) Directory.CreateDirectory(workingDirectory);
 
                 // Iterate through each object in the archive
                 foreach (ZipEntry zipEntry in versionZipFile)
@@ -379,7 +382,7 @@ namespace installer
                         Thread.Sleep(10);
 
                     // Get the current absolute path
-                    string currentPath = Path.Combine(workingDirecotry, zipEntry.Name);
+                    string currentPath = Path.Combine(workingDirectory, zipEntry.Name);
 
                     // Create the directory if needed.
                     if (zipEntry.IsDirectory)
@@ -536,7 +539,7 @@ namespace installer
                             throw new Exception(String.Format("Unable to create registry entry '{0}\\{1}'", root, "Spectero"));
 
                         // Set values
-                        key.SetValue("InstallationDirectory", Program.InstallLocation);
+                        key.SetValue("InstallationDirectory", _absoluteInstallationPath);
                         key.SetValue("InstalledVersion", Program.Version);
                         key.SetValue("InstalledChannel", Program.Channel);
                     }

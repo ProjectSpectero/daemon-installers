@@ -1,4 +1,3 @@
-C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\SpecteroWindowsInstaller.csprojAssemblyReference.cache
 C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\installer.FinishForm.resources
 C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\installer.InstallerOptionForm.resources
 C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\installer.InstallForm.resources
@@ -14,3 +13,4 @@ C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\bin\Debug\Spectero I
 C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\bin\Debug\Spectero Installer.pdb
 C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\Spectero Installer.exe
 C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\Spectero Installer.pdb
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Debug\SpecteroWindowsInstaller.csprojAssemblyReference.cache
