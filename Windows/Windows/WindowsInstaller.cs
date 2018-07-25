@@ -38,7 +38,7 @@ namespace installer
         {
             try
             {
-                string uninstallRegKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+                string uninstallRegKeyPath = @"SOFTWARE\";
                 using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(uninstallRegKeyPath, true))
                 {
                     parent.DeleteSubKey("Spectero");

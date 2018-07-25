@@ -69,8 +69,11 @@ namespace installer
             _zipFilename = Program.Version + ".zip";
             _absoluteZipPath = Path.Combine(Program.InstallLocation, _zipFilename);
 
-            // Download DNCRTs if it doesn't exist.
-            if (!DotNetCore.Exists()) DotNetCoreInstallSubroutine();
+            // Download DNCRTs if it doesn't exist or if the old version is obsolete.
+            if (!DotNetCore.Exists())
+                DotNetCoreInstallSubroutine();
+            else if (!DotNetCore.IsVersionCompatable())
+                DotNetCoreInstallSubroutine();
 
             // Download the project files.
             SpecteroDownloaderSubworker();
