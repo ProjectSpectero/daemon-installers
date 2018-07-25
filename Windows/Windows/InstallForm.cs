@@ -8,6 +8,8 @@ using System.Threading;
 using System.Windows.Forms;
 using Windows;
 using Microsoft.Win32;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace installer
 {
@@ -15,7 +17,8 @@ namespace installer
     {
         // Palceholder variables
         private string _zipFilename;
-
+        private string _installerPath;
+        private string _absoluteInstallationPath;
         private string _absoluteZipPath;
         private string _downloadLink;
         private DateTime _timeStarted;
@@ -38,7 +41,10 @@ namespace installer
         /// <param name="e"></param>
         private void InstallForm_Load(object sender, EventArgs e)
         {
-            // allow illegal thread access to the UI, doesn't mater here
+            // Fix the icon
+            this.Icon = Resources.DefaultIcon;
+            
+            // Allow illegal thread access to the UI, doesn't mater here
             CheckForIllegalCrossThreadCalls = false;
 
             // Show the form and get to work.
@@ -54,17 +60,32 @@ namespace installer
         /// </summary>
         public void Worker()
         {
+
             // Store the download link in an easy to access variable
             _downloadLink = Program.ReleaseInformation["versions"][Program.Version]["download"].ToString();
+
+            // Genereate an absolute installation path specifically so we can store the daemon here.
+            _absoluteInstallationPath = Path.Combine(Program.InstallLocation, "Daemon");
+            _installerPath = Path.Combine(Program.InstallLocation, "Installer.exe");
+
+            // Create the base path and absolute path.
+            if (!Directory.Exists(Program.InstallLocation)) Directory.CreateDirectory(Program.InstallLocation);
+            if (!Directory.Exists(_absoluteInstallationPath)) Directory.CreateDirectory(_absoluteInstallationPath);
+
+            // Check if we're the SxS installer - if not, then copy.
+            if (Assembly.GetExecutingAssembly().Location != _installerPath) File.Copy(Assembly.GetExecutingAssembly().Location, _installerPath, true);
 
             // Create shorthand variables to use rather than redundant functions.
             _zipFilename = Program.Version + ".zip";
             _absoluteZipPath = Path.Combine(Program.InstallLocation, _zipFilename);
 
-            // Download .NET core if it doesn't exist.
-            DotNetCoreDownloaderSubworker();
+            // Download DNCRTs if it doesn't exist or if the old version is obsolete.
+            if (!DotNetCore.Exists())
+                DotNetCoreInstallSubroutine();
+            else if (!DotNetCore.IsVersionCompatable())
+                DotNetCoreInstallSubroutine();
 
-            // Download the files.
+            // Download the project files.
             SpecteroDownloaderSubworker();
 
             // Check service things.
@@ -100,7 +121,7 @@ namespace installer
                 // Check to see if we should add to the path of the system.
                 if (Program.AddToPath)
                 {
-                    AddToPath(Path.Combine(Program.InstallLocation, "latest\\cli\\Tooling"));
+                    AddToPath(Path.Combine(_absoluteInstallationPath, "latest\\cli\\Tooling"));
                 }
             }
             catch (Exception exception)
@@ -112,8 +133,8 @@ namespace installer
             try
             {
                 Program.CreateSymbolicLink(
-                    Path.Combine(Program.InstallLocation, "latest"),
-                    Path.Combine(Program.InstallLocation, Program.Version),
+                    Path.Combine(_absoluteInstallationPath, "latest"),
+                    Path.Combine(_absoluteInstallationPath, Program.Version),
                     Program.SymbolicLink.Directory
                 );
             }
@@ -127,6 +148,16 @@ namespace installer
             
             // Modify registry
             EnableFirewallFormwarding();
+
+            // Add the path to the installer to add/remove page in control panel.
+            var winins = new WindowsInstaller();
+            if (winins.Exists()) winins.CreateEntry(_installerPath);
+
+            // Set markers in registry
+            CreateRegistryEntry();
+
+            // Set the environment state
+            SetASPEnvironment();
 
             // Mark as complete and enable the progress bar
             EasyLog("Installation is complete.");
@@ -191,132 +222,6 @@ namespace installer
             Logger.ScrollToCaret();
         }
 
-        public void DotNetCoreDownloaderSubworker()
-        {
-            // Thread signal.
-            bool complete = false;
-
-            // Webclient
-            WebClient webClient = new WebClient();
-
-            // Remember the directory
-            const string zipName = "dotnet-binary.zip";
-            var dotnetInstallationPath = Path.Combine(Program.InstallLocation, "dotnet");
-            var dotnetZipPath = Path.Combine(Program.InstallLocation, zipName);
-
-            if (!DotNetCore.Exists())
-            {
-                // Make the directory if it doesn't exist.
-                if (!Directory.Exists(dotnetInstallationPath))
-                    Directory.CreateDirectory(dotnetInstallationPath);
-
-                // Tell the user what's going to happen
-                EasyLog(string.Format("Downloading {0} from {1}",
-                    zipName,
-                    DotNetCore.GetDownloadLinkFromArch()
-                ));
-
-                // Start the download stopwatch.
-                _timeStarted = DateTime.Now;
-
-                // Update the progress bar.
-                webClient.DownloadProgressChanged += (senderChild, eChild) =>
-                {
-                    OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
-                    OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
-                    ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
-                        Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
-                        Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
-                        Math.Round(
-                            eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
-                        )
-                    );
-                };
-
-                // Define a rule to the webclient to change a boolean when the download is done.
-                webClient.DownloadFileCompleted += (senderChild, eChild) =>
-                {
-                    // Tell the user where the file was saved.
-                    EasyLog(string.Format("{1} runtime was saved to {0}", dotnetZipPath, zipName));
-
-                    // Extract the archive
-                    ZipFile versionZipFile = new ZipFile(File.OpenRead(dotnetZipPath));
-
-                    // Reset the progress bar.
-                    OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
-                    OverallProgress.Value = 0;
-
-                    // Iterate through each object in the archive
-                    foreach (ZipEntry zipEntry in versionZipFile)
-                    {
-                        // Check if we should pause
-                        while (_pauseActions)
-                            Thread.Sleep(10);
-
-                        // Get the current absolute path
-                        string currentPath = Path.Combine(dotnetInstallationPath, zipEntry.Name);
-
-                        // Create the directory if needed.
-                        if (zipEntry.IsDirectory)
-
-                        {
-                            Directory.CreateDirectory(currentPath);
-                            EasyLog("Created Directory: " + currentPath);
-                        }
-                        // Copy the file to the directory.
-                        else
-                        {
-                            // Redundant path checking
-                            string basepath = new FileInfo(currentPath).Directory.FullName;
-                            if (!Directory.Exists(basepath))
-                            {
-                                Directory.CreateDirectory(basepath);
-                            }
-
-                            // Use a buffer, 4096 bytes seems to be pretty optimal.
-                            byte[] buffer = new byte[4096];
-                            Stream zipStream = versionZipFile.GetInputStream(zipEntry);
-
-                            // Copy to and from the buffer, and then to the disk.
-                            using (FileStream streamWriter = File.Create(currentPath))
-                            {
-                                EasyLog("Copying file: " + currentPath);
-                                StreamUtils.Copy(zipStream, streamWriter, buffer);
-                            }
-                        }
-
-                        // Update the progress bar.
-                        OverallProgress.Value += 1;
-
-                        // Update the progress text.
-                        ProgressText.Text = string.Format("Extracting file {0}/{1}", OverallProgress.Value,
-                            OverallProgress.Maximum);
-                    }
-
-                    // Assign where dotnet is.
-                    Program.DotnetPath = Path.Combine(dotnetInstallationPath, "dotnet.exe");
-
-                    // ADd the installation path to the PATH varaible.
-                    AddToPath(dotnetInstallationPath);
-
-                    // Mark the process as complete.
-                    complete = true;
-                };
-
-                // Download the file asyncronously.
-                webClient.DownloadFileAsync(new Uri(DotNetCore.GetDownloadLinkFromArch()), dotnetZipPath);
-
-                while (webClient.IsBusy || !complete)
-                {
-                    Thread.Sleep(1);
-                }
-            }
-            else
-            {
-                Program.DotnetPath = DotNetCore.GetDotnetPath();
-            }
-        }
-
         public void NonSuckingServiceManagerSubworker()
         {
             // Thread signal.
@@ -361,7 +266,7 @@ namespace installer
                 EasyLog(string.Format("{0} was saved to {1}", zipName, nssmZipPath));
 
                 // Create the installation directory if it doesn't exist.
-                if (!Directory.Exists(Program.InstallLocation))
+                if (!Directory.Exists(nssmInstallPath))
                 {
                     Directory.CreateDirectory(nssmInstallPath);
                     EasyLog("Created Directory: " + nssmInstallPath);
@@ -430,13 +335,6 @@ namespace installer
             // Thread signal.
             bool complete = false;
 
-            // Create the installation directory if it doesn't exist.
-            if (!Directory.Exists(Program.InstallLocation))
-            {
-                Directory.CreateDirectory(Program.InstallLocation);
-                EasyLog("Created Directory: " + Program.InstallLocation);
-            }
-
             // Tell the user what's going to happen
             EasyLog(string.Format("Downloading version {0} ({1} release) from {2}",
                 Program.Version,
@@ -476,6 +374,9 @@ namespace installer
                 OverallProgress.Maximum = int.Parse(versionZipFile.Count.ToString());
                 OverallProgress.Value = 0;
 
+                string workingDirectory = Path.Combine(_absoluteInstallationPath, Program.Version);
+                if (!Directory.Exists(workingDirectory)) Directory.CreateDirectory(workingDirectory);
+
                 // Iterate through each object in the archive
                 foreach (ZipEntry zipEntry in versionZipFile)
                 {
@@ -484,7 +385,7 @@ namespace installer
                         Thread.Sleep(10);
 
                     // Get the current absolute path
-                    string currentPath = Path.Combine(Program.InstallLocation, zipEntry.Name);
+                    string currentPath = Path.Combine(workingDirectory, zipEntry.Name);
 
                     // Create the directory if needed.
                     if (zipEntry.IsDirectory)
@@ -527,6 +428,66 @@ namespace installer
             }
         }
 
+        public void DotNetCoreInstallSubroutine()
+        {
+            // Thread signal.
+            bool complete = false;
+
+            // Webclient
+            WebClient webClient = new WebClient();
+
+            // Remember the directory
+            string dotNetInstallerDownloadLink = Program.SourcesInformation["windows"]["dotnet"].ToString();
+            string[] brokenUrlStrings = dotNetInstallerDownloadLink.Split('/');
+            string dotNetInstallerFilename = brokenUrlStrings[brokenUrlStrings.Length - 1];
+            var dotNetInstallerDownloadPath = Path.Combine(Program.InstallLocation, dotNetInstallerFilename);
+
+            // Tell the user what's going to happen
+            EasyLog(string.Format("Downloading {0} from {1}",
+                dotNetInstallerFilename,
+                dotNetInstallerDownloadLink
+            ));
+
+            // Start the stopwatch.
+            _timeStarted = DateTime.Now;
+
+            // Download Percent Changed Event - Update the progress bar
+            webClient.DownloadProgressChanged += (senderChild, eChild) =>
+            {
+                OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
+                OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
+                ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
+                    Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
+                    Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
+                    Math.Round(eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
+                    )
+                );
+            };
+
+            // Download Complete Event
+            webClient.DownloadFileCompleted += (senderChild, eChild) =>
+            {
+                // Tell the user where the file was saved.
+                EasyLog(string.Format("{0} was saved to {1}", dotNetInstallerFilename, dotNetInstallerDownloadPath));
+
+                // TODO: INSTALL SILENTLY
+                EasyLog("Installing Microsoft Dotnet Core Dependency...");
+                var microsoftVisualCInstaller = Process.Start(dotNetInstallerDownloadPath, "/install /passive /norestart /q");
+                microsoftVisualCInstaller.WaitForExit();
+
+                // Change the thread signal.
+                complete = true;
+            };
+
+            // Download the file asyncronously.
+            webClient.DownloadFileAsync(new Uri(dotNetInstallerDownloadLink), dotNetInstallerDownloadPath);
+
+            while (webClient.IsBusy || !complete)
+            {
+                Thread.Sleep(1);
+            }
+        }
+
         public void AddToPath(string pathToAdd)
         {
             // PATH Variable
@@ -558,6 +519,50 @@ namespace installer
                 "IpEnableRouter",
                 1
             );
+        }
+
+        public void SetASPEnvironment()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production", EnvironmentVariableTarget.Machine);
+        }
+
+        public void CreateRegistryEntry()
+        {
+            string root = @"SOFTWARE\";
+            using (RegistryKey parent = Registry.LocalMachine.OpenSubKey(root, true))
+            {
+                if (parent == null)
+                    throw new Exception("Uninstall registry key not found.");
+
+                try
+                {
+                    RegistryKey key = null;
+                    try
+                    {
+                        // Get the key from the registry.
+                        key = parent.OpenSubKey("Spectero", true) ?? parent.CreateSubKey("Spectero");
+
+                        // If the key doesn't exist, throw a problem.
+                        if (key == null)
+                            throw new Exception(String.Format("Unable to create registry entry '{0}\\{1}'", root, "Spectero"));
+
+                        // Set values
+                        key.SetValue("InstallationDirectory", _absoluteInstallationPath);
+                        key.SetValue("InstalledVersion", Program.Version);
+                        key.SetValue("InstalledChannel", Program.Channel);
+                    }
+                    finally
+                    {
+                        // If data is written, close the stream.
+                        if (key != null)
+                            key.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("An error occurred writing information to the registry.", ex);
+                }
+            }
         }
     }
 }

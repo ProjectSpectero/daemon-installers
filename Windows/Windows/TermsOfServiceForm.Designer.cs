@@ -39,9 +39,11 @@
             this.DisagreeRadioButton = new System.Windows.Forms.RadioButton();
             this.AgreeRadioButton = new System.Windows.Forms.RadioButton();
             this.EULABox = new System.Windows.Forms.RichTextBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
             // 
             // panel3
@@ -89,6 +91,7 @@
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.pictureBox3);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Location = new System.Drawing.Point(0, 0);
@@ -100,7 +103,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(11, 31);
+            this.label2.Location = new System.Drawing.Point(11, 35);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(220, 13);
             this.label2.TabIndex = 1;
@@ -110,7 +113,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(11, 8);
+            this.label1.Location = new System.Drawing.Point(11, 12);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(171, 13);
             this.label1.TabIndex = 0;
@@ -161,6 +164,16 @@
             this.EULABox.TabIndex = 0;
             this.EULABox.Text = "";
             // 
+            // pictureBox3
+            // 
+            this.pictureBox3.Image = global::installer.Properties.Resources.google_32_132;
+            this.pictureBox3.Location = new System.Drawing.Point(513, 5);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(120, 50);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox3.TabIndex = 29;
+            this.pictureBox3.TabStop = false;
+            // 
             // TermsOfServiceForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -182,6 +195,7 @@
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -198,6 +212,7 @@
         private System.Windows.Forms.RichTextBox EULABox;
         private System.Windows.Forms.RadioButton DisagreeRadioButton;
         private System.Windows.Forms.RadioButton AgreeRadioButton;
+        private System.Windows.Forms.PictureBox pictureBox3;
     }
 }
 

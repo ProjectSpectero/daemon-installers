@@ -24,6 +24,9 @@ namespace installer
         // Form Constructor
         private void SelectChannelForm_Load(object sender, EventArgs e)
         {
+            // Fix the icon
+            this.Icon = Resources.DefaultIcon;
+            
             // Disable channels that are null.
             if (Program.ReleaseInformation["channels"]["stable"].Type == JTokenType.Null)
                 StableRadio.Enabled = false;

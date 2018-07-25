@@ -79,11 +79,40 @@ namespace installer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon DefaultIcon {
+            get {
+                object obj = ResourceManager.GetObject("DefaultIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to exit the installation wizard?.
         /// </summary>
         internal static string exit_message {
             get {
                 return ResourceManager.GetString("exit_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap google_32_132 {
+            get {
+                object obj = ResourceManager.GetObject("google-32-132", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {d4e179aa-5ba5-4ef4-99e7-df12f5492e66}.
+        /// </summary>
+        internal static string guid {
+            get {
+                return ResourceManager.GetString("guid", resourceCulture);
             }
         }
         
@@ -107,6 +136,26 @@ namespace installer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_delete_forever_black_18dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_delete_forever_black_18dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_get_app_black_18dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_get_app_black_18dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to download release data. Are you connected to the internet?.
         /// </summary>
         internal static string release_data_error {
@@ -116,7 +165,7 @@ namespace installer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Spectero has successfully been deleted and removed from your system..
+        ///   Looks up a localized string similar to The Spectero Daemon was successfully uninstalled from this computer..
         /// </summary>
         internal static string removal_success {
             get {
@@ -148,16 +197,6 @@ namespace installer.Properties {
         internal static string spectero_releases_url {
             get {
                 return ResourceManager.GetString("spectero_releases_url", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An active installation of Spectero has been found in your computer.
-        ///Would you like to uninstall Spectero?.
-        /// </summary>
-        internal static string uninstall_prompt {
-            get {
-                return ResourceManager.GetString("uninstall_prompt", resourceCulture);
             }
         }
         

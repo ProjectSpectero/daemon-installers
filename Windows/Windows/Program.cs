@@ -1,5 +1,6 @@
 ﻿using installer;
 using installer.Properties;
+using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
@@ -68,23 +69,7 @@ namespace Windows
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Check if an active installation exists.
-            if (Uninstaller.InstallationExists())
-            {
-                // Prompt the user.
-                DialogResult uninstallResult = MessageBox.Show(
-                    Resources.uninstall_prompt, Resources.messagebox_title, MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-
-                // If the user specifies yes, then uninstall spectero.
-                if (uninstallResult == DialogResult.Yes)
-                {
-                    // Uninstall.
-                    new Uninstaller();
-                }
-            }
-
-
+            
             // Try to get the release data
             WebClient dataClient = new WebClient();
             try
@@ -185,6 +170,13 @@ namespace Windows
 
         private static void HandleArguments()
         {
+            if (CommandLineArgumentExists("--uninstall"))
+            {
+                DialogResult dialogResult = MessageBox.Show("Do you want to unisntall the Spectero Daemon?", "Spectero Installer", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes) new Uninstaller();
+                Environment.Exit(0);
+            }
+
             // Check if we should install silently.
             if (CommandLineArgumentExists("--silent"))
                 InstallSliently = true;

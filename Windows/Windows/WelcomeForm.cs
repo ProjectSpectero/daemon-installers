@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
+using installer;
 using installer.Properties;
 using Newtonsoft.Json.Linq;
 using Environment = System.Environment;
@@ -23,6 +24,9 @@ namespace Windows
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Fix the icon for the form in the taskbar.
+            this.Icon = Resources.DefaultIcon;
+
             // Disable next movement
             NextButton.Enabled = false;
 
@@ -43,7 +47,7 @@ namespace Windows
 
         private void NextButton_Click(object sender, EventArgs e)
         {
-            new TermsOfServiceForm().Show();
+            new InstallerOptionForm().Show();
             this.Close();
         }
     }

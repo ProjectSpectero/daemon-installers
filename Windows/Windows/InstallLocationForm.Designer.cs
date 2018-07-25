@@ -41,8 +41,10 @@
             this.ChangeDirectory = new System.Windows.Forms.Button();
             this.InstallAsService = new System.Windows.Forms.CheckBox();
             this.addToEnv = new System.Windows.Forms.CheckBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panel3.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
             // 
             // panel3
@@ -90,6 +92,7 @@
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.pictureBox3);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Location = new System.Drawing.Point(2, 0);
@@ -175,6 +178,16 @@
             this.addToEnv.UseVisualStyleBackColor = true;
             this.addToEnv.CheckedChanged += new System.EventHandler(this.addToEnv_CheckedChanged);
             // 
+            // pictureBox3
+            // 
+            this.pictureBox3.Image = global::installer.Properties.Resources.google_32_132;
+            this.pictureBox3.Location = new System.Drawing.Point(514, 5);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(120, 50);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox3.TabIndex = 30;
+            this.pictureBox3.TabStop = false;
+            // 
             // InstallLocationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -199,6 +212,7 @@
             this.panel3.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -219,5 +233,6 @@
         private System.Windows.Forms.Button ChangeDirectory;
         private System.Windows.Forms.CheckBox InstallAsService;
         private System.Windows.Forms.CheckBox addToEnv;
+        private System.Windows.Forms.PictureBox pictureBox3;
     }
 }
