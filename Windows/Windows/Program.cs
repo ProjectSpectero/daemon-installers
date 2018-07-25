@@ -177,7 +177,6 @@ namespace Windows
                 Environment.Exit(0);
             }
 
-
             // Check if we should install silently.
             if (CommandLineArgumentExists("--silent"))
                 InstallSliently = true;

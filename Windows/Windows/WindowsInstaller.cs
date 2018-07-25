@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Windows;
 
 namespace installer
 {
@@ -73,7 +74,7 @@ namespace installer
                         key.SetValue("ApplicationVersion", version.ToString());
                         key.SetValue("Publisher", "Spectero, Inc");
                         key.SetValue("DisplayIcon", exe);
-                        key.SetValue("DisplayVersion", version.ToString(2));
+                        key.SetValue("DisplayVersion", Program.Version);
                         key.SetValue("URLInfoAbout", "https://spectero.com");
                         key.SetValue("Contact", "support@spectero.com");
                         key.SetValue("InstallDate", DateTime.Now.ToString("yyyyMMdd"));
