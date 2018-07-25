@@ -156,6 +156,9 @@ namespace installer
             // Set markers in registry
             CreateRegistryEntry();
 
+            // Set the environment state
+            SetASPEnvironment();
+
             // Mark as complete and enable the progress bar
             EasyLog("Installation is complete.");
             NextButton.Enabled = true;
@@ -516,6 +519,11 @@ namespace installer
                 "IpEnableRouter",
                 1
             );
+        }
+
+        public void SetASPEnvironment()
+        {
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production", EnvironmentVariableTarget.Machine);
         }
 
         public void CreateRegistryEntry()
