@@ -4,7 +4,7 @@
             "tested":true
         },
         "Windows 8.1":{
-            "tested":false
+            "tested":true
         },
         "Windows 8":{
             "tested":false
