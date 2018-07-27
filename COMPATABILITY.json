@@ -10,7 +10,7 @@
             "tested":false
         },
         "Windows 7":{
-            "tested":false
+            "tested":true
         }
     },
     "MacOS":{
