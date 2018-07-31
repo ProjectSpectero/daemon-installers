@@ -5,18 +5,21 @@
         "tested": true
       },
       "Windows 8.1": {
-        "tested": false
+        "tested": true
       },
       "Windows 8": {
         "tested": false
       },
       "Windows 7": {
-        "tested": false
+        "tested": true
       }
     },
     "Server": {
       "Windows Server 2016": {
         "tested": true
+      },
+      "Windows Server 2012": {
+        "tested": false
       }
     }
   },
