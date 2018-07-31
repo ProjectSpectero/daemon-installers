@@ -15,7 +15,9 @@
       }
     },
     "Server": {
-      "Windows Server 2016": true
+      "Windows Server 2016": {
+        "tested": true
+      }
     }
   },
   "MacOS": {
