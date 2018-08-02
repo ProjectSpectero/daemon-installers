@@ -24,6 +24,7 @@ import subprocess
 import sys
 import traceback
 import urllib.request
+import platform
 
 config = {}
 releases = {}
@@ -431,15 +432,15 @@ def get_sources_information():
 
 
 def get_dotnet_runtime_link():
-    global sources
-    return sources["linux"]["dotnet"]["x64"]
+        return sources["linux"]["dotnet"]["x64"]
 
 
 def exception_unsupported_os():
     print("The python installer script is currently incompatible with this OS.")
     print("Please file an issue with the following information:")
     print("="*40)
-    print("sys.platform => %s" % sys.platform)
+    print("sys.platform\t\t=\t%s" % sys.platform)
+    print("platform.architecture\t\t=>\t%s" % platform.architecture())
     sys.exit(1)
 
 
