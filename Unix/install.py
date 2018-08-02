@@ -435,20 +435,39 @@ def get_dotnet_runtime_link():
     return sources["linux"]["dotnet"]["x64"]
 
 
+def exception_unsupported_os():
+    print("The python installer script is currently incompatible with this OS.")
+    print("Please file an issue with the following information:")
+    print("="*40)
+    print("sys.platform => %s" % sys.platform)
+    sys.exit(1)
+
+
 if __name__ == "__main__":
     read_config()
     get_download_channel_information()
     get_sources_information()
     validate_user_requests_against_releases()
     download_and_extract()
-    create_user()
+
+    if sys.platform in ["linux", "linux2"]:
+        create_user()
+    else:
+        exception_unsupported_os()
+
     fix_permissions()
-    update_sudoers()
+
+    if sys.platform in ["linux", "linux2"]:
+        update_sudoers()
+
     create_latest_symlink()
-    linux_enable_ipv4_forwarding()
-    linux_enable_fs_max()
-    linux_enable_ipv4_reuse()
-    linux_enable_ipv4_timeout()
-    reload_sysctl()
-    create_systemd_service()
+
+    if sys.platform in ["linux", "linux2"]:
+        linux_enable_ipv4_forwarding()
+        linux_enable_fs_max()
+        linux_enable_ipv4_reuse()
+        linux_enable_ipv4_timeout()
+        reload_sysctl()
+        create_systemd_service()
+
     create_shell_script()
