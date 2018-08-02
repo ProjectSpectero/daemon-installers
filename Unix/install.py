@@ -333,7 +333,7 @@ def linux_enable_ipv4_forwarding():
 
 def linux_enable_fs_max():
     # Defined property of what needs to be checked and assigned
-    property = "net.ipv4.ip_forward"
+    property = "fs.file-max"
     val = 2097152
     try:
         # Try to execute
