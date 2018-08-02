@@ -675,7 +675,8 @@ def create_systemd_service():
     if config["service"] == "true":
         try:
             systemd_script_destination = "/etc/systemd/system/spectero.service"
-            systemd_script_template = "%s%s/daemon/Tooling/Linux/spectero.service" % (get_install_directory_from_config(), config["version"])
+            systemd_script_template = "%s%s/daemon/Tooling/Linux/spectero.service" % (
+            get_install_directory_from_config(), config["version"])
 
             # Open a reader to the template
             with open(systemd_script_template, 'r') as file:
@@ -733,7 +734,7 @@ def update_sudoers():
 
 
 def linux_enable_ipv4_forwarding():
-    # Define the propety of  what we need toc heck
+    # Defined property of what needs to be checked and assigned
     property = "net.ipv4.ip_forward"
     try:
         # Try to execute
@@ -744,11 +745,68 @@ def linux_enable_ipv4_forwarding():
             # Enable ip forwarding
             print("Enabling IPv4 Forwarding")
             os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
-            print("Reloading System Configuration Kernel Properties...")
-            os.system("sysctl --system > /dev/null 2>&1")  # Needs more aggressive suppression.
     except:
-        print("There was a problem attempting to check for kernel flag: ipv4_forward.")
+        print("There was a problem attempting to check for kernel flag: %s." % property)
         sys.exit(1)
+
+
+def linux_enable_fs_max():
+    # Defined property of what needs to be checked and assigned
+    property = "net.ipv4.ip_forward"
+    val = 2097152
+    try:
+        # Try to execute
+        result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
+
+        # Check if it is disabled
+        if result == "%s = %s" % (property, val):
+            # Enable ip forwarding
+            print("Adjusting %s value" % property)
+            os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
+    except:
+        print("There was a problem attempting to check for kernel flag: %s." % property)
+        sys.exit(1)
+
+
+def linux_enable_ipv4_reuse():
+    # Defined property of what needs to be checked and assigned
+    property = "net.ipv4.tcp_tw_reuse"
+    val = 1
+    try:
+        # Try to execute
+        result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
+
+        # Check if it is disabled
+        if result == "%s = %s" % (property, val):
+            # Enable ip forwarding
+            print("Adjusting %s value" % property)
+            os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
+    except:
+        print("There was a problem attempting to check for kernel flag: %s." % property)
+        sys.exit(1)
+
+
+def linux_enable_ipv4_timeout():
+    # Defined property of what needs to be checked and assigned
+    property = "net.ipv4.tcp_fin_timeout"
+    val = 10
+    try:
+        # Try to execute
+        result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
+
+        # Check if it is disabled
+        if result == "%s = %s" % (property, val):
+            # Enable ip forwarding
+            print("Adjusting %s value" % property)
+            os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
+    except:
+        print("There was a problem attempting to check for kernel flag: %s." % property)
+        sys.exit(1)
+
+
+def reload_sysctl():
+    print("Reloading sysctl configuration...")
+    os.system("sysctl --system > /dev/null 2>&1")  # Needs more aggressive suppression.
 
 
 def create_shell_script():
@@ -780,11 +838,13 @@ def create_shell_script():
 def get_sources_information():
     global sources
     try:
-        request = urllib.request.Request('https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/SOURCES.json')
+        request = urllib.request.Request(
+            'https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/SOURCES.json')
         result = urllib.request.urlopen(request)
         sources = json.loads(result.read().decode('utf-8'))
     except:
-        request = urllib.request.Request('https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/development/SOURCES.json')
+        request = urllib.request.Request(
+            'https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/development/SOURCES.json')
         result = urllib.request.urlopen(request)
         sources = json.loads(result.read().decode('utf-8'))
 
@@ -805,6 +865,10 @@ if __name__ == "__main__":
     update_sudoers()
     create_latest_symlink()
     linux_enable_ipv4_forwarding()
+    linux_enable_fs_max()
+    linux_enable_ipv4_reuse()
+    linux_enable_ipv4_timeout()
+    reload_sysctl()
     create_systemd_service()
     create_shell_script()
 
