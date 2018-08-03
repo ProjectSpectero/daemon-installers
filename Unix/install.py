@@ -20,11 +20,11 @@
 
 import json
 import os
+import platform
 import subprocess
 import sys
 import traceback
 import urllib.request
-import platform
 
 config = {}
 releases = {}
@@ -63,6 +63,20 @@ def exception_no_download_link():
 def exception_cannnot_read_popen(popen):
     print("Failed to read dotnet output")
     print(popen)
+    sys.exit(1)
+
+
+def exception_unsupported_os():
+    print("The python installer script is currently incompatible with this OS.")
+    print("Please file an issue with the following information:")
+    print("=" * 40)
+    print("sys.platform\t\t=\t%s" % sys.platform)
+    print("platform.architecture\t\t=>\t%s" % platform.architecture())
+    sys.exit(1)
+
+
+def exception_sysctl_add_fail():
+    print("There was an error adding a value to sysctl.conf")
     sys.exit(1)
 
 
@@ -258,7 +272,7 @@ def create_systemd_service():
         try:
             systemd_script_destination = "/etc/systemd/system/spectero.service"
             systemd_script_template = "%s%s/daemon/Tooling/Linux/spectero.service" % (
-            get_install_directory_from_config(), config["version"])
+                get_install_directory_from_config(), config["version"])
 
             # Open a reader to the template
             with open(systemd_script_template, 'r') as file:
@@ -315,76 +329,35 @@ def update_sudoers():
                 sudoers.write(template + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
 
 
-def linux_enable_ipv4_forwarding():
-    # Defined property of what needs to be checked and assigned
-    property = "net.ipv4.ip_forward"
-    val = 1
-    try:
-        # Try to execute
-        result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
+def sysctl_tweaks():
+    tweaks = {
+        "net.ipv4.tcp_fin_timeout": 10,
+        "net.ipv4.tcp_tw_reuse": 1,
+        "fs.file-max": 2097152,
+        "net.ipv4.ip_forward": 1
+    }
 
-        # Check if it is disabled
-        if result != "%s = %s" % (property, val):
-            # Enable ip forwarding
-            print("Enabling IPv4 Forwarding")
-            os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, val))
-    except:
-        print("There was a problem attempting to check for kernel flag: %s." % property)
-        sys.exit(1)
+    for tweak in tweaks:
+        try:
+            sysctl_safe_add(tweak, tweaks[tweak])
+            print("sysctl value '%s' was added successfully." % tweak)
+        except:
+            exception_sysctl_add_fail()
 
 
-def linux_enable_fs_max():
-    # Defined property of what needs to be checked and assigned
-    property = "fs.file-max"
-    val = 2097152
-    try:
-        # Try to execute
-        result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
+def sysctl_safe_add(property, value):
+    # Try to execute
+    result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
 
-        # Check if it is disabled
-        if result != "%s = %s" % (property, val):
-            # Enable ip forwarding
-            print("Adjusting %s value" % property)
-            os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, val))
-    except:
-        print("There was a problem attempting to check for kernel flag: %s." % property)
-        sys.exit(1)
+    # Check if it is disabled, if so add.
+    if result == "%s = %s" % (property, value):
+        print("Appending '%s' to /etc/sysctl.conf with value '%s'..." % (property, value))
+        os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, value))
 
 
-def linux_enable_ipv4_reuse():
-    # Defined property of what needs to be checked and assigned
-    property = "net.ipv4.tcp_tw_reuse"
-    val = 1
-    try:
-        # Try to execute
-        result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
-
-        # Check if it is disabled
-        if result == "%s = %s" % (property, val):
-            # Enable ip forwarding
-            print("Adjusting %s value" % property)
-            os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, val))
-    except:
-        print("There was a problem attempting to check for kernel flag: %s." % property)
-        sys.exit(1)
-
-
-def linux_enable_ipv4_timeout():
-    # Defined property of what needs to be checked and assigned
-    property = "net.ipv4.tcp_fin_timeout"
-    val = 10
-    try:
-        # Try to execute
-        result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
-
-        # Check if it is disabled
-        if result == "%s = %s" % (property, val):
-            # Enable ip forwarding
-            print("Adjusting %s value" % property)
-            os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, val))
-    except:
-        print("There was a problem attempting to check for kernel flag: %s." % property)
-        sys.exit(1)
+def sysctl_reload():
+    print("Reloading sysctl configuration...")
+    os.system("sysctl --system > /dev/null 2>&1")  # Needs more aggressive suppression.
 
 
 def set_ulimit_spectero_user():
@@ -399,7 +372,7 @@ def set_ulimit_spectero_user():
     hard_limit = "spectero hard nofile 500000"
 
     # Append Spectero specific limit.
-    if soft_limit  not in filedata:
+    if soft_limit not in filedata:
         print("Setting soft file descriptor ulimit for specctero user...")
         filedata += ("\n" + soft_limit)
     if hard_limit not in filedata:
@@ -408,11 +381,6 @@ def set_ulimit_spectero_user():
 
     with open(filepath, 'w') as file:
         file.write(filedata)
-
-
-def reload_sysctl():
-    print("Reloading sysctl configuration...")
-    os.system("sysctl --system > /dev/null 2>&1")  # Needs more aggressive suppression.
 
 
 def create_shell_script():
@@ -456,16 +424,7 @@ def get_sources_information():
 
 
 def get_dotnet_runtime_link():
-        return sources["linux"]["dotnet"]["x64"]
-
-
-def exception_unsupported_os():
-    print("The python installer script is currently incompatible with this OS.")
-    print("Please file an issue with the following information:")
-    print("="*40)
-    print("sys.platform\t\t=\t%s" % sys.platform)
-    print("platform.architecture\t\t=>\t%s" % platform.architecture())
-    sys.exit(1)
+    return sources["linux"]["dotnet"]["x64"]
 
 
 if __name__ == "__main__":
@@ -476,7 +435,7 @@ if __name__ == "__main__":
     download_and_extract()
 
     # If the script is attempted to run in reverse compatibility, linux2 may be a valid value.
-    if sys.platform in ["linux", "linux2"]:
+    if sys.platform in ["linux"]:
         create_user()
         set_ulimit_spectero_user()
 
@@ -485,17 +444,14 @@ if __name__ == "__main__":
 
     fix_permissions()
 
-    if sys.platform in ["linux", "linux2"]:
+    if sys.platform in ["linux"]:
         update_sudoers()
 
     create_latest_symlink()
 
-    if sys.platform in ["linux", "linux2"]:
-        linux_enable_ipv4_forwarding()
-        linux_enable_fs_max()
-        linux_enable_ipv4_reuse()
-        linux_enable_ipv4_timeout()
-        reload_sysctl()
+    if sys.platform in ["linux"]:
+        sysctl_tweaks()
+        sysctl_reload()
         create_systemd_service()
 
     create_shell_script()
