@@ -737,15 +737,16 @@ def update_sudoers():
 def linux_enable_ipv4_forwarding():
     # Defined property of what needs to be checked and assigned
     property = "net.ipv4.ip_forward"
+    val = 1
     try:
         # Try to execute
         result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
 
         # Check if it is disabled
-        if result == "%s = 0" % property:
+        if result != "%s = %s" % (property, val):
             # Enable ip forwarding
             print("Enabling IPv4 Forwarding")
-            os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
+            os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, val))
     except:
         print("There was a problem attempting to check for kernel flag: %s." % property)
         sys.exit(1)
@@ -760,10 +761,10 @@ def linux_enable_fs_max():
         result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
 
         # Check if it is disabled
-        if result == "%s = %s" % (property, val):
+        if result != "%s = %s" % (property, val):
             # Enable ip forwarding
             print("Adjusting %s value" % property)
-            os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
+            os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, val))
     except:
         print("There was a problem attempting to check for kernel flag: %s." % property)
         sys.exit(1)
@@ -781,7 +782,7 @@ def linux_enable_ipv4_reuse():
         if result == "%s = %s" % (property, val):
             # Enable ip forwarding
             print("Adjusting %s value" % property)
-            os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
+            os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, val))
     except:
         print("There was a problem attempting to check for kernel flag: %s." % property)
         sys.exit(1)
@@ -799,10 +800,11 @@ def linux_enable_ipv4_timeout():
         if result == "%s = %s" % (property, val):
             # Enable ip forwarding
             print("Adjusting %s value" % property)
-            os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
+            os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, val))
     except:
         print("There was a problem attempting to check for kernel flag: %s." % property)
         sys.exit(1)
+
 
 def set_ulimit_spectero_user():
     filepath = "/etc/security/limits.conf"
@@ -892,6 +894,7 @@ if __name__ == "__main__":
     validate_user_requests_against_releases()
     download_and_extract()
 
+    # If the script is attempted to run in reverse compatibility, linux2 may be a valid value.
     if sys.platform in ["linux", "linux2"]:
         create_user()
         set_ulimit_spectero_user()
