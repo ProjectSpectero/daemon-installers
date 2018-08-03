@@ -443,6 +443,7 @@ import subprocess
 import sys
 import traceback
 import urllib.request
+import platform
 
 config = {}
 releases = {}
@@ -752,7 +753,7 @@ def linux_enable_ipv4_forwarding():
 
 def linux_enable_fs_max():
     # Defined property of what needs to be checked and assigned
-    property = "net.ipv4.ip_forward"
+    property = "fs.file-max"
     val = 2097152
     try:
         # Try to execute
@@ -803,6 +804,28 @@ def linux_enable_ipv4_timeout():
         print("There was a problem attempting to check for kernel flag: %s." % property)
         sys.exit(1)
 
+def set_ulimit_spectero_user():
+    filepath = "/etc/security/limits.conf"
+
+    # String replacement.
+    with open(filepath, 'r') as file:
+        filedata = file.read()
+
+    # Strings
+    soft_limit = "spectero soft nofile 500000"
+    hard_limit = "spectero hard nofile 500000"
+
+    # Append Spectero specific limit.
+    if soft_limit  not in filedata:
+        print("Setting soft file descriptor ulimit for specctero user...")
+        filedata += ("\n" + soft_limit)
+    if hard_limit not in filedata:
+        print("Setting hard file descriptor ulimit for specctero user...")
+        filedata += ("\n" + hard_limit)
+
+    with open(filepath, 'w') as file:
+        file.write(filedata)
+
 
 def reload_sysctl():
     print("Reloading sysctl configuration...")
@@ -850,8 +873,16 @@ def get_sources_information():
 
 
 def get_dotnet_runtime_link():
-    global sources
-    return sources["linux"]["dotnet"]["x64"]
+        return sources["linux"]["dotnet"]["x64"]
+
+
+def exception_unsupported_os():
+    print("The python installer script is currently incompatible with this OS.")
+    print("Please file an issue with the following information:")
+    print("="*40)
+    print("sys.platform\t\t=\t%s" % sys.platform)
+    print("platform.architecture\t\t=>\t%s" % platform.architecture())
+    sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -860,16 +891,29 @@ if __name__ == "__main__":
     get_sources_information()
     validate_user_requests_against_releases()
     download_and_extract()
-    create_user()
+
+    if sys.platform in ["linux", "linux2"]:
+        create_user()
+        set_ulimit_spectero_user()
+
+    else:
+        exception_unsupported_os()
+
     fix_permissions()
-    update_sudoers()
+
+    if sys.platform in ["linux", "linux2"]:
+        update_sudoers()
+
     create_latest_symlink()
-    linux_enable_ipv4_forwarding()
-    linux_enable_fs_max()
-    linux_enable_ipv4_reuse()
-    linux_enable_ipv4_timeout()
-    reload_sysctl()
-    create_systemd_service()
+
+    if sys.platform in ["linux", "linux2"]:
+        linux_enable_ipv4_forwarding()
+        linux_enable_fs_max()
+        linux_enable_ipv4_reuse()
+        linux_enable_ipv4_timeout()
+        reload_sysctl()
+        create_systemd_service()
+
     create_shell_script()
 
 EOF

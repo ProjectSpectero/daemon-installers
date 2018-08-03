@@ -385,6 +385,28 @@ def linux_enable_ipv4_timeout():
         print("There was a problem attempting to check for kernel flag: %s." % property)
         sys.exit(1)
 
+def set_ulimit_spectero_user():
+    filepath = "/etc/security/limits.conf"
+
+    # String replacement.
+    with open(filepath, 'r') as file:
+        filedata = file.read()
+
+    # Strings
+    soft_limit = "spectero soft nofile 500000"
+    hard_limit = "spectero hard nofile 500000"
+
+    # Append Spectero specific limit.
+    if soft_limit  not in filedata:
+        print("Setting soft file descriptor ulimit for specctero user...")
+        filedata += ("\n" + soft_limit)
+    if hard_limit not in filedata:
+        print("Setting hard file descriptor ulimit for specctero user...")
+        filedata += ("\n" + hard_limit)
+
+    with open(filepath, 'w') as file:
+        file.write(filedata)
+
 
 def reload_sysctl():
     print("Reloading sysctl configuration...")
@@ -453,6 +475,8 @@ if __name__ == "__main__":
 
     if sys.platform in ["linux", "linux2"]:
         create_user()
+        set_ulimit_spectero_user()
+
     else:
         exception_unsupported_os()
 
