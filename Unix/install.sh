@@ -491,6 +491,7 @@ def exception_unsupported_os():
     print("=" * 40)
     print("sys.platform\t\t=\t%s" % sys.platform)
     print("platform.architecture\t\t=>\t%s" % platform.architecture())
+    print("os.uname\t\t=>\t%s" % os.uname())
     sys.exit(1)
 
 
@@ -843,10 +844,17 @@ def get_sources_information():
 
 
 def get_dotnet_runtime_link():
-    return sources["linux"]["dotnet"]["x64"]
+    # use the machine unique string to find the download needed for dotnet core.
+    return sources["linux"]["dotnet"][os.uname().machine]
+
+
+def determine_valid_architecture():
+    if os.uname().machine not in ["armv7l", "x86_64"]:
+        exception_unsupported_os()
 
 
 if __name__ == "__main__":
+    determine_valid_architecture()
     read_config()
     get_download_channel_information()
     get_sources_information()

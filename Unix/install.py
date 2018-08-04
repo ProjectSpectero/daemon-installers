@@ -425,7 +425,7 @@ def get_sources_information():
 
 
 def get_dotnet_runtime_link():
-
+    # use the machine unique string to find the download needed for dotnet core.
     return sources["linux"]["dotnet"][os.uname().machine]
 
 
