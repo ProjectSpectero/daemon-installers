@@ -353,7 +353,9 @@ def sysctl_safe_add(property, value):
     # Check if it is disabled, if so add.
     if result == "%s = %s" % (property, value):
         print("Appending '%s' to /etc/sysctl.conf with value '%s'..." % (property, value))
-        os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, value))
+        f = open("/etc/sysctl.conf", "a+")
+        f.write("%s = %s\n" % (property, value))
+        f.close()
 
 
 def sysctl_reload():
