@@ -749,6 +749,19 @@ def update_sudoers():
                 sudoers.write(template + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
 
 
+def sysctl_safe_add(property, value):
+    # Try to execute
+    result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
+
+    # Check if it is disabled, if so add.
+    if result != ("%s = %s" % (property, value)):
+        print("Appending %s = %s" % (property, value))
+        f = open("/etc/sysctl.conf", "a+")
+        f.write("%s = %s\n" % (property, value))
+        f.close()
+        print("sysctl value '%s' was added successfully." % property)
+
+
 def sysctl_tweaks():
     tweaks = {
         "net.ipv4.tcp_fin_timeout": 10,
@@ -760,21 +773,8 @@ def sysctl_tweaks():
     for tweak in tweaks:
         try:
             sysctl_safe_add(tweak, tweaks[tweak])
-            print("sysctl value '%s' was added successfully." % tweak)
         except:
             exception_sysctl_add_fail()
-
-
-def sysctl_safe_add(property, value):
-    # Try to execute
-    result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
-
-    # Check if it is disabled, if so add.
-    if result == "%s = %s" % (property, value):
-        print("Appending '%s' to /etc/sysctl.conf with value '%s'..." % (property, value))
-        f = open("/etc/sysctl.conf", "a+")
-        f.write("%s = %s\n" % (property, value))
-        f.close()
 
 
 def sysctl_reload():
