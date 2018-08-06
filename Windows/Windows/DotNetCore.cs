@@ -36,6 +36,7 @@ namespace installer
 
         /// <summary>
         /// Get the download link dynamically based on the architecture of the system.
+        /// It should be worth noting the ["default"] cotext of the JSON should the .exe for the x86 and x64 installers of dotnet core.
         /// </summary>
         /// <returns></returns>
         public static string GetDownloadLinkFromArch() => 
