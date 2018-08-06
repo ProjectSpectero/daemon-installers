@@ -437,7 +437,7 @@ namespace installer
             WebClient webClient = new WebClient();
 
             // Remember the directory
-            string dotNetInstallerDownloadLink = Program.SourcesInformation["windows"]["dotnet"].ToString();
+            string dotNetInstallerDownloadLink = DotNetCore.GetDownloadLinkFromArch();
             string[] brokenUrlStrings = dotNetInstallerDownloadLink.Split('/');
             string dotNetInstallerFilename = brokenUrlStrings[brokenUrlStrings.Length - 1];
             var dotNetInstallerDownloadPath = Path.Combine(Program.InstallLocation, dotNetInstallerFilename);

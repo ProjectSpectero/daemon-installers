@@ -2,3 +2,5 @@
 /Windows/.vs/Windows/v15
 /Windows/.vs/Spectero Windows Installer/DesignTimeBuild
 /Windows/.vs/Spectero Windows Installer/v15/Server/sqlite3
+/Windows/Windows/bin
+/Windows/Windows/obj
