@@ -39,11 +39,12 @@ namespace installer
         /// It should be worth noting the ["default"] cotext of the JSON should the .exe for the x86 and x64 installers of dotnet core.
         /// </summary>
         /// <returns></returns>
-        public static string GetDownloadLinkFromArch() => 
-            Program.SourcesInformation["dependencies"]["dotnet"][
-                Program.ReleaseInformation["versions"][Program.Version]["requiredDotnetCoreVersion"].ToString()
-                ]
-            ["Windows"]["default"].ToString();
+        public static string GetDownloadLinkFromArch()
+        {
+            string dotnetVersion = Program.ReleaseInformation["versions"][Program.Version]["requiredDotnetCoreVersion"].ToString();
+            return Program.SourcesInformation["dependencies"]["dotnet"][dotnetVersion]["Windows"]["default"].ToString();
+        }
+            
 
         /// <summary>
         /// Determine fi the installed version of dotnet core is compatable with the version specified.
