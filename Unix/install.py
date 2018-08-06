@@ -426,7 +426,8 @@ def get_sources_information():
 
 def get_dotnet_runtime_link():
     # use the machine unique string to find the download needed for dotnet core.
-    return sources["dependencies"]["dotnet"][releases[config["version"]]["requiredDotnetCoreVersion"]]["Linux"][os.uname().machine]
+    get_repository_dotnet_version()
+    return sources["dependencies"]["dotnet"][get_repository_dotnet_version()]["Linux"][os.uname().machine]
 
 
 def determine_valid_architecture():
