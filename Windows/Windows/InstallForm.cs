@@ -231,7 +231,7 @@ namespace installer
             WebClient webClient = new WebClient();
 
             // Remember the directory
-            string nssmDownloadLink = Program.SourcesInformation["windows"]["nssm"].ToString();
+            string nssmDownloadLink = Program.SourcesInformation["dependencies"]["nssm"].ToString();
             string[] brokenUrlStrings = nssmDownloadLink.Split('/');
             string zipName = brokenUrlStrings[brokenUrlStrings.Length - 1];
             nssmInstallPath = Path.Combine(Program.InstallLocation, zipName.Substring(0, zipName.Length - 4));
