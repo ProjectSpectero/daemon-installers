@@ -439,6 +439,7 @@ cat << EOF > "/tmp/spectero-installer.py"
 
 import json
 import os
+import platform
 import subprocess
 import sys
 import traceback
@@ -481,6 +482,21 @@ def exception_no_download_link():
 def exception_cannnot_read_popen(popen):
     print("Failed to read dotnet output")
     print(popen)
+    sys.exit(1)
+
+
+def exception_unsupported_os():
+    print("The python installer script is currently incompatible with this OS.")
+    print("Please file an issue with the following information:")
+    print("=" * 40)
+    print("sys.platform\t\t=\t%s" % sys.platform)
+    print("platform.architecture\t\t=>\t%s" % platform.architecture())
+    print("os.uname\t\t=>\t%s" % os.uname())
+    sys.exit(1)
+
+
+def exception_sysctl_add_fail():
+    print("There was an error adding a value to sysctl.conf")
     sys.exit(1)
 
 
@@ -675,7 +691,8 @@ def create_systemd_service():
     if config["service"] == "true":
         try:
             systemd_script_destination = "/etc/systemd/system/spectero.service"
-            systemd_script_template = "%s%s/daemon/Tooling/Linux/spectero.service" % (get_install_directory_from_config(), config["version"])
+            systemd_script_template = "%s%s/daemon/Tooling/Linux/spectero.service" % (
+                get_install_directory_from_config(), config["version"])
 
             # Open a reader to the template
             with open(systemd_script_template, 'r') as file:
@@ -732,23 +749,58 @@ def update_sudoers():
                 sudoers.write(template + "\n" + "spectero ALL=(ALL) NOPASSWD:SPECTERO_CMDS\n")
 
 
-def linux_enable_ipv4_forwarding():
-    # Define the propety of  what we need toc heck
-    property = "net.ipv4.ip_forward"
-    try:
-        # Try to execute
-        result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
+def sysctl_tweaks():
+    tweaks = {
+        "net.ipv4.tcp_fin_timeout": 10,
+        "net.ipv4.tcp_tw_reuse": 1,
+        "fs.file-max": 2097152,
+        "net.ipv4.ip_forward": 1
+    }
 
-        # Check if it is disabled
-        if result == "%s = 0" % property:
-            # Enable ip forwarding
-            print("Enabling IPv4 Forwarding")
-            os.system("""echo "%s = 1" >> /etc/sysctl.conf""" % property)
-            print("Reloading System Configuration Kernel Properties...")
-            os.system("sysctl --system > /dev/null 2>&1")  # Needs more aggressive suppression.
-    except:
-        print("There was a problem attempting to check for kernel flag: ipv4_forward.")
-        sys.exit(1)
+    for tweak in tweaks:
+        try:
+            sysctl_safe_add(tweak, tweaks[tweak])
+            print("sysctl value '%s' was added successfully." % tweak)
+        except:
+            exception_sysctl_add_fail()
+
+
+def sysctl_safe_add(property, value):
+    # Try to execute
+    result = (subprocess.check_output(["sysctl", property])[:-1]).decode("utf-8")
+
+    # Check if it is disabled, if so add.
+    if result == "%s = %s" % (property, value):
+        print("Appending '%s' to /etc/sysctl.conf with value '%s'..." % (property, value))
+        os.system("""echo "%s = %s" >> /etc/sysctl.conf""" % (property, value))
+
+
+def sysctl_reload():
+    print("Reloading sysctl configuration...")
+    os.system("sysctl --system > /dev/null 2>&1")  # Needs more aggressive suppression.
+
+
+def set_ulimit_spectero_user():
+    filepath = "/etc/security/limits.conf"
+
+    # String replacement.
+    with open(filepath, 'r') as file:
+        filedata = file.read()
+
+    # Strings
+    soft_limit = "spectero soft nofile 500000"
+    hard_limit = "spectero hard nofile 500000"
+
+    # Append Spectero specific limit.
+    if soft_limit not in filedata:
+        print("Setting soft file descriptor ulimit for specctero user...")
+        filedata += ("\n" + soft_limit)
+    if hard_limit not in filedata:
+        print("Setting hard file descriptor ulimit for specctero user...")
+        filedata += ("\n" + hard_limit)
+
+    with open(filepath, 'w') as file:
+        file.write(filedata)
 
 
 def create_shell_script():
@@ -780,32 +832,55 @@ def create_shell_script():
 def get_sources_information():
     global sources
     try:
-        request = urllib.request.Request('https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/SOURCES.json')
+        request = urllib.request.Request(
+            'https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/SOURCES.json')
         result = urllib.request.urlopen(request)
         sources = json.loads(result.read().decode('utf-8'))
     except:
-        request = urllib.request.Request('https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/development/SOURCES.json')
+        request = urllib.request.Request(
+            'https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/development/SOURCES.json')
         result = urllib.request.urlopen(request)
         sources = json.loads(result.read().decode('utf-8'))
 
 
 def get_dotnet_runtime_link():
-    global sources
-    return sources["linux"]["dotnet"]["x64"]
+    # use the machine unique string to find the download needed for dotnet core.
+    return sources["linux"]["dotnet"][os.uname().machine]
+
+
+def determine_valid_architecture():
+    if os.uname().machine not in ["armv7l", "x86_64"]:
+        exception_unsupported_os()
 
 
 if __name__ == "__main__":
+    determine_valid_architecture()
     read_config()
     get_download_channel_information()
     get_sources_information()
     validate_user_requests_against_releases()
     download_and_extract()
-    create_user()
+
+    # If the script is attempted to run in reverse compatibility, linux2 may be a valid value.
+    if sys.platform in ["linux"]:
+        create_user()
+        set_ulimit_spectero_user()
+
+    else:
+        exception_unsupported_os()
+
     fix_permissions()
-    update_sudoers()
+
+    if sys.platform in ["linux"]:
+        update_sudoers()
+
     create_latest_symlink()
-    linux_enable_ipv4_forwarding()
-    create_systemd_service()
+
+    if sys.platform in ["linux"]:
+        sysctl_tweaks()
+        sysctl_reload()
+        create_systemd_service()
+
     create_shell_script()
 
 EOF
