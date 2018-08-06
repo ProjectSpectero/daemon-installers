@@ -45,6 +45,10 @@ namespace installer
                 ]
             ["Windows"]["default"].ToString();
 
+        /// <summary>
+        /// Determine fi the installed version of dotnet core is compatable with the version specified.
+        /// </summary>
+        /// <returns></returns>
         public static bool IsVersionCompatable()
         {
             // Consult the local installation.

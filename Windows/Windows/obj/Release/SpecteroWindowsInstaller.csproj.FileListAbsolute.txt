@@ -13,3 +13,4 @@ C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Release\Spectero
 C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Release\SpecteroWindowsInstaller.csproj.CoreCompileInputs.cache
 C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Release\Spectero Installer.exe
 C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Release\Spectero Installer.pdb
+C:\Users\Ely\source\repos\daemon-installers\Windows\Windows\obj\Release\SpecteroWindowsInstaller.csprojAssemblyReference.cache
