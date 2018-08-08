@@ -816,7 +816,7 @@ def create_shell_script():
         print("Replacing variables in console management interface template...")
         filedata = filedata.replace("{dotnet path}", get_dotnet_core_path())
         filedata = filedata.replace("{spectero working directory}", get_install_directory_from_config())
-        filedata = filedata.replace("{version}", config["version"])
+        filedata = filedata.replace("{version}", "latest")
 
         with open(cli_script, 'w') as file:
             file.write(filedata)
