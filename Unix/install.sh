@@ -1059,6 +1059,7 @@ do
             ;;
         -ai|--install|-[Ii]nstall)
             INSTALL_PROMPT="false";
+            SYSTEMD_BLOCK="false";
             ;;
         -b|--branch|--[Br]ranch|-c|--channel|-[Cc]hannel)
             shift
