@@ -299,7 +299,10 @@ def create_systemd_service():
             print("Using systemctl to start spectero service.")
             os.system("systemctl start spectero")
             print("Getting service status... (You may have to press CTRL+C)")
-            os.system("systemctl status spectero")
+            if config["systemdblock"] == "true":
+                os.system("systemctl status spectero")
+            else :
+                os.system("systemctl --no-pager status spectero")
         except Exception as e:
             traceback.print_exc()
             print("The installer encountered a problem while configuring the systemd service.")

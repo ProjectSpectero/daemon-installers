@@ -22,7 +22,8 @@ BRANCH_VERSION="latest"
 TOS_PROMPT="true";
 INSTALL_PROMPT="true";
 OVERWRITE="true";
-SYMLINK="true"
+SYMLINK="true";
+SYSTEMD_BLOCK="TRUE";
 SERVICE="true";
 
 ##### ==========================
@@ -130,6 +131,8 @@ function PRINT_MAN_PAGE() {
 
     echo "  -nsds, --no-systemd     |   Disables symlinking for the 'latest' folder.";
     echo "                          |";
+
+    echo "  -nctl                   |   Prevents the systemd status screen from blocking invoking of functions."
 
     echo "  -nsl, --no-sl           |   Disables symlinking for the 'latest' folder.";
     echo "                          |";
@@ -413,6 +416,7 @@ function WORK_WRITE_CONFIG() {
     echo "version=$BRANCH_VERSION" >> /tmp/spectero.installconfig;
     echo "service=$SERVICE" >> /tmp/spectero.installconfig;
     echo "symlink=$SYMLINK" >> /tmp/spectero.installconfig;
+    echo "systemdblock=$SYSTEMD_BLOCK" >> /tmp/spectero.installconfig;
 }
 
 function WORK_INSTALL_SPECTERO() {
@@ -718,7 +722,10 @@ def create_systemd_service():
             print("Using systemctl to start spectero service.")
             os.system("systemctl start spectero")
             print("Getting service status... (You may have to press CTRL+C)")
-            os.system("systemctl status spectero")
+            if config["systemdblock"] == "true":
+                os.system("systemctl status spectero")
+            else :
+                os.system("systemctl --no-pager status spectero")
         except Exception as e:
             traceback.print_exc()
             print("The installer encountered a problem while configuring the systemd service.")
@@ -1070,6 +1077,9 @@ do
             ;;
         -nsds|--no-systemd|-[Nn]o[Ss]ystemd)
             SERVICE="false";
+            ;;
+        -nctl|--sysctl-nonblock)
+            SYSTEMD_BLOCK="false";
             ;;
         -u|--uninstall|-[Uu]ninstall)
             WORK_UNINSTALL;
