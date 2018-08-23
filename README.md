@@ -4,37 +4,32 @@ Each directory in this repository is for a designated operating system.
 
 ## Quick Install
 Windows:  
-[Click here to download executable](https://github.com/ProjectSpectero/daemon-installers/blob/master/Windows/Windows/bin/Debug/Spectero%20Installer.exe?raw=true)
+[Click here to download executable](https://c.spectero.com/installers/spectero-win-installer-signed.exe)
 
-Linux, MacOS:
+Linux and MacOS:
 ```bash
-wget -O - https://raw.githubusercontent.com/ProjectSpectero/daemon-installers/master/Unix/install.sh | sudo bash
+wget https://c.spectero.com/installers/spectero-unix-installer.sh -O install.sh
+bash install.sh
 ```
+
+**Note: MacOS Support is current experimental and may not work.**
 
 ## License
 ```
-Spectero, Inc
-Copyright (c) 2018 - All Rights Reserved
-https://spectero.com
+Spectero Daemon - Daemon Component to the Spectero Solution
+Copyright (C)  2017 Spectero, Inc.
 
-INTRODUCTION:
-This license serves to establish what the end user cannot
-and can do with the scripts in this repository.
+Spectero Daemon is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-USE AND DISTRIBUTION:
-The installation scripts provided with this repostory
-are able to be freely distributed among private entities
-and personal use to allow easy installation and distribution
-of the software provided by Spectero.
-
-MODIFICATION:
-The end user is free to modify the `install.sh` to fit their needs
-for deployment purposes only.
-
-WARRANTY:
-This software and dependencies are installed under the discression
-of the end user and is provided without warranty at the end user's
-own risk.
+Spectero Daemon is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://github.com/ProjectSpectero/daemon/blob/master/LICENSE>.
 ```
 
 A copy of this license exists in `license.md`.
