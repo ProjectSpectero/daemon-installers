@@ -153,6 +153,9 @@ namespace installer
             var winins = new WindowsInstaller();
             if (winins.Exists()) winins.CreateEntry(_installerPath);
 
+            // Install OpenVPN.
+            InstallOpenVPN();
+
             // Set markers in registry
             CreateRegistryEntry();
 
@@ -562,6 +565,73 @@ namespace installer
                 {
                     throw new Exception("An error occurred writing information to the registry.", ex);
                 }
+            }
+        }
+
+        public void InstallOpenVPN()
+        {
+            try
+            {
+                // Thread signal.
+                bool complete = false;
+
+                // Webclient
+                WebClient webClient = new WebClient();
+
+                // Get the download link.
+                string openvpnDownloadLink = Program.SourcesInformation["dependencies"]["openvpn"].ToString();
+                string[] brokenUrlStrings = openvpnDownloadLink.Split('/');
+                string openvpnInstallerFilename = brokenUrlStrings[brokenUrlStrings.Length - 1];
+                var openvpnDownloadPath = Path.Combine(Program.InstallLocation, openvpnInstallerFilename);
+
+                // Tell the user what's going to happen
+                EasyLog(string.Format("Downloading {0} from {1}",
+                    openvpnInstallerFilename,
+                    openvpnDownloadLink
+                ));
+
+                // Start the stopwatch.
+                _timeStarted = DateTime.Now;
+
+                // Download Percent Changed Event - Update the progress bar
+                webClient.DownloadProgressChanged += (senderChild, eChild) =>
+                {
+                    OverallProgress.Maximum = int.Parse(eChild.TotalBytesToReceive.ToString());
+                    OverallProgress.Value = int.Parse(eChild.BytesReceived.ToString());
+                    ProgressText.Text = string.Format("Downloaded {0}/{1} MiB @ {2} KiB/s",
+                        Math.Round(eChild.BytesReceived / Math.Pow(1024, 2), 2),
+                        Math.Round(eChild.TotalBytesToReceive / Math.Pow(1024, 2), 2),
+                        Math.Round(eChild.BytesReceived / (DateTime.Now - _timeStarted).TotalSeconds / Math.Pow(1024, 1), 2
+                        )
+                    );
+                };
+
+                // Download Complete Event
+                webClient.DownloadFileCompleted += (senderChild, eChild) =>
+                {
+                    // Tell the user where the file was saved.
+                    EasyLog(string.Format("{0} was saved to {1}", openvpnInstallerFilename, openvpnDownloadPath));
+
+                    // TODO: INSTALL SILENTLY
+                    EasyLog("Installing OpenVPN + Tun/Tap Driver...");
+                    var openvpnInstaller = Process.Start(openvpnDownloadPath, "/S /SELECT_TAP=1");
+                    openvpnInstaller.WaitForExit();
+
+                    // Change the thread signal.
+                    complete = true;
+                };
+
+                // Download the file asyncronously.
+                webClient.DownloadFileAsync(new Uri(openvpnDownloadLink), openvpnDownloadPath);
+
+                while (webClient.IsBusy || !complete)
+                {
+                    Thread.Sleep(1);
+                }
+
+            } catch (Exception exception)
+            {
+                throw new Exception("An error occured while attempting to install OpenVPN into the system.", exception);
             }
         }
     }
