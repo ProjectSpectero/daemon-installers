@@ -183,6 +183,7 @@
             this.UninstallArea.Size = new System.Drawing.Size(414, 71);
             this.UninstallArea.TabIndex = 27;
             this.UninstallArea.Click += new System.EventHandler(this.UninstallArea_Click);
+
             // 
             // label5
             // 
