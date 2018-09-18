@@ -21,7 +21,7 @@
         }
       }
     },
-    "nssm": "https://nssm.cc/release/nssm-2.24.zip",
+    "nssm": "https://c.spectero.com/nssm/nssm-2.24.zip",
     "openvpn": "https://swupdate.openvpn.org/community/releases/openvpn-install-2.4.6-I602.exe"
   }
 }
