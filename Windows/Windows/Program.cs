@@ -172,7 +172,7 @@ namespace Windows
         {
             if (CommandLineArgumentExists("--uninstall"))
             {
-                DialogResult dialogResult = MessageBox.Show("Do you want to unisntall the Spectero Daemon?", "Spectero Installer", MessageBoxButtons.YesNo);
+                DialogResult dialogResult = MessageBox.Show("Do you want to uninstall the Spectero Daemon?", "Spectero Installer", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes) new Uninstaller();
                 Environment.Exit(0);
             }

@@ -614,7 +614,7 @@ namespace installer
 
                     // TODO: INSTALL SILENTLY
                     EasyLog("Installing OpenVPN + Tun/Tap Driver...");
-                    var openvpnInstaller = Process.Start(openvpnDownloadPath, "/S /SELECT_TAP=1");
+                    var openvpnInstaller = Process.Start(openvpnDownloadPath, "/S /SELECT_TAP=1 /SELECT_OPENVPNGUI=0 /SELECT_ASSOCIATIONS=0 /SELECT_SERVICE=0 /SELECT_SHORTCUTS=0");
                     openvpnInstaller.WaitForExit();
 
                     // Change the thread signal.
