@@ -154,7 +154,7 @@ namespace installer
             if (winins.Exists()) winins.CreateEntry(_installerPath);
 
             // Install OpenVPN.
-            InstallOpenVPN();
+            if (!IsOpenVPNInstalled()) InstallOpenVPN();
 
             // Set markers in registry
             CreateRegistryEntry();
@@ -568,6 +568,13 @@ namespace installer
             }
         }
 
+        public bool IsOpenVPNInstalled()
+        {
+            var paths = new[] { "C:/Program Files/OpenVPN/bin/openvpn.exe", "C:/Program Files (x86)/OpenVPN/bin/openvpn.exe" };
+            foreach (string path in paths) if (File.Exists(path)) return true;
+            return false;
+        }
+
         public void InstallOpenVPN()
         {
             try
@@ -614,7 +621,7 @@ namespace installer
 
                     // TODO: INSTALL SILENTLY
                     EasyLog("Installing OpenVPN + Tun/Tap Driver...");
-                    var openvpnInstaller = Process.Start(openvpnDownloadPath, "/S /SELECT_TAP=1");
+                    var openvpnInstaller = Process.Start(openvpnDownloadPath, "/S /SELECT_TAP=1 /SELECT_OPENVPNGUI=0 /SELECT_ASSOCIATIONS=0 /SELECT_SERVICE=0 /SELECT_SHORTCUTS=0");
                     openvpnInstaller.WaitForExit();
 
                     // Change the thread signal.
