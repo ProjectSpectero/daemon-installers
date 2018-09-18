@@ -154,7 +154,7 @@ namespace installer
             if (winins.Exists()) winins.CreateEntry(_installerPath);
 
             // Install OpenVPN.
-            if (!IsOpenVPNInstalled()) InstallOpenVPN();
+            InstallOpenVPN();
 
             // Set markers in registry
             CreateRegistryEntry();
@@ -566,13 +566,6 @@ namespace installer
                     throw new Exception("An error occurred writing information to the registry.", ex);
                 }
             }
-        }
-
-        public bool IsOpenVPNInstalled()
-        {
-            var paths = new[] { "C:/Program Files/OpenVPN/bin/openvpn.exe", "C:/Program Files (x86)/OpenVPN/bin/openvpn.exe" };
-            foreach (string path in paths) if (File.Exists(path)) return true;
-            return false;
         }
 
         public void InstallOpenVPN()
